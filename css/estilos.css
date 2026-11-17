@@ -132,3 +132,91 @@ select, input[type="number"] {
 .rejilla-a3 { margin: 12px 0; }
 .rejilla-a3 ol, .rejilla-a3 ul { padding-left: 18px; margin: 4px 0; }
 .titulo-seccion { font-size: 0.8rem; color: var(--texto-suave); margin: 0 0 6px; }
+
+/* ---- Animación de la cola ---- */
+.anim-controles { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 10px; }
+.anim-vel { font-size: 0.82rem; color: var(--texto-suave); display: flex; gap: 6px; align-items: center; }
+.anim-reloj { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--primario); min-width: 80px; }
+.anim-barra { flex: 1; min-width: 180px; accent-color: var(--primario); }
+.anim-fila { border: 1px solid var(--borde); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; background: #fff; }
+.anim-titulo { font-weight: 600; font-size: 0.88rem; margin-bottom: 4px; }
+.anim-svg { width: 100%; height: auto; display: block; }
+.anim-datos { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.8rem; color: var(--texto); }
+.anim-etq { font-size: 11px; fill: var(--texto-suave); }
+.anim-etq.peor { fill: var(--alerta); }
+.anim-etq.mejor { fill: var(--ok); }
+.anim-etq.centro { text-anchor: middle; }
+.anim-etq.blanco { fill: #fff; font-weight: 600; }
+.anim-etq.fuerte { font-weight: 700; font-size: 12px; }
+.via-publica { fill: #f6dcd9; }
+.via-acceso { fill: #dfe5ea; }
+.garita { fill: var(--aviso); }
+.terminal { fill: var(--primario); }
+.pre-est { fill: #e3f2e9; stroke: var(--ok); stroke-dasharray: 5 4; }
+.camion { opacity: 0; transition: opacity 0.25s; }
+.camion.visible { opacity: 1; }
+.camion.en-acceso rect { fill: var(--primario); }
+.camion.en-publica rect { fill: var(--alerta); }
+.camion.en-pre rect { fill: var(--ok); }
+
+/* ---- Mapa ---- */
+.mapa { height: 380px; border-radius: 8px; border: 1px solid var(--borde); background: #dfe7ec; }
+.mapa-rejilla { grid-template-columns: 1fr 1.6fr; }
+@media (max-width: 800px) { .mapa-rejilla { grid-template-columns: 1fr; } }
+.mapa-texto p { font-size: 0.9rem; line-height: 1.45; }
+.pin { width: 18px; height: 18px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.35); }
+.pin-terminal { background: var(--primario); }
+.pin-garita { background: var(--aviso); }
+.pin-puente { background: var(--alerta); }
+.pin-preest { background: var(--ok); }
+.etq-mapa { font-size: 11px; font-weight: 600; }
+
+/* ---- Modo presentación ---- */
+.boton-presentar { background: #ffd166; color: #3d2e00; border: 0; border-radius: 6px; padding: 6px 12px; font-weight: 700; cursor: pointer; }
+.presentacion { display: none; position: fixed; inset: 0; z-index: 2000; background: #fff; overflow: auto; }
+body.presentando { overflow: hidden; }
+body.presentando .presentacion { display: block; }
+.pres-barra { position: sticky; top: 0; z-index: 2; display: flex; gap: 8px; align-items: center; justify-content: flex-end;
+  padding: 8px 16px; background: var(--fondo); border-bottom: 1px solid var(--borde); font-size: 0.85rem; flex-wrap: wrap; }
+#pres-contador { margin-right: auto; color: var(--texto-suave); }
+#pres-reloj { font-variant-numeric: tabular-nums; font-weight: 700; }
+.pres-progreso { height: 4px; background: var(--borde); }
+#pres-progreso-barra { height: 100%; background: var(--primario); transition: width .3s; }
+.diapositiva { max-width: 1150px; margin: 0 auto; padding: 28px 32px 16px; min-height: calc(100vh - 70px); display: flex; flex-direction: column; }
+.diapositiva h2 { font-size: 1.9rem; color: var(--primario); margin: 0 0 18px; }
+.diapositiva h1 { font-size: 3.4rem; color: var(--primario); margin: 8px 0; }
+.pres-pie { margin-top: auto; padding-top: 16px; font-size: 0.75rem; color: var(--texto-suave); text-align: right; }
+.pres-portada { margin: auto 0; text-align: center; }
+.pres-etiqueta { color: var(--texto-suave); font-size: 0.95rem; }
+.pres-sub { font-size: 1.4rem; }
+.pres-equipo { font-size: 1.05rem; color: var(--texto-suave); }
+.pres-lead { font-size: 1.25rem; line-height: 1.5; }
+.pres-numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 24px 0; }
+.pres-numeros > div { border: 1px solid var(--borde); border-radius: 10px; padding: 18px; font-size: 1rem; }
+.pres-numeros span { display: block; font-size: 2.8rem; font-weight: 800; }
+.pres-dos { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: center; }
+@media (max-width: 800px) { .pres-dos { grid-template-columns: 1fr; } .diapositiva { padding: 20px 16px; } .diapositiva h1 { font-size: 2.4rem; } }
+.pres-lista li { font-size: 1.2rem; margin-bottom: 12px; line-height: 1.4; }
+.pres-grafico { position: relative; height: 340px; min-width: 0; }
+.pres-tabla { border-collapse: collapse; width: 100%; font-size: 1rem; }
+.pres-tabla th, .pres-tabla td { border-bottom: 1px solid var(--borde); padding: 8px 10px; text-align: left; }
+.pres-tabla th { background: var(--primario-claro); }
+.pres-caja { background: var(--primario-claro); border-radius: 10px; padding: 18px; font-size: 1.1rem; line-height: 1.7; }
+.pres-palancas { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.pres-palancas > div { border: 1px solid var(--borde); border-top: 5px solid var(--ok); border-radius: 10px; padding: 16px; }
+.pres-palancas h3 { margin: 6px 0; color: var(--primario); }
+.pres-palancas p { font-size: 1.02rem; }
+.pres-icono { font-size: 2.2rem; }
+.pres-botones { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 20px; }
+.pres-botones .boton { font-size: 1rem; padding: 10px 16px; }
+
+/* Imprimir / PDF: todas las diapositivas, una por página horizontal */
+@media print {
+  @page { size: A4 landscape; margin: 8mm; }
+  body.imprimiendo { overflow: visible !important; }
+  body.imprimiendo > *:not(.presentacion) { display: none !important; }
+  body.imprimiendo .presentacion { display: block; position: static; overflow: visible; }
+  body.imprimiendo .pres-barra, body.imprimiendo .pres-progreso, body.imprimiendo .anim-controles { display: none; }
+  body.imprimiendo .diapositiva { min-height: 0; height: 180mm; page-break-after: always; break-after: page; padding: 10px 20px; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

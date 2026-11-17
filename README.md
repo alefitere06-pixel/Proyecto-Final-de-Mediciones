@@ -34,14 +34,29 @@ varias horas de desborde, mientras que los días sin buque la garita casi siempr
 
 El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 
+## Lo más fácil de ver (para la defensa)
+- **Pestaña 1 · Mapa y cola en vivo:** mapa real del Puerto de Balboa (OpenStreetMap, necesita internet) con la
+  garita, el Puente de las Américas y el pre-estacionamiento propuesto, y una **animación** con un camioncito por
+  cada camión en cola: arriba la situación actual (los camiones salen a la vía pública en rojo), abajo con
+  Gate Inteligente. Botón ▶ para reproducir el día completo.
+- **Botón ▶ Presentación** (arriba): diapositivas a pantalla completa para los 15 minutos de exposición, con los
+  números calculados en vivo, la animación antes/después, un reloj y botones para ir a la demo de cada módulo.
+  Teclas → ← y Esc. "Guardar PDF" imprime todas las diapositivas: copia en
+  [`presentacion/presentacion_gate_balboa.pdf`](presentacion/presentacion_gate_balboa.pdf).
+
+> Los puntos del mapa son **aproximados**: arrástrenlos a su lugar exacto, hagan clic para ver las coordenadas
+> y cópienlas en `PUNTOS_MAPA` (`js/modulos/mapa.js`).
+
 ## Cómo abrir el dashboard
 1. Descargar o clonar el repositorio.
 2. Abrir **`index.html` con doble clic** (Chrome o Edge). No hace falta instalar nada ni servidor:
-   Chart.js está guardado en `js/lib/` y los datos en `data/llegadas.js`.
+   Chart.js y Leaflet están guardados en `js/lib/` y los datos en `data/llegadas.js`.
+   Solo el fondo del mapa necesita internet; todo lo demás funciona sin conexión.
 
 ## Módulos
 | # | Módulo | Qué muestra |
 |---|---|---|
+| 0 | Mapa y cola en vivo | Mapa del Puerto de Balboa + animación de la cola sin y con la propuesta |
 | 1 | Llegadas | Perfil de llegadas por hora y día, horas pico, filtro por transacción |
 | 2 | Simulador de cola | Carriles, servicio y llegadas → Lq, Wq, ρ y horas con desborde |
 | 3 | Truck Turn Time | Desglose del TTT por etapa y por hora |

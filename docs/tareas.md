@@ -55,6 +55,14 @@ Flujo: rama `mejora-<tema>` → commits pequeños → Pull Request → el **otro
 | [ ] | ρ pico sigue en ~93 % con la propuesta: ¿abrir el 6.º carril en hora pico de días de buque? (probar en módulo 2) | |
 | [ ] | Costo-beneficio de la propuesta (opcional) | |
 
+## Mapa, animación y presentación
+| Hecho | Tarea | Tomada por |
+|---|---|---|
+| [x] | Mapa del Puerto de Balboa, animación de la cola y modo presentación | Claude (rama `mejora-mapa-animacion-presentacion`) |
+| [ ] | Verificar en el mapa la ubicación real de la garita y elegir dónde iría el pre-estacionamiento | |
+| [ ] | Ensayar la presentación con el reloj (15 min) y repartir qué diapositiva explica cada uno | |
+| [ ] | Volver a exportar el PDF si cambian los supuestos (botón Guardar PDF) | |
+
 ## Tareas generales
 | Hecho | Tarea | Tomada por |
 |---|---|---|
@@ -64,5 +72,5 @@ Flujo: rama `mejora-<tema>` → commits pequeños → Pull Request → el **otro
 | [ ] | Completar y revisar las fichas de KPI (`docs/fichas_kpi.md`) | |
 | [ ] | Verificar a mano 3 KPI (`docs/verificacion_manual.md`) | |
 | [ ] | Registrar prompts en la bitácora (`docs/bitacora_ia.md`) — cada uno los suyos | |
-| [ ] | Diapositivas en PDF (`presentacion/`) | |
+| [x] | Diapositivas en PDF (`presentacion/`) | Claude (modo presentación) |
 | [ ] | Opcional (+2): publicar con GitHub Pages | |

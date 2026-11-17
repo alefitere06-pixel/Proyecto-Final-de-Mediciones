@@ -88,7 +88,7 @@ MODULOS.push({
   render(contenedor, estado) {
     const m = MEJORA_ESTADO;
     contenedor.innerHTML = `
-      <h2>5 · Propuesta de mejora · A3 "Gate Inteligente"</h2>
+      <h2>Propuesta de mejora · A3 "Gate Inteligente"</h2>
       <div class="controles-fila">
         <label>Analizar
           <select id="mej-alcance">

@@ -171,3 +171,10 @@ function simularPeriodo(dias, esc) {
 
 function diasConBuque() { return DATOS.dias.filter((d) => d.dia_buque).map((d) => d.dia); }
 function todosLosDias() { return DATOS.dias.map((d) => d.dia); }
+
+// Escenario de la propuesta completa (3 palancas). Si el módulo 5 está cargado,
+// usa sus parámetros (pre-estacionamiento, % doble transacción) y los del TAS del módulo 4.
+function escPropuesta() {
+  if (typeof escPalancas === "function") return escPalancas({ tas: true, colaVirtual: true, doble: true });
+  return escenario({ tas: { activo: true }, colaVirtual: { activo: true }, doble: { activo: true } });
+}

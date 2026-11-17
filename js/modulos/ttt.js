@@ -35,7 +35,7 @@ function desgloseTTTPeriodo(dias, esc) {
   return { etapas, ttt: etapas.reduce((a, b) => a + b, 0) };
 }
 
-const ESC_PROPUESTA = () => escenario({ tas: { activo: true }, colaVirtual: { activo: true }, doble: { activo: true } });
+const ESC_PROPUESTA = () => escPropuesta();
 
 MODULOS.push({
   id: "ttt",
@@ -58,7 +58,7 @@ MODULOS.push({
       <td class="${p.ttt <= M.ttt_min ? "mejor" : "peor"}">${fmt(p.ttt, 1)}</td></tr>`;
 
     contenedor.innerHTML = `
-      <h2>3 · Truck Turn Time (TTT)</h2>
+      <h2>Truck Turn Time (TTT)</h2>
       <label class="check"><input type="checkbox" id="ttt-propuesta" ${TTT_ESTADO.verPropuesta ? "checked" : ""}>
         Ver con la propuesta Gate Inteligente (3 palancas activas)</label>
       ${htmlTarjetas([

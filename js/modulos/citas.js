@@ -29,7 +29,7 @@ MODULOS.push({
   render(contenedor, estado) {
     const c = CITAS_ESTADO;
     contenedor.innerHTML = `
-      <h2>4 · Sistema de citas (TAS) · clásico vs dinámico</h2>
+      <h2>Sistema de citas (TAS) · clásico vs dinámico</h2>
       <div class="rejilla-2">
         <div class="panel-control">
           <h3>Supuestos del TAS</h3>

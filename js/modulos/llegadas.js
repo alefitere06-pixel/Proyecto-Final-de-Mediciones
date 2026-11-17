@@ -79,7 +79,7 @@ MODULOS.push({
       registros.reduce((s, r) => s + r[t], 0));
 
     contenedor.innerHTML = `
-      <h2>1 · Llegadas de camiones (λ)</h2>
+      <h2>Llegadas de camiones (λ)</h2>
       <div class="controles-fila">
         <label>Tipo de transacción
           <select id="lleg-transaccion">

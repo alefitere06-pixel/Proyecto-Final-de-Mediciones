@@ -36,7 +36,7 @@ MODULOS.push({
     const serv = SIM_ESTADO.servicioMin ?? Math.round(servReal * 10) / 10;
 
     contenedor.innerHTML = `
-      <h2>2 · Simulador de cola</h2>
+      <h2>Simulador de cola</h2>
       <div class="rejilla-2">
         <div class="panel-control">
           <h3>Escenario (controles)</h3>

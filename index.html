@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gate Balboa · Dashboard de cola y citas</title>
+  <link rel="stylesheet" href="css/leaflet.css" />
   <link rel="stylesheet" href="css/estilos.css" />
 </head>
 <body>
@@ -38,15 +39,19 @@
 
   <!-- Orden de carga: librería → datos → fórmulas → módulos → app -->
   <script src="js/lib/chart.umd.js"></script>
+  <script src="js/lib/leaflet.js"></script>
   <script src="data/llegadas.js"></script>
   <script src="js/kpi.js"></script>
   <script src="js/escenarios.js"></script>
+  <script src="js/animacion.js"></script>
   <script>const MODULOS = [];</script>
   <script src="js/modulos/llegadas.js"></script>
   <script src="js/modulos/simulador.js"></script>
   <script src="js/modulos/ttt.js"></script>
   <script src="js/modulos/citas.js"></script>
   <script src="js/modulos/mejora.js"></script>
+  <script src="js/modulos/mapa.js"></script>
+  <script src="js/presentacion.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

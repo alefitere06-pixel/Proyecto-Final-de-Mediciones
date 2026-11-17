@@ -99,6 +99,8 @@ function activarModulo(id) {
 function pintarModulo() {
   const m = MODULOS.find((x) => x.id === ESTADO.moduloActivo);
   const contenedor = document.getElementById("contenido-modulo");
+  // Detener animaciones de la pestaña anterior (no las de la presentación)
+  Object.entries(ANIMACIONES).forEach(([k, a]) => { if (k !== "anim-pres") a.detener(); });
   contenedor.innerHTML = "";
   m.render(contenedor, ESTADO);
 }
