@@ -77,6 +77,13 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 | 4 | Citas (TAS) | TAS dinámico: franjas, sin TAS vs con TAS, cumplimiento y no-show |
 | 5 | Mejora | A3 Lean y gráfico cascada de las 3 palancas |
 
+### Aporte de `tejadaoperaciones-star`: plan de ventanilla adicional
+El Módulo 2 permite activar una **ventanilla adicional únicamente en horas pico**
+(07:00–11:00 y 15:00–19:00), sin superar las 6 instaladas. El tablero compara antes/después
+para espera promedio, fila máxima, horas de desborde y utilización pico. Si la medida no alcanza
+la meta de ρ ≤ 85 %, recomienda combinarla con TAS, pre-registro o una reducción del tiempo de atención.
+El cambio modifica solo la capacidad de entrada por hora; conserva las fórmulas KPI del curso.
+
 ## Datos simulados
 Se generan con `python data/generar_datos.py` (Python 3, sin librerías extra). Usa **semilla fija (42)**:
 si se ejecuta otra vez se obtienen exactamente los mismos datos. Produce `data/llegadas.json` y

@@ -52,7 +52,7 @@ Flujo: rama `mejora-<tema>` → commits pequeños → Pull Request → el **otro
 |---|---|---|
 | [ ] | Revisar cada número del dashboard y anotar lo que no se entienda | |
 | [ ] | Discutir si los supuestos de la propuesta (70 % citas, ±2 h, 60 camiones de pre-estacionamiento) son razonables | |
-| [ ] | ρ pico sigue en ~93 % con la propuesta: ¿abrir el 6.º carril en hora pico de días de buque? (probar en módulo 2) | |
+| [x] | ρ pico sigue en ~93 % con la propuesta: probar una ventanilla adicional solo en horas pico y mostrar su impacto antes/después | tejadaoperaciones-star (rama `codex/tejada-simulador-cola`) |
 | [ ] | Costo-beneficio de la propuesta (opcional) | |
 
 ## Mapa, animación y presentación

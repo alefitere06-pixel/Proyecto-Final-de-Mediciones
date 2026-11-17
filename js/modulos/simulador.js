@@ -10,6 +10,7 @@
 
 const SIM_ESTADO = {
   carriles: 5,
+  carrilExtraPico: false,
   servicioMin: null,   // null = el promedio real del día (no se toca)
   extraPicoPct: 0,
   capacidadVia: 40,
@@ -45,6 +46,11 @@ MODULOS.push({
           ${htmlSlider("sim-servicio", "Minutos para revisar cada camión", 2, 6, 0.1, serv, " min")}
           ${htmlSlider("sim-pico", "Camiones extra en horas de más tráfico", 0, 50, 5, SIM_ESTADO.extraPicoPct, " %")}
           ${htmlSlider("sim-via", "Camiones que caben en el carril de espera", 20, 80, 5, SIM_ESTADO.capacidadVia, " camiones")}
+          <label class="check destacada">
+            <input type="checkbox" id="sim-carril-extra" ${SIM_ESTADO.carrilExtraPico ? "checked" : ""}>
+            Abrir una ventanilla adicional solo en horas pico
+          </label>
+          <p class="suave nota">Horario del plan: 07:00–11:00 y 15:00–19:00. Nunca supera las 6 ventanillas instaladas.</p>
           <button id="sim-reset" class="boton">Volver a como está hoy</button>
           <p class="suave nota">Hoy: 5 ventanillas abiertas, cada camión tarda unos
           ${fmt(servReal, 1)} min en la puerta y caben 40 camiones en el carril de espera.</p>
@@ -54,6 +60,7 @@ MODULOS.push({
           <div class="contenedor-grafico"><canvas id="graf-sim-cola"></canvas></div>
         </div>
       </div>
+      <section id="sim-plan-pico" class="plan-operativo" aria-live="polite"></section>
       <div id="sim-respuesta" class="respuesta"></div>
       <details class="mas"><summary>Ver más: llegadas vs lo que puede atender, y la tabla hora por hora</summary>
       <h3>Camiones que llegan vs camiones que la puerta puede atender</h3>
@@ -68,8 +75,14 @@ MODULOS.push({
     conectarSlider(contenedor, "sim-servicio", (v) => { SIM_ESTADO.servicioMin = v; actualizar(); });
     conectarSlider(contenedor, "sim-pico", (v) => { SIM_ESTADO.extraPicoPct = v; actualizar(); });
     conectarSlider(contenedor, "sim-via", (v) => { SIM_ESTADO.capacidadVia = v; actualizar(); });
+    contenedor.querySelector("#sim-carril-extra").addEventListener("change", (e) => {
+      SIM_ESTADO.carrilExtraPico = e.target.checked;
+      actualizar();
+    });
     contenedor.querySelector("#sim-reset").addEventListener("click", () => {
-      Object.assign(SIM_ESTADO, { carriles: 5, servicioMin: null, extraPicoPct: 0, capacidadVia: 40 });
+      Object.assign(SIM_ESTADO, {
+        carriles: 5, carrilExtraPico: false, servicioMin: null, extraPicoPct: 0, capacidadVia: 40,
+      });
       this.render(contenedor, estado);
     });
     actualizar();
@@ -79,11 +92,28 @@ MODULOS.push({
     const M = KPI.METAS;
     const esc = escenario({
       carriles: SIM_ESTADO.carriles,
+      carrilExtraPico: SIM_ESTADO.carrilExtraPico,
       servicioMin: SIM_ESTADO.servicioMin,
       extraPicoPct: SIM_ESTADO.extraPicoPct,
       capacidadVia: SIM_ESTADO.capacidadVia,
     });
     const k = simularDia(estado.dia, esc);
+    const escSinExtra = escenario({
+      carriles: SIM_ESTADO.carriles,
+      carrilExtraPico: false,
+      servicioMin: SIM_ESTADO.servicioMin,
+      extraPicoPct: SIM_ESTADO.extraPicoPct,
+      capacidadVia: SIM_ESTADO.capacidadVia,
+    });
+    const escConExtra = escenario({
+      carriles: SIM_ESTADO.carriles,
+      carrilExtraPico: true,
+      servicioMin: SIM_ESTADO.servicioMin,
+      extraPicoPct: SIM_ESTADO.extraPicoPct,
+      capacidadVia: SIM_ESTADO.capacidadVia,
+    });
+    const kSinExtra = simularDia(estado.dia, escSinExtra);
+    const kConExtra = simularDia(estado.dia, escConExtra);
     const capVia = SIM_ESTADO.capacidadVia;
     const horas = Array.from({ length: 19 }, (_, i) => i + 4); // 04:00 a 22:00
 
@@ -96,6 +126,38 @@ MODULOS.push({
       { nombre: "Horas con fila en la calle", ayuda: "desborde", valor: fmt(k.horasDesborde) + " h", meta: "ideal: 0", cumple: k.horasDesborde <= M.desborde_h },
       { nombre: "Camiones en la calle", ayuda: "calle", valor: fmt(k.viaPublicaMax), meta: "máximo · ideal: 0", cumple: k.viaPublicaMax <= 0 },
     ]).replace('class="tarjetas"', 'class="tarjetas compactas"');
+
+    // --- Aporte del integrante: plan operativo de ventanilla extra en horas pico ---
+    const ahorroEspera = Math.max(0, kSinExtra.wqPromedio - kConExtra.wqPromedio);
+    const reduccionCola = Math.max(0, kSinExtra.lqMax - kConExtra.lqMax);
+    const reduccionDesborde = Math.max(0, kSinExtra.horasDesborde - kConExtra.horasDesborde);
+    const yaEnMaximo = SIM_ESTADO.carriles >= 6;
+    const planSuficiente = kConExtra.rhoPico <= M.rho_pct && kConExtra.horasDesborde <= M.desborde_h;
+    contenedor.querySelector("#sim-plan-pico").innerHTML = `
+      <div class="plan-encabezado">
+        <div>
+          <span class="plan-etiqueta">APORTE DE TEJADAOPERACIONES-STAR</span>
+          <h3>Plan operativo: ventanilla adicional en horas pico</h3>
+          <p>Compara el mismo día con ${SIM_ESTADO.carriles} ventanillas todo el tiempo contra abrir
+          ${Math.min(6, SIM_ESTADO.carriles + 1)} durante 07:00–11:00 y 15:00–19:00.</p>
+        </div>
+        <span class="plan-estado ${SIM_ESTADO.carrilExtraPico ? "activo" : ""}">
+          ${SIM_ESTADO.carrilExtraPico ? "Plan aplicado" : "Comparación disponible"}
+        </span>
+      </div>
+      <div class="comparacion-plan">
+        <div><span>Espera promedio</span><strong>${fmt(kSinExtra.wqPromedio)} → ${fmt(kConExtra.wqPromedio)} min</strong><small>−${fmt(ahorroEspera)} min</small></div>
+        <div><span>Fila máxima</span><strong>${fmt(kSinExtra.lqMax)} → ${fmt(kConExtra.lqMax)}</strong><small>−${fmt(reduccionCola)} camiones</small></div>
+        <div><span>Horas en la calle</span><strong>${fmt(kSinExtra.horasDesborde)} → ${fmt(kConExtra.horasDesborde)} h</strong><small>−${fmt(reduccionDesborde)} h</small></div>
+        <div><span>Ocupación pico</span><strong>${fmt(kSinExtra.rhoPico)} → ${fmt(kConExtra.rhoPico)} %</strong><small>meta ≤ ${M.rho_pct} %</small></div>
+      </div>
+      <p class="decision-plan ${planSuficiente ? "suficiente" : "complementar"}">
+        ${yaEnMaximo
+          ? "Ya seleccionaste las 6 ventanillas instaladas; el plan no puede agregar otra."
+          : planSuficiente
+            ? "Para este día, la ventanilla adicional es suficiente para cumplir ocupación y eliminar el desborde."
+            : "La ventanilla adicional ayuda, pero no resuelve todo: debe combinarse con TAS, pre-registro o menor tiempo de atención."}
+      </p>`;
 
     // --- Gráfico de cola ---
     crearGrafico("graf-sim-cola", {
@@ -132,13 +194,13 @@ MODULOS.push({
     const filas = horas.map((h) => {
       const desb = k.colas[h] > capVia;
       return `<tr class="${desb ? "desborde" : ""}">
-        <td>${horaTexto(h)}</td><td>${fmt(k.llegadas[h])}</td><td>${fmt(k.capacidades[h], 1)}</td>
+        <td>${horaTexto(h)}</td><td>${fmt(k.carrilesPorHora[h])}</td><td>${fmt(k.llegadas[h])}</td><td>${fmt(k.capacidades[h], 1)}</td>
         <td>${k.capacidades[h] > 0 ? fmt(k.rho[h]) + " %" : "cerrada"}</td>
         <td>${fmt(k.colas[h], 1)}</td><td>${fmt(k.esperas[h], 1)}</td>
         <td>${fmt(KPI.camionesEnViaPublica(k.colas[h], capVia))}</td></tr>`;
     }).join("");
     contenedor.querySelector("#sim-tabla").innerHTML = `<table class="tabla-horas">
-      <tr><th>Hora</th><th>Llegan</th><th>Puede atender</th><th>Qué tan llena</th><th>Esperando</th><th>Espera (min)</th><th>En la calle</th></tr>
+      <tr><th>Hora</th><th>Ventanillas</th><th>Llegan</th><th>Puede atender</th><th>Qué tan llena</th><th>Esperando</th><th>Espera (min)</th><th>En la calle</th></tr>
       ${filas}</table>`;
 
     // --- Respuestas a las preguntas del enunciado ---
