@@ -59,8 +59,8 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
   "atrás" del navegador funciona.
 - **Inicio** muestra una portada real del Puerto de Balboa y cuatro rutas desplegables: ubicación, simulación,
   solución y datos. Cada ruta contiene sus enlaces secundarios sin llenar la pantalla.
-- La barra superior deja visibles solo Inicio, Mapa, Simulador, Citas y Solución; Llegadas y TTT quedan bajo
-  **"Más análisis"** y también dentro de las rutas de Inicio.
+- La barra superior deja visibles solo Inicio, Mapa, Simulador, Citas y el **Generador de solución**. Llegadas,
+  TTT y el análisis A3 con gráficos quedan bajo **"Más análisis"**.
 - Cada sección tiene una frase de introducción, migas "Inicio › Sección" y botones **← Anterior / Siguiente →**.
 - Los detalles (tablas hora por hora, gráficos extra, análisis A3 completo) están en **"Ver más"** y los
   7 indicadores del día en un botón plegable.
@@ -79,6 +79,7 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 | 3 | Truck Turn Time | Desglose del TTT por etapa y por hora |
 | 4 | Citas (TAS) | TAS dinámico: franjas, sin TAS vs con TAS, cumplimiento y no-show |
 | 5 | Mejora | A3 Lean y gráfico cascada de las 3 palancas |
+| 6 | Generador de solución | Dos preguntas → diagnóstico, antes/después y plan operativo por etapas, sin gráficos |
 
 ### Aporte de `tejadaoperaciones-star`: plan de ventanilla adicional
 El Módulo 2 permite activar una **ventanilla adicional únicamente en horas pico**

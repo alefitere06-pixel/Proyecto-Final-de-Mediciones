@@ -92,7 +92,7 @@ function renderLogistica(contenedor, estado) {
       <p>En el día ${estado.dia}, la fila máxima es de <strong>${fmt(k.lqMax)} camiones</strong>. ${enCalle > 0
         ? `<strong>${enCalle} quedarían en la calle</strong> cerca de la zona portuaria.`
         : `La fila cabe en el acceso y <strong>no invade la calle</strong>.`}</p>
-      <a href="#mejora">Ver cómo lo resolvemos →</a>
+      <a href="#solucion">Generar una solución →</a>
     </section>
 
     <div class="rutas-cabecera">
@@ -117,7 +117,7 @@ function renderLogistica(contenedor, estado) {
       <details class="ruta-inteligente destacada">
         <summary><span class="ruta-icono">03</span><span><strong>Aplicar la solución</strong><small>Citas + cola virtual + viajes combinados</small></span></summary>
         <div class="ruta-ramas">
-          <a href="#mejora">Ver Gate Inteligente completo</a>
+          <a href="#solucion">Generar un plan para el día elegido</a>
           <a href="#citas">Explorar el sistema de citas</a>
         </div>
       </details>

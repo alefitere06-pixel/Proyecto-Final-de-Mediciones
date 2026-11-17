@@ -92,8 +92,8 @@ function pintarInfoDia() {
 // navegador y saltar de una sección a otra con <a href="#simulador">.
 function prepararPestanas() {
   const nav = document.getElementById("pestanas");
-  const principales = ["inicio", "mapa", "simulador", "citas", "mejora"];
-  const nombres = { mapa: "Mapa", simulador: "Simulador", citas: "Citas", mejora: "Solución" };
+  const principales = ["inicio", "mapa", "simulador", "citas", "solucion"];
+  const nombres = { mapa: "Mapa", simulador: "Simulador", citas: "Citas", solucion: "Solución" };
   const visibles = principales.map((id) => MODULOS.find((m) => m.id === id)).filter(Boolean);
   const extras = MODULOS.filter((m) => !principales.includes(m.id));
   nav.innerHTML = visibles.map((m) =>
@@ -125,7 +125,7 @@ function mostrarModulo(id) {
   document.querySelectorAll("#pestanas a").forEach((b) =>
     b.classList.toggle("activa", b.dataset.id === id));
   const menuMas = document.querySelector("#pestanas .nav-mas");
-  if (menuMas) menuMas.classList.toggle("activa", ["llegadas", "ttt"].includes(id));
+  if (menuMas) menuMas.classList.toggle("activa", ["llegadas", "ttt", "mejora"].includes(id));
   pintarModulo();
   window.scrollTo(0, 0);
 }

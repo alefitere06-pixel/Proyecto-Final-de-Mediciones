@@ -25,6 +25,7 @@ function diasDelAlcance(estado) {
 function escPalancas(p) {
   const c = typeof CITAS_ESTADO !== "undefined" ? CITAS_ESTADO : ESCENARIO_BASE.tas;
   return escenario({
+    carrilExtraPico: !!p.carrilExtraPico,
     tas: { activo: !!p.tas, modo: "dinamica", pctCita: c.pctCita, puntualidad: c.puntualidad,
       noShow: c.noShow, flexibilidadH: c.flexibilidadH },
     colaVirtual: { activo: !!p.colaVirtual, capacidadPreEst: MEJORA_ESTADO.capacidadPreEst },
@@ -81,7 +82,7 @@ function graficoCascada(idCanvas, pasos, campo, titulo, unidad) {
 
 MODULOS.push({
   id: "mejora",
-  titulo: "Nuestra propuesta",
+  titulo: "Análisis técnico A3",
   intro: "Nuestras 3 ideas y cuánto ayuda cada una. Marquen o desmarquen cada idea para ver la diferencia.",
   dueno: "Todo el grupo",
   rama: "mejora-propuesta-a3",
