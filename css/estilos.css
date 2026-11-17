@@ -1,0 +1,89 @@
+/* Estilos del dashboard · colores en variables para cambiarlos en un solo lugar */
+:root {
+  --fondo: #f4f6f8;
+  --panel: #ffffff;
+  --texto: #1d2733;
+  --texto-suave: #5b6876;
+  --borde: #d9dfe5;
+  --primario: #0b4f71;      /* azul marítimo */
+  --primario-claro: #e3eef4;
+  --ok: #1e7b4a;
+  --alerta: #b3261e;
+  --alerta-fondo: #fbeaea;
+  --aviso: #a86200;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+}
+
+/* ---- Barra superior y pestañas ---- */
+.barra {
+  background: var(--primario);
+  color: #fff;
+  padding: 12px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+.barra-titulo { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.barra h1 { font-size: 1.15rem; margin: 0; }
+.sello-simulado {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
+  background: #ffd166; color: #3d2e00; padding: 3px 8px; border-radius: 4px;
+}
+.pestanas { display: flex; flex-wrap: wrap; gap: 6px; }
+.pestanas button {
+  border: 1px solid rgba(255,255,255,0.4); background: transparent; color: #fff;
+  padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+}
+.pestanas button.activa { background: #fff; color: var(--primario); font-weight: 600; }
+
+main { padding: 16px 20px; max-width: 1300px; margin: 0 auto; }
+
+/* ---- Filtros ---- */
+.filtros { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.filtros label { font-size: 0.85rem; color: var(--texto-suave); display: flex; gap: 8px; align-items: center; }
+select, input[type="number"] {
+  padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; font-size: 0.9rem;
+}
+.info-dia { font-size: 0.85rem; color: var(--texto-suave); }
+.etiqueta-buque { color: var(--aviso); font-weight: 600; }
+
+/* ---- Tarjetas KPI ---- */
+.tarjetas {
+  display: grid; gap: 10px; margin-bottom: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+.tarjeta {
+  background: var(--panel); border: 1px solid var(--borde); border-radius: 8px;
+  padding: 10px 12px; border-left: 5px solid var(--ok);
+}
+.tarjeta.no-cumple { border-left-color: var(--alerta); background: var(--alerta-fondo); }
+.tarjeta .nombre { font-size: 0.75rem; color: var(--texto-suave); }
+.tarjeta .valor { font-size: 1.5rem; font-weight: 700; margin: 2px 0; }
+.tarjeta .meta { font-size: 0.72rem; color: var(--texto-suave); }
+.tarjeta .estado { font-size: 0.72rem; font-weight: 600; }
+.tarjeta.no-cumple .estado { color: var(--alerta); }
+.tarjeta:not(.no-cumple) .estado { color: var(--ok); }
+
+/* ---- Módulos ---- */
+.modulo { background: var(--panel); border: 1px solid var(--borde); border-radius: 8px; padding: 16px; }
+.modulo h2 { margin-top: 0; font-size: 1.1rem; color: var(--primario); }
+.rejilla-2 { display: grid; gap: 16px; grid-template-columns: 280px 1fr; }
+@media (max-width: 800px) { .rejilla-2 { grid-template-columns: 1fr; } }
+.contenedor-grafico { position: relative; height: 340px; }
+
+/* Aviso de módulo en construcción (se borra cuando el módulo esté listo) */
+.en-construccion {
+  border: 2px dashed var(--borde); border-radius: 8px; padding: 16px; background: var(--primario-claro);
+}
+.en-construccion code { background: #fff; padding: 1px 4px; border-radius: 3px; }
+
+.pie { text-align: center; font-size: 0.75rem; color: var(--texto-suave); padding: 20px; }
