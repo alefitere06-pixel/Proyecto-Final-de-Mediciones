@@ -376,3 +376,266 @@ details.mas[open] > summary { margin-bottom: 12px; }
 .diapositiva .mf-svg { max-height: 60vh; }
 .diapositiva .mf-cuerpo { grid-template-columns: minmax(0, 1fr) 240px; }
 @media print { .diapositiva .mf-svg { max-height: 120mm; } }
+
+/* =============================================================================
+   Dirección editorial ilustrada · inspirada en portales marítimos panameños
+   ============================================================================= */
+:root[data-tema="logistica"] body {
+  background:
+    linear-gradient(rgba(4, 25, 36, .78), rgba(4, 25, 36, .88)),
+    url("../img/balboa-smart-gate-hero.png") center top / cover fixed;
+}
+:root[data-tema="logistica"] .app {
+  background: linear-gradient(180deg, rgba(247,250,250,.98), rgba(232,239,240,.98));
+  backdrop-filter: blur(10px);
+}
+:root[data-tema="logistica"] .barra {
+  position: relative;
+  z-index: 60;
+  background: rgba(247,250,250,.92);
+  border-bottom: 1px solid rgba(20,37,45,.08);
+  backdrop-filter: blur(16px);
+}
+
+/* Portada a pantalla completa con puntos explicativos */
+.hero-balboa.hero-puerto-interactivo {
+  --hero-x: 0px;
+  --hero-y: 0px;
+  position: relative;
+  isolation: isolate;
+  grid-template-columns: minmax(0, .88fr) minmax(420px, 1.12fr);
+  min-height: 590px;
+  background: #061f2c;
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 28px 70px rgba(3,24,35,.28);
+}
+.hero-balboa.hero-puerto-interactivo::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: -20px;
+  background: url("../img/balboa-smart-gate-hero.png") center center / cover no-repeat;
+  transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(1.045);
+  transition: transform .45s cubic-bezier(.2,.8,.2,1);
+  will-change: transform;
+}
+.hero-balboa.hero-puerto-interactivo::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(4,24,34,.98) 0%, rgba(4,24,34,.90) 38%, rgba(4,24,34,.33) 66%, rgba(4,24,34,.18) 100%),
+    linear-gradient(0deg, rgba(4,24,34,.60) 0%, transparent 42%);
+}
+.hero-puerto-interactivo .hero-balboa-contenido {
+  position: relative;
+  z-index: 2;
+  padding: clamp(34px, 5vw, 72px);
+  justify-content: flex-end;
+}
+.hero-puerto-interactivo .hero-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid rgba(127,224,211,.34);
+  border-radius: 999px;
+  background: rgba(4,37,48,.45);
+  backdrop-filter: blur(10px);
+}
+.hero-puerto-interactivo .hero-etiqueta::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #65d3c9;
+  box-shadow: 0 0 0 5px rgba(101,211,201,.14);
+}
+.hero-puerto-interactivo h2 {
+  max-width: 720px;
+  margin-top: 18px;
+  font-size: clamp(2.45rem, 4.5vw, 5rem);
+  line-height: .94;
+  text-wrap: balance;
+  text-shadow: 0 3px 24px rgba(0,0,0,.28);
+}
+.hero-puerto-interactivo .hero-balboa-contenido > p { max-width: 610px; color: rgba(255,255,255,.84); }
+.hero-puerto-interactivo .hero-acciones .boton { transition: transform .18s, box-shadow .18s, background .18s; }
+.hero-puerto-interactivo .hero-acciones .boton:hover { transform: translateY(-2px); opacity: 1; }
+.hero-puerto-interactivo .hero-principal { box-shadow: 0 10px 24px rgba(243,179,64,.22); }
+.hero-puerto-interactivo .hero-metricas {
+  max-width: 630px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 18px;
+  background: rgba(2,22,31,.44);
+  backdrop-filter: blur(14px);
+}
+.hero-puerto-interactivo .hero-metricas > div { padding: 0 10px; border-top: 0; border-left: 1px solid rgba(255,255,255,.14); }
+.hero-puerto-interactivo .hero-metricas > div:first-child { border-left: 0; }
+.hero-escena { position: relative; z-index: 3; min-height: 590px; }
+.hero-instruccion {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  padding: 8px 11px;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 999px;
+  background: rgba(3,28,39,.50);
+  color: rgba(255,255,255,.82);
+  backdrop-filter: blur(12px);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.hero-punto {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.hero-punto-buque { left: 7%; top: 47%; }
+.hero-punto-flujo { left: 46%; top: 66%; }
+.hero-punto-garita { right: 5%; top: 55%; }
+.hero-pulso {
+  position: relative;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #f3b340;
+  box-shadow: 0 0 0 5px rgba(243,179,64,.20), 0 4px 14px rgba(0,0,0,.35);
+}
+.hero-pulso::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 50%;
+  animation: heroPulso 2.2s ease-out infinite;
+}
+.punto-etiqueta {
+  padding: 6px 9px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 999px;
+  background: rgba(3,27,38,.64);
+  box-shadow: 0 8px 20px rgba(0,0,0,.18);
+  backdrop-filter: blur(12px);
+  font-size: .72rem;
+  font-weight: 800;
+}
+.punto-info {
+  position: absolute;
+  left: 0;
+  top: 34px;
+  width: 220px;
+  padding: 12px 13px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 14px;
+  background: rgba(3,28,39,.92);
+  box-shadow: 0 16px 34px rgba(0,0,0,.28);
+  color: rgba(255,255,255,.78);
+  font-size: .72rem;
+  line-height: 1.45;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity .18s, visibility .18s, transform .18s;
+  pointer-events: none;
+}
+.hero-punto-garita .punto-info { left: auto; right: 0; }
+.punto-info strong { display: block; margin-bottom: 4px; color: #fff; font-size: .82rem; }
+.hero-punto:hover .punto-info,
+.hero-punto:focus-visible .punto-info,
+.hero-punto[aria-expanded="true"] .punto-info { opacity: 1; visibility: visible; transform: translateY(0); }
+.hero-punto:focus-visible { outline: 2px solid #fff; outline-offset: 6px; border-radius: 999px; }
+.hero-ruta-animada {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 42px;
+  height: 2px;
+  overflow: visible;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.52) 18%, rgba(243,179,64,.9) 80%, transparent);
+}
+.hero-camion {
+  position: absolute;
+  top: -9px;
+  left: 0;
+  width: 30px;
+  height: 13px;
+  border-radius: 3px 2px 2px 3px;
+  background: #f3b340;
+  box-shadow: 0 4px 10px rgba(0,0,0,.32);
+  animation: heroTrayecto 8s ease-in-out infinite;
+}
+.hero-camion::before { content: ""; position: absolute; right: -9px; bottom: 0; width: 10px; height: 10px; border-radius: 2px 3px 2px 0; background: #fff; }
+.hero-camion::after { content: ""; position: absolute; left: 4px; bottom: -4px; width: 5px; height: 5px; border-radius: 50%; background: #081d27; box-shadow: 22px 0 #081d27, 31px 0 #081d27; }
+.hero-credito { position: absolute; right: 18px; bottom: 12px; color: rgba(255,255,255,.55); font-size: .58rem; }
+@keyframes heroPulso { 0% { transform: scale(.65); opacity: .9; } 75%, 100% { transform: scale(1.6); opacity: 0; } }
+@keyframes heroTrayecto { 0% { left: 0; opacity: 0; } 8%, 86% { opacity: 1; } 94%, 100% { left: calc(100% - 38px); opacity: 0; } }
+
+/* El asesor reutiliza la ilustración para que el sitio se sienta como una historia continua. */
+.sol-encabezado { position: relative; isolation: isolate; overflow: hidden; background: #082f3b; }
+.sol-encabezado::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: -30% -5%;
+  background: url("../img/balboa-smart-gate-hero.png") 72% 62% / cover no-repeat;
+  filter: saturate(.78);
+}
+.sol-encabezado::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(4,28,39,.98) 0%, rgba(4,28,39,.88) 54%, rgba(4,28,39,.40) 100%);
+}
+
+@media (max-width: 1000px) {
+  .hero-balboa.hero-puerto-interactivo { grid-template-columns: 1fr; min-height: 760px; }
+  .hero-puerto-interactivo .hero-balboa-contenido { min-height: 520px; justify-content: center; padding-bottom: 24px; }
+  .hero-escena { min-height: 240px; }
+  .hero-punto-buque { left: 18%; top: 22%; }
+  .hero-punto-flujo { left: 48%; top: 45%; }
+  .hero-punto-garita { right: 7%; top: 29%; }
+}
+@media (max-width: 620px) {
+  :root[data-tema="logistica"] body { padding: 0; background-attachment: scroll; }
+  :root[data-tema="logistica"] .app { border-radius: 0; }
+  .hero-balboa.hero-puerto-interactivo { min-height: 720px; border-radius: 20px; }
+  .hero-puerto-interactivo .hero-balboa-contenido { min-height: 510px; padding: 32px 22px 20px; }
+  .hero-puerto-interactivo h2 { font-size: clamp(2.35rem, 12vw, 3.7rem); }
+  .hero-puerto-interactivo .hero-metricas { gap: 0; padding: 12px 5px; }
+  .hero-puerto-interactivo .hero-metricas > div { padding: 0 8px; }
+  .hero-puerto-interactivo .hero-metricas dd { font-size: 1.18rem; }
+  .hero-escena { min-height: 210px; }
+  .hero-instruccion { left: 18px; right: auto; top: 5px; }
+  .hero-punto-buque { left: 7%; top: 31%; }
+  .hero-punto-flujo { left: 42%; top: 51%; }
+  .hero-punto-garita { right: 4%; top: 34%; }
+  .punto-etiqueta { font-size: .64rem; padding: 5px 7px; }
+  .punto-info { width: min(190px, 70vw); }
+  .hero-punto-flujo .punto-info { left: 50%; transform: translate(-50%, -6px); }
+  .hero-punto-flujo:hover .punto-info,
+  .hero-punto-flujo:focus-visible .punto-info,
+  .hero-punto-flujo[aria-expanded="true"] .punto-info { transform: translate(-50%, 0); }
+  .hero-credito { left: 18px; right: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-balboa.hero-puerto-interactivo::before { transition: none; transform: scale(1.03); }
+  .hero-pulso::after, .hero-camion { animation: none; }
+  .hero-camion { left: 55%; opacity: 1; }
+}

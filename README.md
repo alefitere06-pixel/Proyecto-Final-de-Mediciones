@@ -57,8 +57,9 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 ## Navegación (menos cargado)
 - Cada sección es un **enlace** (`index.html#mapa`, `#simulador`, `#mejora`…): se puede compartir y el botón
   "atrás" del navegador funciona.
-- **Inicio** muestra una portada real del Puerto de Balboa y cuatro rutas desplegables: ubicación, simulación,
-  solución y datos. Cada ruta contiene sus enlaces secundarios sin llenar la pantalla.
+- **Inicio** muestra una ilustración original e interactiva del Puerto de Balboa y cuatro rutas desplegables:
+  ubicación, simulación, solución y datos. Los puntos sobre la escena explican buque, flujo y garita; cada ruta
+  contiene sus enlaces secundarios sin llenar la pantalla.
 - La barra superior deja visibles solo Inicio, Mapa, Simulador, Citas y el **Generador de solución**. Llegadas,
   TTT y el análisis A3 con gráficos quedan bajo **"Más análisis"**.
 - Cada sección tiene una frase de introducción, migas "Inicio › Sección" y botones **← Anterior / Siguiente →**.

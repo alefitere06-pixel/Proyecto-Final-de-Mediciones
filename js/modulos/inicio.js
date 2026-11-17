@@ -66,14 +66,14 @@ function renderLogistica(contenedor, estado) {
   const enCalle = Math.round(k.viaPublicaMax);
   const soloCitas = simularDia(estado.dia, escenario({ tas: { activo: true } }));
   contenedor.innerHTML = `
-    <section class="hero-balboa">
+    <section class="hero-balboa hero-puerto-interactivo" id="hero-puerto">
       <div class="hero-balboa-contenido">
-        <span class="hero-etiqueta">PUERTO DE BALBOA · PANAMÁ</span>
-        <h2>Una entrada portuaria que se anticipa a la fila.</h2>
-        <p>Smart Gate combina citas, una cola virtual y decisiones basadas en datos para que los camiones lleguen cuando la puerta puede atenderlos.</p>
+        <span class="hero-etiqueta">SMART GATE · PUERTO DE BALBOA</span>
+        <h2>El puerto se mueve. La fila también puede hacerlo mejor.</h2>
+        <p>Explora cómo un buque, la llegada de camiones y la capacidad de la garita se conectan. Después genera una solución para evitar que la fila llegue a la calle.</p>
         <div class="hero-acciones">
-          <a class="boton hero-principal" href="#mapa">Ver el puerto y la fila</a>
-          <a class="boton hero-secundario" href="#simulador">Probar una mejora</a>
+          <a class="boton hero-principal" href="#solucion">Generar una solución</a>
+          <a class="boton hero-secundario" href="#mapa">Explorar el puerto</a>
         </div>
         <dl class="hero-metricas" aria-label="Resumen del día elegido">
           <div><dt>Llegadas</dt><dd>${fmt(info.llegadas)}</dd><small>camiones</small></div>
@@ -81,10 +81,23 @@ function renderLogistica(contenedor, estado) {
           <div><dt>Con la solución</dt><dd class="mejor">${fmt(p.wqPromedio)}</dd><small>minutos</small></div>
         </dl>
       </div>
-      <figure class="hero-balboa-foto">
-        <img src="img/puerto-balboa-contenedores.jpg" alt="Vista real de la terminal de contenedores del Puerto de Balboa, Panamá">
-        <figcaption>Puerto de Balboa · Foto: Mdesanjur, <a href="https://commons.wikimedia.org/wiki/File:Puerto_de_Contenedores_en_Balboa.jpg" target="_blank" rel="noopener">Wikimedia Commons (CC BY-SA 4.0)</a></figcaption>
-      </figure>
+      <div class="hero-escena" aria-label="Ilustración interactiva de la operación del Puerto de Balboa">
+        <span class="hero-instruccion">Toca los puntos para entender la operación</span>
+        <button type="button" class="hero-punto hero-punto-buque" data-hero-punto aria-expanded="false">
+          <span class="hero-pulso" aria-hidden="true"></span><span class="punto-etiqueta">Buque</span>
+          <span class="punto-info"><strong>Más carga</strong>Un día con buque aumenta los movimientos y las llegadas de camiones.</span>
+        </button>
+        <button type="button" class="hero-punto hero-punto-flujo" data-hero-punto aria-expanded="false">
+          <span class="hero-pulso" aria-hidden="true"></span><span class="punto-etiqueta">Flujo</span>
+          <span class="punto-info"><strong>Llegadas coordinadas</strong>Las citas distribuyen los camiones para que no lleguen todos a la vez.</span>
+        </button>
+        <button type="button" class="hero-punto hero-punto-garita" data-hero-punto aria-expanded="false">
+          <span class="hero-pulso" aria-hidden="true"></span><span class="punto-etiqueta">Garita</span>
+          <span class="punto-info"><strong>Capacidad de entrada</strong>Una sexta ventanilla en horas pico ayuda a mover la cola con rapidez.</span>
+        </button>
+        <div class="hero-ruta-animada" aria-hidden="true"><span class="hero-camion"></span></div>
+        <small class="hero-credito">Ilustración conceptual creada para Smart Gate Balboa</small>
+      </div>
     </section>
 
     <section class="mensaje-clave ${enCalle > 0 ? "con-alerta" : "sin-alerta"}" aria-label="Diagnóstico sencillo">
@@ -222,6 +235,28 @@ function renderLogistica(contenedor, estado) {
     detalle.open = true;
     detalle.scrollIntoView({ behavior: "smooth", block: "start" });
   });
+
+  // La portada responde suavemente al cursor y muestra explicaciones puntuales.
+  const heroPuerto = contenedor.querySelector("#hero-puerto");
+  const movimientoPermitido = window.matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)").matches;
+  if (heroPuerto && movimientoPermitido) {
+    heroPuerto.addEventListener("pointermove", (evento) => {
+      const caja = heroPuerto.getBoundingClientRect();
+      const x = ((evento.clientX - caja.left) / caja.width - 0.5) * -14;
+      const y = ((evento.clientY - caja.top) / caja.height - 0.5) * -10;
+      heroPuerto.style.setProperty("--hero-x", `${x}px`);
+      heroPuerto.style.setProperty("--hero-y", `${y}px`);
+    });
+    heroPuerto.addEventListener("pointerleave", () => {
+      heroPuerto.style.setProperty("--hero-x", "0px");
+      heroPuerto.style.setProperty("--hero-y", "0px");
+    });
+  }
+  contenedor.querySelectorAll("[data-hero-punto]").forEach((punto) => punto.addEventListener("click", () => {
+    const abrir = punto.getAttribute("aria-expanded") !== "true";
+    contenedor.querySelectorAll("[data-hero-punto]").forEach((otro) => otro.setAttribute("aria-expanded", "false"));
+    punto.setAttribute("aria-expanded", String(abrir));
+  }));
 
   // Tabla filtrable
   const pintarTabla = (f) => {
