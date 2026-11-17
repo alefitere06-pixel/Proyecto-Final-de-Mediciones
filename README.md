@@ -70,6 +70,32 @@ si se ejecuta otra vez se obtienen exactamente los mismos datos. Produce `data/l
 | Capacidad de la vía de acceso | 40 camiones | ~700 m de vía útil ÷ ~18 m por camión con separación. _(Pendiente: medir en mapa y justificar.)_ |
 | Piloto TAS | 60 % con cita, 80 % puntuales, 12 % no-show | Supuestos del grupo para el piloto de citas. |
 
+### Supuestos de la propuesta (escenarios, `js/escenarios.js`)
+| Supuesto | Valor por defecto | Por qué / cómo se modela |
+|---|---|---|
+| Camiones con cita | 70 % | Meta de adopción del TAS (el piloto simulado tiene 60 %). Ajustable en el módulo 4. |
+| Puntualidad | 85 % | Igual a la meta de cumplimiento. Los impuntuales llegan a su hora original. |
+| No-show | 10 % | Igual a la meta. Los no-show no usan su franja y llegan sin cita a su hora original (no estaban previstos). |
+| Flexibilidad del transportista | ±2 h | Un transportista acepta mover su cita como máximo 2 horas; si no hay espacio, llega a su hora. |
+| Capacidad por franja (TAS dinámico) | μ·c × 0,85 − camiones sin cita previstos | Para que ρ quede en la meta de 85 % en cada hora. |
+| Capacidad por franja (TAS clásico) | 60 camiones/h fija | El TAS del ejemplo del profesor: no mira la capacidad real ni a los camiones sin cita. |
+| Pre-estacionamiento (cola virtual) | 60 camiones | Supuesto: lote de ~1 ha fuera de la vía. Suma espacio de espera; no cambia la espera Wq. |
+| Doble transacción | 30 % de camiones import/export | Cada par entrega + retiro se hace en una sola visita: las llegadas bajan en (imp + exp) × 30 % ÷ 2. |
+| Extra en hora pico (módulo 2) | 0 % | Para probar picos más fuertes (07–10 y 15–18). |
+
+Ningún escenario usa fórmulas nuevas: solo cambian las entradas (llegadas por hora, capacidad, espacio de
+espera) y los KPI se calculan con las fórmulas del curso en `js/kpi.js`.
+
+## Resultados principales (promedio de los días con buque, datos simulados)
+| KPI | Actual | TAS clásico | Gate Inteligente (3 palancas) | Meta |
+|---|---|---|---|---|
+| Espera promedio Wq | 31 min | 26 min | 1,5 min | ≤ 30 min |
+| Cola máxima Lq | 80 camiones | 68 | 12 | ≤ 40 |
+| Horas con desborde | 6,1 h/día | 5,3 | 0 | 0 |
+| Camiones en vía pública (máx) | 46 | 37 | 0 | 0 |
+| Truck Turn Time | 82 min | 78 | 53 | ≤ 90 |
+| ρ en hora pico | 132 % | 119 % | 93 % | ≤ 85 % (aún no se cumple) |
+
 ## KPI
 Fichas completas en [`docs/fichas_kpi.md`](docs/fichas_kpi.md). Fórmulas en `js/kpi.js`.
 Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual.md).

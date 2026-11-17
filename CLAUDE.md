@@ -46,6 +46,7 @@ nuestra propuesta **"Gate Inteligente: 3 palancas"**:
 index.html              dashboard (pestañas + tarjetas KPI)
 css/estilos.css
 js/kpi.js               fórmulas (KPI.*, kpiDelDia, registrosDelDia)
+js/escenarios.js        escenarios qué-pasa-si (TAS, cola virtual, doble transacción) sin fórmulas nuevas
 js/app.js               pestañas, filtro de día, tarjetas, crearGrafico, avisoEnConstruccion
 js/modulos/*.js         un archivo por módulo (llegadas, simulador, ttt, citas, mejora)
 js/lib/chart.umd.js     Chart.js 4.4.1

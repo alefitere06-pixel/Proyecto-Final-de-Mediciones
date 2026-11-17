@@ -98,11 +98,12 @@ function maximo(arr) {
 
 // Calcula todos los KPI de UN día a partir de sus 24 registros horarios.
 // `opciones` permite cambiar supuestos (lo usará el simulador del módulo 2):
-//   { carriles, servicioMin, capacidadVia, llegadas (arreglo de 24 que reemplaza λ) }
+//   { carriles, servicioMin, capacidadVia, llegadas (arreglo de 24 que reemplaza λ),
+//     capacidades (arreglo de 24 con μ·c ya calculado; si se da, reemplaza carriles/servicio) }
 function kpiDelDia(registros, opciones = {}) {
   const capVia = opciones.capacidadVia ?? DATOS.supuestos.capacidad_via_camiones;
   const llegadas = opciones.llegadas ?? registros.map((r) => r.llegadas);
-  const capacidades = registros.map((r) => {
+  const capacidades = opciones.capacidades ?? registros.map((r) => {
     if (!r.garita_abierta) return 0;
     const c = opciones.carriles ?? r.carriles_abiertos;
     const s = opciones.servicioMin ?? r.servicio_min;

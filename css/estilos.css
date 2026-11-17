@@ -101,3 +101,34 @@ select, input[type="number"] {
 .nota { margin-top: 8px; }
 .texto-alerta { color: var(--alerta); font-weight: 600; }
 .texto-ok { color: var(--ok); font-weight: 600; }
+
+/* ---- Sliders y paneles de control ---- */
+.panel-control { background: var(--fondo); border: 1px solid var(--borde); border-radius: 8px; padding: 12px; }
+.panel-control h3 { margin-top: 0; }
+.slider { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; margin-bottom: 12px; color: var(--texto-suave); }
+.slider input { width: 100%; accent-color: var(--primario); }
+.check { font-size: 0.85rem; display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+.respuesta { background: var(--primario-claro); border-left: 4px solid var(--primario); padding: 10px 12px; border-radius: 6px; font-size: 0.88rem; margin: 12px 0; }
+.tabla-scroll { overflow-x: auto; }
+.tabla-horas { border-collapse: collapse; font-size: 0.78rem; width: 100%; }
+.tabla-horas th, .tabla-horas td { padding: 4px 6px; border-bottom: 1px solid var(--borde); text-align: right; white-space: nowrap; }
+.tabla-horas th { background: var(--primario-claro); }
+.tabla-horas tr.desborde td { background: var(--alerta-fondo); color: var(--alerta); }
+.tarjetas.compactas .valor { font-size: 1.2rem; }
+.rejilla-a3 { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+.rejilla-a3 > section { border: 1px solid var(--borde); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.rejilla-a3 h3 { margin: 0 0 6px; font-size: 0.9rem; color: var(--primario); }
+.rejilla-a3 p, .rejilla-a3 li { font-size: 0.84rem; }
+@media (max-width: 800px) { .rejilla-a3 { grid-template-columns: 1fr; } }
+.mejor { color: var(--ok); font-weight: 600; }
+.peor { color: var(--alerta); font-weight: 600; }
+.boton { background: var(--primario); color: #fff; border: 0; border-radius: 6px; padding: 7px 12px; cursor: pointer; font-size: 0.85rem; }
+.boton:hover { opacity: 0.9; }
+.boton.secundario { background: #fff; color: var(--primario); border: 1px solid var(--primario); }
+.tarjeta.neutra { border-left-color: var(--borde); }
+.rejilla-2.parejo { grid-template-columns: 1fr 1fr; }
+@media (max-width: 800px) { .rejilla-2.parejo { grid-template-columns: 1fr; } }
+.tabla-horas td:first-child, .tabla-horas th:first-child { text-align: left; }
+.rejilla-a3 { margin: 12px 0; }
+.rejilla-a3 ol, .rejilla-a3 ul { padding-left: 18px; margin: 4px 0; }
+.titulo-seccion { font-size: 0.8rem; color: var(--texto-suave); margin: 0 0 6px; }

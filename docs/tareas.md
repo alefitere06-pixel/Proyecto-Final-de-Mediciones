@@ -19,33 +19,41 @@ Flujo: rama `mejora-<tema>` → commits pequeños → Pull Request → el **otro
 ## Módulo 2 · Simulador de cola
 | Hecho | Tarea | Tomada por |
 |---|---|---|
-| [ ] | Sliders: carriles abiertos, tiempo de servicio, % extra de llegadas en pico | |
-| [ ] | Gráfico de cola por hora (Lq) con línea del límite de la vía de acceso | |
-| [ ] | Wq, Lq y ρ por hora; marcar horas con desborde | |
-| [ ] | Responder: ¿cuántos carriles para ρ ≤ 85 % en la hora pico? | |
+| [x] | Sliders: carriles abiertos, tiempo de servicio, % extra de llegadas en pico | Claude (rama `mejora-modulos-2-5`) |
+| [x] | Gráfico de cola por hora (Lq) con línea del límite de la vía de acceso | Claude (rama `mejora-modulos-2-5`) |
+| [x] | Wq, Lq y ρ por hora; marcar horas con desborde | Claude (rama `mejora-modulos-2-5`) |
+| [x] | Responder: ¿cuántos carriles para ρ ≤ 85 % en la hora pico? | Claude (rama `mejora-modulos-2-5`) |
 
 ## Módulo 3 · Truck Turn Time
 | Hecho | Tarea | Tomada por |
 |---|---|---|
-| [ ] | Desglose del TTT por etapa (barras apiladas) | |
-| [ ] | TTT por hora del día | |
-| [ ] | Comparar días con buque vs sin buque | |
+| [x] | Desglose del TTT por etapa (barras apiladas) | Claude (rama `mejora-modulos-2-5`) |
+| [x] | TTT por hora del día | Claude (rama `mejora-modulos-2-5`) |
+| [x] | Comparar días con buque vs sin buque | Claude (rama `mejora-modulos-2-5`) |
 
 ## Módulo 4 · Citas (TAS dinámico)
 | Hecho | Tarea | Tomada por |
 |---|---|---|
-| [ ] | Franjas y capacidad dinámica por franja (carriles × μ × 0,85) | |
-| [ ] | Redistribuir llegadas con cita (puntualidad y no-show) | |
-| [ ] | Comparación sin TAS vs con TAS | |
-| [ ] | Escenario de no-show alto | |
+| [x] | Franjas y capacidad dinámica por franja (carriles × μ × 0,85) | Claude (rama `mejora-modulos-2-5`) |
+| [x] | Redistribuir llegadas con cita (puntualidad y no-show) | Claude (rama `mejora-modulos-2-5`) |
+| [x] | Comparación sin TAS vs con TAS | Claude (rama `mejora-modulos-2-5`) |
+| [x] | Escenario de no-show alto | Claude (rama `mejora-modulos-2-5`) |
 
 ## Módulo 5 · Mejora (A3 + 3 palancas)
 | Hecho | Tarea | Tomada por |
 |---|---|---|
-| [ ] | Resumen A3: problema, causa raíz, desperdicio, propuesta | |
-| [ ] | Interruptores de las 3 palancas (TAS dinámico, cola virtual, doble transacción) | |
-| [ ] | Gráfico cascada del aporte de cada palanca | |
-| [ ] | Tabla actual vs propuesta con KPI meta | |
+| [x] | Resumen A3: problema, causa raíz, desperdicio, propuesta | Claude (rama `mejora-modulos-2-5`) |
+| [x] | Interruptores de las 3 palancas (TAS dinámico, cola virtual, doble transacción) | Claude (rama `mejora-modulos-2-5`) |
+| [x] | Gráfico cascada del aporte de cada palanca | Claude (rama `mejora-modulos-2-5`) |
+| [x] | Tabla actual vs propuesta con KPI meta | Claude (rama `mejora-modulos-2-5`) |
+
+## Para mejorar (ideas del grupo)
+| Hecho | Tarea | Tomada por |
+|---|---|---|
+| [ ] | Revisar cada número del dashboard y anotar lo que no se entienda | |
+| [ ] | Discutir si los supuestos de la propuesta (70 % citas, ±2 h, 60 camiones de pre-estacionamiento) son razonables | |
+| [ ] | ρ pico sigue en ~93 % con la propuesta: ¿abrir el 6.º carril en hora pico de días de buque? (probar en módulo 2) | |
+| [ ] | Costo-beneficio de la propuesta (opcional) | |
 
 ## Tareas generales
 | Hecho | Tarea | Tomada por |

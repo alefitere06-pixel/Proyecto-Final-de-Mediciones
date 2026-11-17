@@ -16,6 +16,7 @@ const GRAFICOS = {};
 function crearGrafico(idCanvas, config) {
   if (GRAFICOS[idCanvas]) GRAFICOS[idCanvas].destroy();
   const canvas = document.getElementById(idCanvas);
+  config.options = Object.assign({ animation: false, maintainAspectRatio: false }, config.options);
   GRAFICOS[idCanvas] = new Chart(canvas, config);
   return GRAFICOS[idCanvas];
 }
@@ -120,6 +121,51 @@ function avisoEnConstruccion(contenedor, modulo, tareas, prompt) {
       <p>Prompt sugerido para el agente de IA:</p>
       <p><code>${prompt}</code></p>
     </div>`;
+}
+
+// ---- Ayudas para los módulos ------------------------------------------------
+// Tarjetas KPI pequeñas: lista de { nombre, valor, meta, cumple }
+function htmlTarjetas(lista) {
+  return `<div class="tarjetas">` + lista.map((t) => `
+    <div class="tarjeta ${t.cumple === false ? "no-cumple" : t.cumple === undefined ? "neutra" : ""}">
+      <div class="nombre">${t.nombre}</div>
+      <div class="valor">${t.valor}</div>
+      <div class="meta">${t.meta ?? ""}</div>
+      ${t.cumple === undefined ? "" : `<div class="estado">${t.cumple ? "✓ cumple" : "✗ no cumple"}</div>`}
+    </div>`).join("") + `</div>`;
+}
+
+// Slider con etiqueta y valor visible
+function htmlSlider(id, etiqueta, min, max, paso, valor, unidad = "") {
+  return `<label class="slider">
+      <span>${etiqueta}: <strong id="${id}-valor">${valor}${unidad}</strong></span>
+      <input type="range" id="${id}" min="${min}" max="${max}" step="${paso}" value="${valor}" data-unidad="${unidad}">
+    </label>`;
+}
+
+// Conecta un slider: actualiza el número visible y llama a alCambiar(valor)
+function conectarSlider(contenedor, id, alCambiar) {
+  const input = contenedor.querySelector("#" + id);
+  const etiqueta = contenedor.querySelector("#" + id + "-valor");
+  input.addEventListener("input", () => {
+    etiqueta.textContent = input.value + input.dataset.unidad;
+    alCambiar(Number(input.value));
+  });
+}
+
+// Convierte una lista de horas en tramos: [7,8,9,15,16] -> "07:00–10:00 y 15:00–17:00"
+function tramosHorarios(horas) {
+  const tramos = [];
+  horas.forEach((h) => {
+    const ult = tramos[tramos.length - 1];
+    if (ult && h === ult[1] + 1) ult[1] = h; else tramos.push([h, h]);
+  });
+  return tramos.map(([a, b]) => `${horaTexto(a)}–${horaTexto(b + 1)}`).join(" y ");
+}
+
+// Colores del tema (desde las variables CSS)
+function color(nombre) {
+  return getComputedStyle(document.documentElement).getPropertyValue("--" + nombre).trim();
 }
 
 // ---- Inicio -----------------------------------------------------------------
