@@ -50,6 +50,7 @@ function promedioPorDiaSemana(transaccion) {
 MODULOS.push({
   id: "llegadas",
   titulo: "¿Cuántos llegan?",
+  intro: "Cuántos camiones llegan cada hora y qué días hay más. Las barras naranjas son las horas con más camiones.",
   dueno: "Todo el grupo",
   rama: "mejora-llegadas",
 
@@ -122,8 +123,10 @@ MODULOS.push({
         </div>
       </div>
 
+      <details class="mas"><summary>Ver más: ¿qué días de la semana llegan más camiones?</summary>
       <h3>¿Qué días llegan más camiones? (promedio)</h3>
       <div class="contenedor-grafico bajo"><canvas id="graf-llegadas-semana"></canvas></div>
+      </details>
       <p class="suave nota">Datos simulados · 30 días · data/generar_datos.py</p>`;
 
     // --- Controles ---

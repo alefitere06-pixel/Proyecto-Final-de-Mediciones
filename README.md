@@ -42,23 +42,30 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
   su símbolo del curso (λ, μ·c, ρ, Lq, Wq, TTT), que se mantiene en las fichas y en la presentación.
 
 ## Lo más fácil de ver (para la defensa)
-- **Pestaña 1 · Mapa y cola en vivo:** mapa real del Puerto de Balboa (OpenStreetMap, necesita internet) con la
-  garita, el Puente de las Américas y el pre-estacionamiento propuesto, y una **animación** con un camioncito por
-  cada camión en cola: arriba la situación actual (los camiones salen a la vía pública en rojo), abajo con
-  Gate Inteligente. Botón ▶ para reproducir el día completo.
+- **La fila en el mapa:** sobre el mapa de distribución del Puerto de Balboa (`img/mapa-puerto-balboa.png`)
+  se dibuja un punto por cada camión esperando, desde la puerta principal hacia La Boca y la carretera al Puente
+  de las Américas: morado = carril de espera (40), rojo = en la calle. Botones "Hoy" / "Con nuestra propuesta"
+  (aparece el estacionamiento de espera en verde) y ▶ para reproducir el día. Funciona sin internet.
 - **Botón ▶ Presentación** (arriba): diapositivas a pantalla completa para los 15 minutos de exposición, con los
   números calculados en vivo, la animación antes/después, un reloj y botones para ir a la demo de cada módulo.
   Teclas → ← y Esc. "Guardar PDF" imprime todas las diapositivas: copia en
   [`presentacion/presentacion_gate_balboa.pdf`](presentacion/presentacion_gate_balboa.pdf).
 
-> Los puntos del mapa son **aproximados**: arrástrenlos a su lugar exacto, hagan clic para ver las coordenadas
-> y cópienlas en `PUNTOS_MAPA` (`js/modulos/mapa.js`).
+> La ruta de la fila y la ubicación del estacionamiento de espera son **supuestos del grupo** dibujados sobre el
+> mapa (coordenadas en `RUTA_FILA` y `PRE_EST`, `js/mapaFila.js`). Citen la fuente del mapa en la presentación.
+
+## Navegación (menos cargado)
+- Cada sección es un **enlace** (`index.html#mapa`, `#simulador`, `#mejora`…): se puede compartir y el botón
+  "atrás" del navegador funciona.
+- **Inicio** muestra solo lo esencial (4 pasos + resumen + 6 tarjetas-enlace "¿Qué quieres ver?").
+- Cada sección tiene una frase de introducción, migas "Inicio › Sección" y botones **← Anterior / Siguiente →**.
+- Los detalles (tablas hora por hora, gráficos extra, análisis A3 completo) están en **"Ver más"** y los
+  7 indicadores del día en un botón plegable.
 
 ## Cómo abrir el dashboard
 1. Descargar o clonar el repositorio.
 2. Abrir **`index.html` con doble clic** (Chrome o Edge). No hace falta instalar nada ni servidor:
-   Chart.js y Leaflet están guardados en `js/lib/` y los datos en `data/llegadas.js`.
-   Solo el fondo del mapa necesita internet; todo lo demás funciona sin conexión.
+   Chart.js está guardado en `js/lib/`, el mapa en `img/` y los datos en `data/llegadas.js`: funciona sin internet.
 
 ## Módulos
 | # | Módulo | Qué muestra |

@@ -127,7 +127,7 @@ const DIAPOSITIVAS = [
   {
     titulo: "Antes y después",
     html: () => `<h2>Antes y después (en vivo)</h2><div id="pres-anim"></div>`,
-    despues: () => crearAnimacionCola(document.getElementById("pres-anim"), { dia: 2, prefijo: "anim-pres" }),
+    despues: () => crearMapaFila(document.getElementById("pres-anim"), { dia: 2, prefijo: "anim-pres" }),
   },
   {
     titulo: "Resultados",

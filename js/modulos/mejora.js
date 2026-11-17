@@ -82,6 +82,7 @@ function graficoCascada(idCanvas, pasos, campo, titulo, unidad) {
 MODULOS.push({
   id: "mejora",
   titulo: "Nuestra propuesta",
+  intro: "Nuestras 3 ideas y cuánto ayuda cada una. Marquen o desmarquen cada idea para ver la diferencia.",
   dueno: "Todo el grupo",
   rama: "mejora-propuesta-a3",
 
@@ -137,6 +138,7 @@ MODULOS.push({
     const ningunaPalanca = pasos.length === 1;
 
     contenedor.querySelector("#mej-a3").innerHTML = `
+      <details class="mas"><summary>Ver el análisis completo: el problema, por qué pasa, qué se desperdicia y qué proponemos</summary>
       <div class="rejilla-a3">
         <section>
           <h3>1 · ¿Cuál es el problema?</h3>
@@ -174,6 +176,7 @@ MODULOS.push({
           </ul>
         </section>
       </div>
+      </details>
 
       <h3>5 · ¿Qué ganamos? (${nombreAlcance})</h3>
       ${ningunaPalanca ? `<p class="peor">Marquen al menos una idea arriba para ver el resultado.</p>` : ""}
@@ -203,6 +206,7 @@ MODULOS.push({
         <div class="contenedor-grafico"><canvas id="graf-cascada-via"></canvas></div>
       </div>
 
+      <details class="mas"><summary>Ver cómo lo haríamos y cómo sabríamos que funciona</summary>
       <div class="rejilla-a3">
         <section>
           <h3>6 · ¿Cómo lo haríamos?</h3>
@@ -220,6 +224,7 @@ MODULOS.push({
           Si muchos reservan y no llegan, aplicar la multa.</p>
         </section>
       </div>
+      </details>
       <p class="suave nota">Números simulados con supuestos del grupo (ver README): muestran la tendencia, no son una predicción exacta.</p>`;
 
     graficoCascada("graf-cascada-wq", pasos, "wqPromedio", "¿Cuántos minutos de espera quita cada idea?", "min");

@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gate Balboa · Fila de camiones</title>
-  <link rel="stylesheet" href="css/leaflet.css" />
   <link rel="stylesheet" href="css/estilos.css" />
   <link rel="stylesheet" href="css/temas.css" />
 </head>
@@ -27,12 +26,17 @@
       <span id="info-dia" class="info-dia"></span>
     </section>
 
-    <p class="titulo-seccion">Cómo está hoy la entrada del puerto, sin ningún cambio. Verde = bien, rojo = mal. Toquen la <b>i</b> para ver qué significa cada cosa.</p>
-    <!-- Tarjetas KPI: se llenan desde js/app.js con las fórmulas de js/kpi.js -->
-    <section id="tarjetas-kpi" class="tarjetas" aria-label="KPI principales"></section>
+    <!-- Tarjetas KPI (plegadas para no cargar la pantalla): js/app.js con las fórmulas de js/kpi.js -->
+    <details id="kpi-plegable" class="kpi-plegable">
+      <summary id="kpi-resumen">📊 Indicadores del día</summary>
+      <p class="titulo-seccion">Cómo está hoy la entrada del puerto, sin ningún cambio. Verde = bien, rojo = mal. Toquen la <b>i</b> para ver qué significa cada cosa.</p>
+      <section id="tarjetas-kpi" class="tarjetas" aria-label="Indicadores principales"></section>
+    </details>
+    <nav id="migas" class="migas" aria-label="Ubicación"></nav>
 
     <!-- Aquí cada módulo dibuja su contenido -->
     <section id="contenido-modulo" class="modulo"></section>
+    <nav id="nav-pie" class="nav-pie" aria-label="Anterior y siguiente"></nav>
   </main>
 
   <footer class="pie">
@@ -43,11 +47,11 @@
 
   <!-- Orden de carga: librería → datos → fórmulas → módulos → app -->
   <script src="js/lib/chart.umd.js"></script>
-  <script src="js/lib/leaflet.js"></script>
   <script src="data/llegadas.js"></script>
   <script src="js/kpi.js"></script>
   <script src="js/escenarios.js"></script>
   <script src="js/animacion.js"></script>
+  <script src="js/mapaFila.js"></script>
   <script src="js/temas.js"></script>
   <script src="js/ilustraciones.js"></script>
   <script src="js/glosario.js"></script>

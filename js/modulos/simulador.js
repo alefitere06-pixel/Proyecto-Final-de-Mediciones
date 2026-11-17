@@ -27,6 +27,7 @@ function carrilesNecesarios(dia, servicioMin, extraPicoPct) {
 MODULOS.push({
   id: "simulador",
   titulo: "Simulador de la fila",
+  intro: "Muevan los controles y miren qué pasa con la fila. Por ejemplo: ¿y si abrimos una ventanilla más?",
   dueno: "Todo el grupo",
   rama: "mejora-simulador",
 
@@ -54,10 +55,12 @@ MODULOS.push({
         </div>
       </div>
       <div id="sim-respuesta" class="respuesta"></div>
+      <details class="mas"><summary>Ver más: llegadas vs lo que puede atender, y la tabla hora por hora</summary>
       <h3>Camiones que llegan vs camiones que la puerta puede atender</h3>
       <div class="contenedor-grafico bajo"><canvas id="graf-sim-lambda"></canvas></div>
       <h3>Hora por hora</h3>
       <div class="tabla-scroll" id="sim-tabla"></div>
+      </details>
       <p class="suave nota">Datos simulados. Filas en rojo = la fila no cupo en su carril y salió a la calle.</p>`;
 
     const actualizar = () => this.actualizar(contenedor, estado);

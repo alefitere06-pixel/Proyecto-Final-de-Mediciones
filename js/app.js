@@ -57,7 +57,12 @@ function definirTarjetas(k, citasDia) {
 function pintarTarjetas() {
   const k = kpiDelDia(registrosDelDia(ESTADO.dia));
   const citasDia = DATOS.citas_piloto.find((c) => c.dia === ESTADO.dia);
-  document.getElementById("tarjetas-kpi").innerHTML = htmlTarjetas(definirTarjetas(k, citasDia))
+  const lista = definirTarjetas(k, citasDia);
+  const malos = lista.filter((x) => x.cumple === false).length;
+  document.getElementById("kpi-resumen").innerHTML = `📊 Indicadores del día ${ESTADO.dia}: ` +
+    (malos ? `<span class="peor">${malos} de ${lista.length} en rojo</span>` : `<span class="mejor">todos en verde</span>`) +
+    ` <span class="suave">(tocar para ver)</span>`;
+  document.getElementById("tarjetas-kpi").innerHTML = htmlTarjetas(lista)
     .replace(/^<div class="tarjetas">/, "").replace(/<\/div>$/, "");
 }
 
@@ -82,29 +87,54 @@ function pintarInfoDia() {
 }
 
 // ---- Pestañas ---------------------------------------------------------------
+// ---- Pestañas como enlaces (#inicio, #mapa, ...) ------------------------------
+// Cada pestaña es un hipervínculo: se puede compartir el enlace, usar "atrás" del
+// navegador y saltar de una sección a otra con <a href="#simulador">.
 function prepararPestanas() {
   const nav = document.getElementById("pestanas");
   nav.innerHTML = MODULOS.map((m, i) =>
-    `<button data-id="${m.id}">${i + 1} · ${m.titulo}</button>`).join("");
-  nav.querySelectorAll("button").forEach((b) =>
-    b.addEventListener("click", () => activarModulo(b.dataset.id)));
+    `<a href="#${m.id}" data-id="${m.id}">${i + 1} · ${m.titulo}</a>`).join("");
+  window.addEventListener("hashchange", () => {
+    const id = location.hash.slice(1) || MODULOS[0].id;  // sin # = Inicio
+    if (MODULOS.some((m) => m.id === id) && id !== ESTADO.moduloActivo) mostrarModulo(id);
+  });
 }
 
+// Ir a un módulo desde el código (botones, presentación): cambia el enlace
 function activarModulo(id) {
+  if (location.hash.slice(1) !== id) {
+    try { history.pushState(null, "", "#" + id); } catch (e) { /* file:// sin historial */ }
+  }
+  mostrarModulo(id);
+}
+
+function mostrarModulo(id) {
   ESTADO.moduloActivo = id;
   document.body.dataset.modulo = id;   // permite estilos por pestaña (ej. ocultar tarjetas en Inicio)
-  document.querySelectorAll("#pestanas button").forEach((b) =>
+  document.querySelectorAll("#pestanas a").forEach((b) =>
     b.classList.toggle("activa", b.dataset.id === id));
   pintarModulo();
+  window.scrollTo(0, 0);
 }
 
 function pintarModulo() {
-  const m = MODULOS.find((x) => x.id === ESTADO.moduloActivo);
+  const i = MODULOS.findIndex((x) => x.id === ESTADO.moduloActivo);
+  const m = MODULOS[i];
   const contenedor = document.getElementById("contenido-modulo");
   // Detener animaciones de la pestaña anterior (no las de la presentación)
   Object.entries(ANIMACIONES).forEach(([k, a]) => { if (k !== "anim-pres") a.detener(); });
   contenedor.innerHTML = "";
   m.render(contenedor, ESTADO);
+  if (m.intro) contenedor.insertAdjacentHTML("afterbegin", `<p class="intro-modulo">${m.intro}</p>`);
+
+  // Migas: Inicio › Sección
+  document.getElementById("migas").innerHTML = m.id === "inicio" ? "" :
+    `<a href="#inicio">Inicio</a> <span>›</span> <strong>${m.titulo}</strong>`;
+  // Anterior / Siguiente: recorrido guiado por todas las secciones
+  const ant = MODULOS[i - 1], sig = MODULOS[i + 1];
+  document.getElementById("nav-pie").innerHTML = `
+    ${ant ? `<a href="#${ant.id}" class="nav-ant">← ${ant.titulo}</a>` : "<span></span>"}
+    ${sig ? `<a href="#${sig.id}" class="nav-sig">Siguiente: ${sig.titulo} →</a>` : `<a href="#inicio" class="nav-sig">Volver al inicio ↺</a>`}`;
 }
 
 function refrescar() {
@@ -177,6 +207,9 @@ function color(nombre) {
 document.addEventListener("DOMContentLoaded", () => {
   prepararFiltroDia();
   prepararPestanas();
-  activarModulo(MODULOS[0].id);
-  refrescar();
+  const pedido = location.hash.slice(1);
+  ESTADO.moduloActivo = MODULOS.some((m) => m.id === pedido) ? pedido : MODULOS[0].id;
+  mostrarModulo(ESTADO.moduloActivo);
+  pintarInfoDia();
+  pintarTarjetas();
 });

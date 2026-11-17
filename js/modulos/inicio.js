@@ -64,6 +64,7 @@ function renderLogistica(contenedor, estado) {
   const cuenta = (e) => filas.filter((f) => f.estadoH === e).length;
 
   const enCalle = Math.round(k.viaPublicaMax);
+  const soloCitas = simularDia(estado.dia, escenario({ tas: { activo: true } }));
   contenedor.innerHTML = `
     <div class="guia">
       <div class="guia-paso"><span class="num">1</span><div><strong>🚛 Llegan camiones</strong>
@@ -83,9 +84,27 @@ function renderLogistica(contenedor, estado) {
           : `La fila siempre cupo en su carril: <b class="mejor">nadie quedó en la calle</b>.`}</div></div>
       <div class="fila-res"><span class="ico">😀</span><div><strong>Con nuestra propuesta:</strong>
         la espera bajaría a <b class="mejor">${fmt(p.wqPromedio)} ${fmt(p.wqPromedio) === "1" ? "minuto" : "minutos"}</b> y quedarían <b class="mejor">${fmt(p.viaPublicaMax)}</b> camiones en la calle.
-        <a href="#" data-ir="mapa">Ver la animación ›</a></div></div>
+        <a href="#mapa">Ver la fila en el mapa ›</a></div></div>
     </div>
 
+    <h3 class="titulo-explora">¿Qué quieres ver?</h3>
+    <div class="explora">
+      <a href="#mapa" class="explora-tarjeta"><span class="ico">🗺️</span><strong>La fila en el mapa</strong>
+        <span>Los camiones haciendo fila en el Puerto de Balboa</span><em class="${enCalle ? "peor" : "mejor"}">${enCalle} en la calle a las ${horaTexto(D.horaCola)}</em></a>
+      <a href="#llegadas" class="explora-tarjeta"><span class="ico">🚛</span><strong>¿Cuántos llegan?</strong>
+        <span>Horas y días con más camiones</span><em>${fmt(info.llegadas)} hoy · más tráfico ${horaTexto(k.horaPico)}</em></a>
+      <a href="#simulador" class="explora-tarjeta"><span class="ico">🎛️</span><strong>Simulador de la fila</strong>
+        <span>¿Y si abrimos más ventanillas?</span><em>harían falta ${carrilesNecesarios(estado.dia, null, 0).carriles ?? "más de 12"} (hay 6)</em></a>
+      <a href="#ttt" class="explora-tarjeta"><span class="ico">⏱️</span><strong>Tiempo total del camión</strong>
+        <span>En qué se pierde el tiempo</span><em>${fmt(k.wqPromedio)} min solo esperando</em></a>
+      <a href="#citas" class="explora-tarjeta"><span class="ico">📅</span><strong>Sistema de citas</strong>
+        <span>Reservar una hora para llegar</span><em class="mejor">espera ${fmt(k.wqPromedio)} → ${fmt(soloCitas.wqPromedio)} min</em></a>
+      <a href="#mejora" class="explora-tarjeta destacada"><span class="ico">💡</span><strong>Nuestra propuesta</strong>
+        <span>Las 3 ideas y cuánto ayudan</span><em class="mejor">espera ${fmt(k.wqPromedio)} → ${fmt(p.wqPromedio)} min</em></a>
+    </div>
+
+    <details class="mas" id="ini-detalle">
+    <summary>Ver el tablero completo del día (gráficos, los 30 días y hora por hora)</summary>
     <div class="lg-rejilla">
       <div class="lg-izq">
         <div class="ini-tarjeta">
@@ -111,7 +130,7 @@ function renderLogistica(contenedor, estado) {
         <div class="ini-tarjeta" style="display:flex;align-items:center;gap:10px">
           <div class="pill morado" style="font-size:1.1rem;padding:8px 10px">⛩</div>
           <div style="flex:1"><strong style="font-size:.88rem">La puerta (garita)${ayuda("garita")}</strong><div class="ini-sub">5 de 6 ventanillas abiertas · revisa cada camión en ${fmt(D.servicio, 1)} min</div></div>
-          <button class="boton secundario" data-ir="simulador" title="Abrir simulador">⚙</button>
+          <a class="boton secundario" href="#simulador" title="Abrir el simulador">⚙</a>
         </div>
       </div>
 
@@ -166,7 +185,8 @@ function renderLogistica(contenedor, estado) {
         </div>
         <div class="lg-tabla-caja"><table class="lg-tabla" id="lg-tabla"></table></div>
       </div>
-    </div>`;
+    </div>
+    </details>`;
 
   // Tabla filtrable
   const pintarTabla = (f) => {

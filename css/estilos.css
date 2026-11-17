@@ -39,11 +39,11 @@ body {
   background: #ffd166; color: #3d2e00; padding: 3px 8px; border-radius: 4px;
 }
 .pestanas { display: flex; flex-wrap: wrap; gap: 6px; }
-.pestanas button {
+.pestanas a { text-decoration: none;
   border: 1px solid rgba(255,255,255,0.4); background: transparent; color: #fff;
   padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;
 }
-.pestanas button.activa { background: #fff; color: var(--primario); font-weight: 600; }
+.pestanas a.activa { background: #fff; color: var(--primario); font-weight: 600; }
 
 main { padding: 16px 20px; max-width: 1300px; margin: 0 auto; }
 

@@ -40,6 +40,7 @@ const ESC_PROPUESTA = () => escPropuesta();
 MODULOS.push({
   id: "ttt",
   titulo: "Tiempo total del camión",
+  intro: "Todo el tiempo que pasa un camión, desde que llega a la fila hasta que sale. La parte roja es tiempo perdido esperando.",
   dueno: "Todo el grupo",
   rama: "mejora-ttt",
 
@@ -75,12 +76,14 @@ MODULOS.push({
         <div><div class="contenedor-grafico"><canvas id="graf-ttt-dona"></canvas></div></div>
         <div><div class="contenedor-grafico"><canvas id="graf-ttt-horas"></canvas></div></div>
       </div>
+      <details class="mas"><summary>Ver más: días con barco grande vs sin barco</summary>
       <h3>Días con barco grande vs sin barco (minutos, hoy sin cambios)</h3>
       <div class="tabla-scroll"><table class="tabla-horas">
         <tr><th>Grupo</th>${ETAPAS_TTT.map((e) => `<th>${e}</th>`).join("")}<th>Total</th></tr>
         ${filaPeriodo("Días con barco grande", buque)}
         ${filaPeriodo("Días sin barco", sinBuque)}
       </table></div>
+      </details>
       <p class="suave nota">Datos simulados. TTT ponderado por llegadas (las horas con más camiones pesan más).</p>`;
 
     contenedor.querySelector("#ttt-propuesta").addEventListener("change", (e) => {

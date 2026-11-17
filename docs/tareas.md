@@ -59,7 +59,8 @@ Flujo: rama `mejora-<tema>` → commits pequeños → Pull Request → el **otro
 | Hecho | Tarea | Tomada por |
 |---|---|---|
 | [x] | Mapa del Puerto de Balboa, animación de la cola y modo presentación | Claude (rama `mejora-mapa-animacion-presentacion`) |
-| [ ] | Verificar en el mapa la ubicación real de la garita y elegir dónde iría el pre-estacionamiento | |
+| [ ] | Confirmar la puerta principal y la ruta de la fila en el mapa; elegir dónde iría el estacionamiento de espera (`js/mapaFila.js`) | |
+| [ ] | Anotar la fuente del mapa del puerto (img/mapa-puerto-balboa.png) en el README y la presentación | |
 | [ ] | Ensayar la presentación con el reloj (15 min) y repartir qué diapositiva explica cada uno | |
 | [ ] | Volver a exportar el PDF si cambian los supuestos (botón Guardar PDF) | |
 

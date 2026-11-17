@@ -23,6 +23,7 @@ function escTAS(modo) {
 MODULOS.push({
   id: "citas",
   titulo: "Sistema de citas",
+  intro: "Si cada camión reserva una hora para llegar (como un turno en el médico), no llegan todos juntos.",
   dueno: "Todo el grupo",
   rama: "mejora-citas",
 
@@ -53,12 +54,14 @@ MODULOS.push({
         </div>
       </div>
       <div id="tas-respuesta" class="respuesta"></div>
+      <details class="mas"><summary>Ver más: a qué hora llegan con citas, y qué pasa si muchos no llegan</summary>
       <div class="rejilla-2 parejo">
         <div><h3>A qué hora llegan: sin citas vs con citas</h3>
           <div class="contenedor-grafico bajo"><canvas id="graf-tas-llegadas"></canvas></div></div>
         <div><h3>¿Y si muchos reservan y no llegan? (días con barco grande)</h3>
           <div class="contenedor-grafico bajo"><canvas id="graf-tas-noshow"></canvas></div></div>
       </div>
+      </details>
       <p class="suave nota">Datos simulados. Supuestos del modelo en el README (los no-show y los impuntuales llegan a su hora original, sin cita).</p>`;
 
     contenedor.querySelector("#tas-modo").value = c.modoGrafico;
@@ -162,7 +165,7 @@ MODULOS.push({
     const alto = sens[sens.length - 1];
     contenedor.querySelector("#tas-respuesta").innerHTML = `
       <strong>¿Cuánto ayudan las citas?</strong>
-      Día ${estado.dia}: Wq pasa de <strong>${fmt(sin.wqPromedio)}</strong> min a
+      Día ${estado.dia}: la espera pasa de <strong>${fmt(sin.wqPromedio)}</strong> min a
       <strong>${fmt(fija.wqPromedio)}</strong> (citas normales) y <strong class="mejor">${fmt(din.wqPromedio)}</strong> (citas inteligentes);
       horas con fila en la calle: ${fmt(sin.horasDesborde)} → ${fmt(fija.horasDesborde)} → <strong class="mejor">${fmt(din.horasDesborde)}</strong>.
       Las citas normales ofrecen los mismos cupos todas las horas; las inteligentes ofrecen solo los cupos
