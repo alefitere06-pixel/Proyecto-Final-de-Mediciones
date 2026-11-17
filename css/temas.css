@@ -1050,3 +1050,119 @@ body[data-modulo="pase"] .intro-modulo { display: none; }
   .pase-qr-zona { grid-template-columns: minmax(0, 1fr); }
   .pase-panel { padding: 24px 17px; }
 }
+
+/* =============================================================================
+   Fondos fotográficos aportados por el equipo
+   Cada parte del recorrido usa una escena distinta para evitar páginas planas.
+   ============================================================================= */
+:root[data-tema="logistica"] { --vidrio-claro: rgba(216, 233, 235, .86); }
+
+body[data-modulo="llegadas"],
+body[data-modulo="ttt"] { --arte-modulo: url("../img/fondo-terminal-buque.webp"); }
+body[data-modulo="mapa"],
+body[data-modulo="simulador"] { --arte-modulo: url("../img/fondo-camion-muelle.webp"); }
+body[data-modulo="citas"],
+body[data-modulo="pase"],
+body[data-modulo="solucion"],
+body[data-modulo="mejora"] { --arte-modulo: url("../img/fondo-camion-contenedor.webp"); }
+
+body:not([data-modulo="inicio"]) #contenido-modulo::before {
+  opacity: .64;
+  background-position: center top;
+}
+body[data-modulo="llegadas"] #contenido-modulo::before,
+body[data-modulo="ttt"] #contenido-modulo::before { background-position: center 18%; }
+body[data-modulo="mapa"] #contenido-modulo::before,
+body[data-modulo="simulador"] #contenido-modulo::before { background-position: 54% center; }
+body[data-modulo="citas"] #contenido-modulo::before,
+body[data-modulo="pase"] #contenido-modulo::before,
+body[data-modulo="solucion"] #contenido-modulo::before,
+body[data-modulo="mejora"] #contenido-modulo::before { background-position: center 58%; }
+body:not([data-modulo="inicio"]) #contenido-modulo::after {
+  background: linear-gradient(180deg, rgba(3,25,35,.56), rgba(3,25,35,.88) 42%, rgba(3,25,35,.95));
+}
+
+/* Las tarjetas analíticas dejan pasar parte de la fotografía sin perder lectura. */
+:root[data-tema="logistica"] .tarjeta,
+:root[data-tema="logistica"] .tarjeta.no-cumple,
+:root[data-tema="logistica"] .panel-control,
+:root[data-tema="logistica"] .rejilla-a3 > section,
+:root[data-tema="logistica"] .anim-fila,
+.sol-opcion > span,
+.sol-diagnostico,
+.sol-metrica,
+.sol-plan-generado,
+.sol-conclusion,
+.plan-operativo,
+.comparacion-plan > div,
+.resumen-simple,
+.explora-tarjeta {
+  background: rgba(219, 235, 237, .86);
+  box-shadow: 0 14px 32px rgba(2,20,29,.16);
+}
+.lg-dia,
+.lg-dia.activo,
+.mf-dato,
+.guia-paso { background: rgba(219,235,237,.84); }
+
+/* Mapa: la escena del camión se convierte en cabecera fotográfica. */
+.mapa-portada {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.17);
+  background:
+    linear-gradient(90deg, rgba(3,27,38,.96) 0%, rgba(3,27,38,.78) 48%, rgba(3,27,38,.28) 100%),
+    url("../img/fondo-camion-muelle.webp") center / cover no-repeat;
+  box-shadow: 0 22px 50px rgba(0,0,0,.24);
+}
+.mapa-portada h2 { color: #fff; }
+.mapa-portada p { color: rgba(255,255,255,.76); }
+.mapa-enlace-simple { color: #8ee8de; }
+.mapa-foto-real { border: 1px solid rgba(255,255,255,.18); box-shadow: 0 16px 32px rgba(0,0,0,.25); }
+
+/* Solución: misma lógica de portada, con la ruta del camión como contexto. */
+.solucionador {
+  border: 1px solid rgba(255,255,255,.16);
+  background:
+    linear-gradient(rgba(3,26,36,.83), rgba(3,26,36,.94)),
+    url("../img/fondo-camion-contenedor.webp") center / cover fixed;
+  color: #fff;
+}
+.sol-encabezado::before {
+  background-image: url("../img/fondo-camion-contenedor.webp");
+  background-position: center 56%;
+}
+.sol-preguntas legend { color: #fff; }
+.sol-opcion > span,
+.sol-diagnostico,
+.sol-metrica,
+.sol-plan-generado,
+.sol-conclusion { color: var(--texto); }
+.sol-respaldo-enlaces a { background: rgba(220,237,239,.90); }
+
+/* Pase QR: fotografía del camión como protagonista y continuidad en el cierre. */
+.pase-portada::before {
+  background-image: url("../img/fondo-camion-contenedor.webp");
+  background-position: center 58%;
+}
+.pase-portada::after {
+  background:
+    linear-gradient(90deg, rgba(3,24,34,.98) 0%, rgba(3,24,34,.84) 45%, rgba(3,24,34,.18) 78%),
+    linear-gradient(0deg, rgba(3,24,34,.84), transparent 52%);
+}
+.pase-integracion {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(4,37,48,.96), rgba(4,37,48,.72)),
+    url("../img/fondo-terminal-buque.webp") center 56% / cover no-repeat;
+}
+
+@media (max-width: 650px) {
+  body:not([data-modulo="inicio"]) #contenido-modulo::before { background-position: center top; }
+  .mapa-portada { background-position: 62% center; }
+  .solucionador { background-attachment: scroll; }
+  .pase-portada::before { background-position: 62% center; }
+}

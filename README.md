@@ -157,6 +157,9 @@ Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual
 - Los botones de Google Maps usan **Maps URLs** y no guardan claves ni tokens; necesitan conexión a internet.
 - `img/balboa-smart-gate-hero.png` y `img/pase-smart-gate-qr.png` son ilustraciones originales generadas para
   este proyecto. La segunda muestra al conductor usando el pase digital en una garita inteligente.
+- `img/fondo-terminal-buque.webp`, `img/fondo-camion-muelle.webp` y `img/fondo-camion-contenedor.webp` fueron
+  aportadas por el equipo y se usan como fondos temáticos. Antes de una publicación externa, el grupo debe
+  confirmar su fuente, licencia y permiso de uso; la primera imagen conserva una marca de agua visible.
 - Portada: *Puerto de Contenedores en Balboa*, Mdesanjur, Wikimedia Commons, CC BY-SA 4.0.
 - Operación de contenedor: U.S. Government Accountability Office, Wikimedia Commons, dominio público.
 
