@@ -66,42 +66,70 @@ function renderLogistica(contenedor, estado) {
   const enCalle = Math.round(k.viaPublicaMax);
   const soloCitas = simularDia(estado.dia, escenario({ tas: { activo: true } }));
   contenedor.innerHTML = `
-    <div class="guia">
-      <div class="guia-paso"><span class="num">1</span><div><strong>🚛 Llegan camiones</strong>
-        <p>Traen o recogen contenedores. Entran al puerto por una puerta llamada <b>garita</b>${ayuda("garita")}.</p></div></div>
-      <div class="guia-paso"><span class="num">2</span><div><strong>⏳ Se forma una fila</strong>
-        <p>Si llegan más camiones de los que la puerta puede revisar, esperan en un carril (caben ${capVia}).</p></div></div>
-      <div class="guia-paso malo"><span class="num">3</span><div><strong>🚧 La fila sale a la calle</strong>
-        <p>Si no caben, quedan en la calle y bloquean el tránsito cerca del Puente de las Américas.</p></div></div>
-      <div class="guia-paso bueno"><span class="num">4</span><div><strong>💡 Nuestra solución</strong>
-        <p>Citas para llegar, un estacionamiento de espera con app y dos trámites en un solo viaje.</p></div></div>
-    </div>
+    <section class="hero-balboa">
+      <div class="hero-balboa-contenido">
+        <span class="hero-etiqueta">PUERTO DE BALBOA · PANAMÁ</span>
+        <h2>Una entrada portuaria que se anticipa a la fila.</h2>
+        <p>Smart Gate combina citas, una cola virtual y decisiones basadas en datos para que los camiones lleguen cuando la puerta puede atenderlos.</p>
+        <div class="hero-acciones">
+          <a class="boton hero-principal" href="#mapa">Ver el puerto y la fila</a>
+          <a class="boton hero-secundario" href="#simulador">Probar una mejora</a>
+        </div>
+        <dl class="hero-metricas" aria-label="Resumen del día elegido">
+          <div><dt>Llegadas</dt><dd>${fmt(info.llegadas)}</dd><small>camiones</small></div>
+          <div><dt>Espera actual</dt><dd class="${k.wqPromedio > M.wq_min ? "peor" : "mejor"}">${fmt(k.wqPromedio)}</dd><small>minutos</small></div>
+          <div><dt>Con la solución</dt><dd class="mejor">${fmt(p.wqPromedio)}</dd><small>minutos</small></div>
+        </dl>
+      </div>
+      <figure class="hero-balboa-foto">
+        <img src="img/puerto-balboa-contenedores.jpg" alt="Vista real de la terminal de contenedores del Puerto de Balboa, Panamá">
+        <figcaption>Puerto de Balboa · Foto: Mdesanjur, <a href="https://commons.wikimedia.org/wiki/File:Puerto_de_Contenedores_en_Balboa.jpg" target="_blank" rel="noopener">Wikimedia Commons (CC BY-SA 4.0)</a></figcaption>
+      </figure>
+    </section>
 
-    <div class="resumen-simple">
-      <div class="fila-res"><span class="ico">😟</span><div><strong>Hoy (día ${estado.dia}, ${info.dia_semana}${info.dia_buque ? ", llegó un barco grande" : ""}):</strong>
-        llegaron <b>${fmt(info.llegadas)}</b> camiones. Cada uno esperó en promedio <b class="${k.wqPromedio > M.wq_min ? "peor" : "mejor"}">${fmt(k.wqPromedio)} minutos</b> para entrar.
-        ${enCalle > 0 ? `A las ${horaTexto(D.horaCola)} había <b>${fmt(k.lqMax)}</b> camiones esperando y <b class="peor">${enCalle} no cabían y estaban en la calle</b>.`
-          : `La fila siempre cupo en su carril: <b class="mejor">nadie quedó en la calle</b>.`}</div></div>
-      <div class="fila-res"><span class="ico">😀</span><div><strong>Con nuestra propuesta:</strong>
-        la espera bajaría a <b class="mejor">${fmt(p.wqPromedio)} ${fmt(p.wqPromedio) === "1" ? "minuto" : "minutos"}</b> y quedarían <b class="mejor">${fmt(p.viaPublicaMax)}</b> camiones en la calle.
-        <a href="#mapa">Ver la fila en el mapa ›</a></div></div>
-    </div>
+    <section class="mensaje-clave ${enCalle > 0 ? "con-alerta" : "sin-alerta"}" aria-label="Diagnóstico sencillo">
+      <span>${enCalle > 0 ? "ATENCIÓN" : "BUEN ESTADO"}</span>
+      <p>En el día ${estado.dia}, la fila máxima es de <strong>${fmt(k.lqMax)} camiones</strong>. ${enCalle > 0
+        ? `<strong>${enCalle} quedarían en la calle</strong> cerca de la zona portuaria.`
+        : `La fila cabe en el acceso y <strong>no invade la calle</strong>.`}</p>
+      <a href="#solucion">Generar una solución →</a>
+    </section>
 
-    <h3 class="titulo-explora">¿Qué quieres ver?</h3>
-    <div class="explora">
-      <a href="#mapa" class="explora-tarjeta"><span class="ico">🗺️</span><strong>La fila en el mapa</strong>
-        <span>Los camiones haciendo fila en el Puerto de Balboa</span><em class="${enCalle ? "peor" : "mejor"}">${enCalle} en la calle a las ${horaTexto(D.horaCola)}</em></a>
-      <a href="#llegadas" class="explora-tarjeta"><span class="ico">🚛</span><strong>¿Cuántos llegan?</strong>
-        <span>Horas y días con más camiones</span><em>${fmt(info.llegadas)} hoy · más tráfico ${horaTexto(k.horaPico)}</em></a>
-      <a href="#simulador" class="explora-tarjeta"><span class="ico">🎛️</span><strong>Simulador de la fila</strong>
-        <span>¿Y si abrimos más ventanillas?</span><em>harían falta ${carrilesNecesarios(estado.dia, null, 0).carriles ?? "más de 12"} (hay 6)</em></a>
-      <a href="#ttt" class="explora-tarjeta"><span class="ico">⏱️</span><strong>Tiempo total del camión</strong>
-        <span>En qué se pierde el tiempo</span><em>${fmt(k.wqPromedio)} min solo esperando</em></a>
-      <a href="#citas" class="explora-tarjeta"><span class="ico">📅</span><strong>Sistema de citas</strong>
-        <span>Reservar una hora para llegar</span><em class="mejor">espera ${fmt(k.wqPromedio)} → ${fmt(soloCitas.wqPromedio)} min</em></a>
-      <a href="#mejora" class="explora-tarjeta destacada"><span class="ico">💡</span><strong>Nuestra propuesta</strong>
-        <span>Las 3 ideas y cuánto ayudan</span><em class="mejor">espera ${fmt(k.wqPromedio)} → ${fmt(p.wqPromedio)} min</em></a>
+    <div class="rutas-cabecera">
+      <div><span class="seccion-etiqueta">EXPLORAR SIN COMPLICACIONES</span><h3>Elige una ruta</h3></div>
+      <p>Cada ruta abre sus detalles solo cuando los necesitas.</p>
     </div>
+    <section class="rutas-inteligentes" aria-label="Rutas del dashboard">
+      <details class="ruta-inteligente">
+        <summary><span class="ruta-icono">01</span><span><strong>Ubicar el problema</strong><small>Puerto, accesos y fila de camiones</small></span></summary>
+        <div class="ruta-ramas">
+          <a href="#mapa">Ver la fila simulada</a>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=Puerto+de+Balboa%2C+Panam%C3%A1" target="_blank" rel="noopener">Abrir Puerto de Balboa en Google Maps ↗</a>
+          <a href="https://www.google.com/maps/@?api=1&amp;map_action=map&amp;center=8.9559%2C-79.5676&amp;zoom=14" target="_blank" rel="noopener">Explorar las vías cercanas ↗</a>
+        </div>
+      </details>
+      <details class="ruta-inteligente">
+        <summary><span class="ruta-icono">02</span><span><strong>Probar alternativas</strong><small>Cambia ventanillas, servicio y demanda</small></span></summary>
+        <div class="ruta-ramas">
+          <a href="#simulador">Abrir el simulador y evaluar la sexta ventanilla</a>
+        </div>
+      </details>
+      <details class="ruta-inteligente destacada">
+        <summary><span class="ruta-icono">03</span><span><strong>Aplicar la solución</strong><small>Citas + cola virtual + viajes combinados</small></span></summary>
+        <div class="ruta-ramas">
+          <a href="#solucion">Generar un plan para el día elegido</a>
+          <a href="#citas">Explorar el sistema de citas</a>
+        </div>
+      </details>
+      <details class="ruta-inteligente">
+        <summary><span class="ruta-icono">04</span><span><strong>Consultar los datos</strong><small>Indicadores y análisis detallado</small></span></summary>
+        <div class="ruta-ramas">
+          <a href="#llegadas">Llegadas por hora y por día</a>
+          <a href="#ttt">Etapas del recorrido del camión</a>
+          <button type="button" id="abrir-tablero-completo">Abrir el tablero completo del día</button>
+        </div>
+      </details>
+    </section>
 
     <details class="mas" id="ini-detalle">
     <summary>Ver el tablero completo del día (gráficos, los 30 días y hora por hora)</summary>
@@ -187,6 +215,13 @@ function renderLogistica(contenedor, estado) {
       </div>
     </div>
     </details>`;
+
+  const abrirTablero = contenedor.querySelector("#abrir-tablero-completo");
+  if (abrirTablero) abrirTablero.addEventListener("click", () => {
+    const detalle = contenedor.querySelector("#ini-detalle");
+    detalle.open = true;
+    detalle.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
   // Tabla filtrable
   const pintarTabla = (f) => {

@@ -92,8 +92,19 @@ function pintarInfoDia() {
 // navegador y saltar de una sección a otra con <a href="#simulador">.
 function prepararPestanas() {
   const nav = document.getElementById("pestanas");
-  nav.innerHTML = MODULOS.map((m, i) =>
-    `<a href="#${m.id}" data-id="${m.id}">${i + 1} · ${m.titulo}</a>`).join("");
+  const principales = ["inicio", "mapa", "simulador", "citas", "solucion"];
+  const nombres = { mapa: "Mapa", simulador: "Simulador", citas: "Citas", solucion: "Solución" };
+  const visibles = principales.map((id) => MODULOS.find((m) => m.id === id)).filter(Boolean);
+  const extras = MODULOS.filter((m) => !principales.includes(m.id));
+  nav.innerHTML = visibles.map((m) =>
+    `<a href="#${m.id}" data-id="${m.id}">${nombres[m.id] || m.titulo}</a>`).join("") +
+    `<details class="nav-mas">
+      <summary>Más análisis</summary>
+      <div>${extras.map((m) => `<a href="#${m.id}" data-id="${m.id}">${m.titulo}</a>`).join("")}</div>
+    </details>`;
+  nav.querySelectorAll(".nav-mas a").forEach((a) => a.addEventListener("click", () => {
+    a.closest("details").open = false;
+  }));
   window.addEventListener("hashchange", () => {
     const id = location.hash.slice(1) || MODULOS[0].id;  // sin # = Inicio
     if (MODULOS.some((m) => m.id === id) && id !== ESTADO.moduloActivo) mostrarModulo(id);
@@ -113,6 +124,8 @@ function mostrarModulo(id) {
   document.body.dataset.modulo = id;   // permite estilos por pestaña (ej. ocultar tarjetas en Inicio)
   document.querySelectorAll("#pestanas a").forEach((b) =>
     b.classList.toggle("activa", b.dataset.id === id));
+  const menuMas = document.querySelector("#pestanas .nav-mas");
+  if (menuMas) menuMas.classList.toggle("activa", ["llegadas", "ttt", "mejora"].includes(id));
   pintarModulo();
   window.scrollTo(0, 0);
 }

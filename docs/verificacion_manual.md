@@ -37,11 +37,25 @@ Wq = Lq ÷ λ = 52,30 ÷ 106 = 0,4934 h × 60 = **29,6 min**
 Reservadas 717 · usadas 621 · dentro de franja 483
 Cumplimiento = 483 ÷ 621 × 100 = **77,8 %** · No-show = (717 − 621) ÷ 717 × 100 = **13,4 %**
 
+## Verificación del aporte · sexta ventanilla en hora pico
+
+Al activar el plan operativo, a las 08:00 se usan **6 ventanillas** y se conserva el tiempo
+de servicio de **4,08 min**:
+
+- Capacidad: μ·c = (60 ÷ 4,08) × 6 = **88,24 camiones/h**.
+- Utilización: ρ = 106 ÷ 88,24 × 100 = **120,1 %**.
+- Cola previa a las 08:00: **5,2 camiones**. Lq = máx[0; 5,2 + 106 − 88,24] = **23,0 camiones**.
+- Espera: Wq = 23,0 ÷ 106 × 60 = **13,0 min**.
+
+Estos resultados coinciden con la tabla horaria del simulador. La sexta ventanilla reduce la fila,
+pero ρ permanece sobre la meta de 85 %, por lo que el tablero recomienda combinarla con TAS o
+reducir el tiempo de atención.
+
 ---
 
 ## Verificaciones del grupo
 | # | KPI | Responsable | Día/hora | A mano | Dashboard | ¿Coincide? |
 |---|---|---|---|---|---|---|
-| 1 | | | | | | |
+| 1 | μ·c, ρ, Lq y Wq con sexta ventanilla | tejadaoperaciones-star | Día 2 · 08:00 | 88,24; 120,1 %; 23,0; 13,0 min | 88,2; 120 %; 23,0; 13,0 min | ✓ |
 | 2 | | | | | | |
 | 3 | | | | | | |

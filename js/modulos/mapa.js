@@ -9,12 +9,30 @@
 
 MODULOS.unshift({   // unshift: queda antes de Llegadas (Inicio se agrega después y queda primero)
   id: "mapa",
-  titulo: "La fila en el mapa",
-  intro: "Cada punto es un camión esperando para entrar al puerto. Toquen ▶ para ver cómo crece la fila durante el día.",
+  titulo: "Puerto y fila",
+  intro: "Mira primero la ubicación real del Puerto de Balboa y después reproduce la fila simulada del día elegido.",
   render(contenedor, estado) {
     contenedor.innerHTML = `
-      <h2>La fila en el mapa del Puerto de Balboa · día ${estado.dia}</h2>
-      <div id="mapa-fila"></div>
+      <section class="mapa-portada">
+        <div class="mapa-portada-texto">
+          <span class="seccion-etiqueta">UBICACIÓN REAL</span>
+          <h2>Puerto de Balboa y sus alrededores</h2>
+          <p>Consulta la terminal, el Puente de las Américas y las vías cercanas en Google Maps. Los enlaces se abren en una pestaña nueva y necesitan internet.</p>
+          <div class="mapa-enlaces">
+            <a class="boton" href="https://www.google.com/maps/search/?api=1&amp;query=Puerto+de+Balboa%2C+Panam%C3%A1" target="_blank" rel="noopener">Ver el puerto en Google Maps ↗</a>
+            <a class="boton secundario" href="https://www.google.com/maps/@?api=1&amp;map_action=map&amp;center=8.9559%2C-79.5676&amp;zoom=14" target="_blank" rel="noopener">Explorar alrededores ↗</a>
+            <a class="mapa-enlace-simple" href="https://www.google.com/maps/dir/?api=1&amp;destination=Puerto+de+Balboa%2C+Panam%C3%A1" target="_blank" rel="noopener">Cómo llegar al Puerto de Balboa ↗</a>
+          </div>
+        </div>
+        <figure class="mapa-foto-real">
+          <img src="img/operacion-contenedor-balboa.jpg" alt="Camión con contenedor pasando por equipo de inspección en el Puerto de Balboa">
+          <figcaption>Operación real en Balboa · Foto: U.S. GAO, <a href="https://commons.wikimedia.org/wiki/File:Figure_3-_Panama_Customs_Examining_a_Container_Using_Imaging_Equipment,_Port_of_Balboa,_Panama_(10408265725).jpg" target="_blank" rel="noopener">dominio público</a></figcaption>
+        </figure>
+      </section>
+      <section class="mapa-simulacion">
+        <div class="mapa-seccion-cabecera"><div><span class="seccion-etiqueta">SIMULACIÓN DEL PROYECTO</span><h3>Así crece la fila durante el día ${estado.dia}</h3></div><p>Cada punto representa un camión. Pulsa ▶ para reproducir el día.</p></div>
+        <div id="mapa-fila"></div>
+      </section>
       <details class="mas">
         <summary>Ver más: comparación lado a lado (hoy vs propuesta)</summary>
         <div id="anim-mapa"></div>

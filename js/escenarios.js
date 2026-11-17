@@ -17,6 +17,7 @@ const HORAS_PICO = [7, 8, 9, 10, 15, 16, 17, 18];
 // Valores por defecto de la propuesta (supuestos del grupo, ver README)
 const ESCENARIO_BASE = {
   carriles: null,          // null = los de los datos (5)
+  carrilExtraPico: false,  // abre una ventanilla adicional solo en HORAS_PICO (máximo 6)
   servicioMin: null,       // null = los de los datos (≈ 4 min, varía por hora)
   extraPicoPct: 0,         // % extra de llegadas en horas pico
   capacidadVia: null,      // null = supuesto de los datos (40 camiones)
@@ -118,8 +119,15 @@ function simularDia(dia, esc = ESCENARIO_BASE) {
   // Tiempo de servicio: si se da un promedio, se escalan las horas para conservar su variación
   const servAbiertas = regs.filter((r) => r.garita_abierta).map((r) => r.servicio_min);
   const factorServ = esc.servicioMin ? esc.servicioMin / promedio(servAbiertas) : 1;
-  const capacidades = regs.map((r) => r.garita_abierta
-    ? KPI.capacidad(esc.carriles ?? r.carriles_abiertos, r.servicio_min * factorServ) : 0);
+  const carrilesPorHora = regs.map((r) => {
+    if (!r.garita_abierta) return 0;
+    const carrilesBase = esc.carriles ?? r.carriles_abiertos;
+    return esc.carrilExtraPico && HORAS_PICO.includes(r.hora)
+      ? Math.min(6, carrilesBase + 1)
+      : carrilesBase;
+  });
+  const capacidades = regs.map((r, h) => r.garita_abierta
+    ? KPI.capacidad(carrilesPorHora[h], r.servicio_min * factorServ) : 0);
 
   // Llegadas: base + extra en horas pico
   let llegadas = regs.map((r) =>
@@ -146,6 +154,7 @@ function simularDia(dia, esc = ESCENARIO_BASE) {
   const capEspera = capVia + (esc.colaVirtual.activo ? esc.colaVirtual.capacidadPreEst : 0);
 
   const k = kpiDelDia(regs, { llegadas, capacidades, capacidadVia: capEspera });
+  k.carrilesPorHora = carrilesPorHora;
   k.capacidadEspera = capEspera;
   k.totalLlegadas = llegadas.reduce((a, b) => a + b, 0);
   if (citas) {

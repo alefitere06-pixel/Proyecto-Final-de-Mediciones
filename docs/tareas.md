@@ -52,13 +52,15 @@ Flujo: rama `mejora-<tema>` → commits pequeños → Pull Request → el **otro
 |---|---|---|
 | [ ] | Revisar cada número del dashboard y anotar lo que no se entienda | |
 | [ ] | Discutir si los supuestos de la propuesta (70 % citas, ±2 h, 60 camiones de pre-estacionamiento) son razonables | |
-| [ ] | ρ pico sigue en ~93 % con la propuesta: ¿abrir el 6.º carril en hora pico de días de buque? (probar en módulo 2) | |
+| [x] | ρ pico sigue en ~93 % con la propuesta: probar una ventanilla adicional solo en horas pico y mostrar su impacto antes/después | tejadaoperaciones-star (rama `codex/tejada-simulador-cola`) |
 | [ ] | Costo-beneficio de la propuesta (opcional) | |
 
 ## Mapa, animación y presentación
 | Hecho | Tarea | Tomada por |
 |---|---|---|
 | [x] | Mapa del Puerto de Balboa, animación de la cola y modo presentación | Claude (rama `mejora-mapa-animacion-presentacion`) |
+| [x] | Simplificar la portada, agrupar enlaces por ramas y añadir accesos a Google Maps con imágenes reales de Balboa | tejadaoperaciones-star (rama `codex/tejada-simulador-cola`) |
+| [x] | Crear un generador de solución sin gráficos: problema + alcance → diagnóstico, resultado y plan por etapas | tejadaoperaciones-star (rama `codex/tejada-simulador-cola`) |
 | [ ] | Confirmar la puerta principal y la ruta de la fila en el mapa; elegir dónde iría el estacionamiento de espera (`js/mapaFila.js`) | |
 | [ ] | Anotar la fuente del mapa del puerto (img/mapa-puerto-balboa.png) en el README y la presentación | |
 | [ ] | Ensayar la presentación con el reloj (15 min) y repartir qué diapositiva explica cada uno | |
