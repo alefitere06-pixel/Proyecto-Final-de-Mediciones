@@ -8,8 +8,8 @@ Proyecto semestral · **Medición y Rendimiento de Terminales Portuarias** · Un
 ## Integrantes
 | Nombre | Usuario GitHub |
 |---|---|
-| _(nombre pendiente)_ | alefitere06-pixel |
-| _(nombre pendiente)_ | tejadaoperaciones-star |
+| alefitere06-pixel | alefitere06-pixel |
+| tejadaoperaciones-star | tejadaoperaciones-star |
 
 El proyecto **no está dividido por integrante**: cada uno puede mejorar cualquier parte
 (ver [Cómo trabajamos](#cómo-trabajamos-git)).

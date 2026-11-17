@@ -50,7 +50,6 @@ Flujo: rama `mejora-<tema>` → commits pequeños → Pull Request → el **otro
 ## Tareas generales
 | Hecho | Tarea | Tomada por |
 |---|---|---|
-| [ ] | Poner nombres completos en el README | |
 | [ ] | Justificar capacidad de la vía de acceso (40 camiones) con mapa/medición | |
 | [ ] | Comparar volumen diario simulado con una cifra publicada y citar la fuente | |
 | [ ] | Confirmar con el profesor el denominador de "cumplimiento de citas" | |
