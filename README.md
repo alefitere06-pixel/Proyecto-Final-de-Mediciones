@@ -57,7 +57,10 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 ## Navegación (menos cargado)
 - Cada sección es un **enlace** (`index.html#mapa`, `#simulador`, `#mejora`…): se puede compartir y el botón
   "atrás" del navegador funciona.
-- **Inicio** muestra solo lo esencial (4 pasos + resumen + 6 tarjetas-enlace "¿Qué quieres ver?").
+- **Inicio** muestra una portada real del Puerto de Balboa y cuatro rutas desplegables: ubicación, simulación,
+  solución y datos. Cada ruta contiene sus enlaces secundarios sin llenar la pantalla.
+- La barra superior deja visibles solo Inicio, Mapa, Simulador, Citas y Solución; Llegadas y TTT quedan bajo
+  **"Más análisis"** y también dentro de las rutas de Inicio.
 - Cada sección tiene una frase de introducción, migas "Inicio › Sección" y botones **← Anterior / Siguiente →**.
 - Los detalles (tablas hora por hora, gráficos extra, análisis A3 completo) están en **"Ver más"** y los
   7 indicadores del día en un botón plegable.
@@ -135,6 +138,12 @@ espera) y los KPI se calculan con las fórmulas del curso en `js/kpi.js`.
 ## KPI
 Fichas completas en [`docs/fichas_kpi.md`](docs/fichas_kpi.md). Fórmulas en `js/kpi.js`.
 Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual.md).
+
+## Mapa e imágenes
+- El mapa simulado funciona sin internet con `img/mapa-puerto-balboa.png`.
+- Los botones de Google Maps usan **Maps URLs** y no guardan claves ni tokens; necesitan conexión a internet.
+- Portada: *Puerto de Contenedores en Balboa*, Mdesanjur, Wikimedia Commons, CC BY-SA 4.0.
+- Operación de contenedor: U.S. Government Accountability Office, Wikimedia Commons, dominio público.
 
 ## Cómo trabajamos (Git)
 - **Nadie es dueño de un módulo.** Cualquier integrante puede tomar cualquier tarea y mejorar cualquier parte.

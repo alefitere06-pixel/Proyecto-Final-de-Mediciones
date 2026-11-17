@@ -59,6 +59,7 @@ Flujo: rama `mejora-<tema>` → commits pequeños → Pull Request → el **otro
 | Hecho | Tarea | Tomada por |
 |---|---|---|
 | [x] | Mapa del Puerto de Balboa, animación de la cola y modo presentación | Claude (rama `mejora-mapa-animacion-presentacion`) |
+| [x] | Simplificar la portada, agrupar enlaces por ramas y añadir accesos a Google Maps con imágenes reales de Balboa | tejadaoperaciones-star (rama `codex/tejada-simulador-cola`) |
 | [ ] | Confirmar la puerta principal y la ruta de la fila en el mapa; elegir dónde iría el estacionamiento de espera (`js/mapaFila.js`) | |
 | [ ] | Anotar la fuente del mapa del puerto (img/mapa-puerto-balboa.png) en el README y la presentación | |
 | [ ] | Ensayar la presentación con el reloj (15 min) y repartir qué diapositiva explica cada uno | |
