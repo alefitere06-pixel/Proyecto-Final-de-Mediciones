@@ -34,6 +34,12 @@ varias horas de desborde, mientras que los días sin buque la garita casi siempr
 
 El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 
+## Estilos visuales
+El dashboard tiene 3 estilos (selector **Estilo** en la barra, o `index.html?tema=logistica|tecnico|ejecutivo`):
+**A · Logística** (tarjetas claras con camión al centro), **B · Técnico** (diagrama de la garita con alarmas) y
+**C · Ejecutivo** (saludo, KPI con mini-gráficos, puerto). Cada uno tiene su portada **Inicio**. Cuando el grupo
+escoja uno, cambien `TEMA_POR_DEFECTO` en `js/temas.js`.
+
 ## Lo más fácil de ver (para la defensa)
 - **Pestaña 1 · Mapa y cola en vivo:** mapa real del Puerto de Balboa (OpenStreetMap, necesita internet) con la
   garita, el Puente de las Américas y el pre-estacionamiento propuesto, y una **animación** con un camioncito por

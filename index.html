@@ -6,10 +6,13 @@
   <title>Gate Balboa · Dashboard de cola y citas</title>
   <link rel="stylesheet" href="css/leaflet.css" />
   <link rel="stylesheet" href="css/estilos.css" />
+  <link rel="stylesheet" href="css/temas.css" />
 </head>
 <body>
+  <div class="app">
   <header class="barra">
     <div class="barra-titulo">
+      <div class="logo" aria-hidden="true"></div>
       <h1>Gate Balboa · Dashboard de cola y citas</h1>
       <span class="sello-simulado">DATOS SIMULADOS</span>
     </div>
@@ -36,6 +39,7 @@
     Proyecto semestral · Medición y Rendimiento de Terminales Portuarias · UMIP ·
     Todos los datos son <strong>simulados</strong> (data/generar_datos.py, semilla fija).
   </footer>
+  </div>
 
   <!-- Orden de carga: librería → datos → fórmulas → módulos → app -->
   <script src="js/lib/chart.umd.js"></script>
@@ -44,6 +48,8 @@
   <script src="js/kpi.js"></script>
   <script src="js/escenarios.js"></script>
   <script src="js/animacion.js"></script>
+  <script src="js/temas.js"></script>
+  <script src="js/ilustraciones.js"></script>
   <script>const MODULOS = [];</script>
   <script src="js/modulos/llegadas.js"></script>
   <script src="js/modulos/simulador.js"></script>
@@ -51,6 +57,7 @@
   <script src="js/modulos/citas.js"></script>
   <script src="js/modulos/mejora.js"></script>
   <script src="js/modulos/mapa.js"></script>
+  <script src="js/modulos/inicio.js"></script>
   <script src="js/presentacion.js"></script>
   <script src="js/app.js"></script>
 </body>

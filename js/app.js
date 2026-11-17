@@ -91,6 +91,7 @@ function prepararPestanas() {
 
 function activarModulo(id) {
   ESTADO.moduloActivo = id;
+  document.body.dataset.modulo = id;   // permite estilos por pestaña (ej. ocultar tarjetas en Inicio)
   document.querySelectorAll("#pestanas button").forEach((b) =>
     b.classList.toggle("activa", b.dataset.id === id));
   pintarModulo();
