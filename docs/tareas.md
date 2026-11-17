@@ -11,10 +11,10 @@ Flujo: rama `mejora-<tema>` → commits pequeños → Pull Request → el **otro
 ## Módulo 1 · Llegadas
 | Hecho | Tarea | Tomada por |
 |---|---|---|
-| [ ] | Gráfico de llegadas por hora (λ) del día elegido + promedio de los 30 días | |
-| [ ] | Llegadas por día de la semana; días con buque vs sin buque | |
-| [ ] | Filtro por tipo de transacción (importación, exportación, vacío) | |
-| [ ] | Marcar las horas pico | |
+| [x] | Gráfico de llegadas por hora (λ) del día elegido + promedio de los 30 días | Claude (rama `mejora-llegadas`) |
+| [x] | Llegadas por día de la semana; días con buque vs sin buque | Claude (rama `mejora-llegadas`) |
+| [x] | Filtro por tipo de transacción (importación, exportación, vacío) | Claude (rama `mejora-llegadas`) |
+| [x] | Marcar las horas pico | Claude (rama `mejora-llegadas`) |
 
 ## Módulo 2 · Simulador de cola
 | Hecho | Tarea | Tomada por |

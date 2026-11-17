@@ -77,6 +77,7 @@ select, input[type="number"] {
 .modulo { background: var(--panel); border: 1px solid var(--borde); border-radius: 8px; padding: 16px; }
 .modulo h2 { margin-top: 0; font-size: 1.1rem; color: var(--primario); }
 .rejilla-2 { display: grid; gap: 16px; grid-template-columns: 280px 1fr; }
+.rejilla-2 > * { min-width: 0; }  /* deja que los gráficos se achiquen */
 @media (max-width: 800px) { .rejilla-2 { grid-template-columns: 1fr; } }
 .contenedor-grafico { position: relative; height: 340px; }
 
@@ -87,3 +88,16 @@ select, input[type="number"] {
 .en-construccion code { background: #fff; padding: 1px 4px; border-radius: 3px; }
 
 .pie { text-align: center; font-size: 0.75rem; color: var(--texto-suave); padding: 20px; }
+
+/* ---- Controles y tablas de los módulos ---- */
+.controles-fila { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 14px; }
+.controles-fila label { font-size: 0.85rem; color: var(--texto-suave); display: flex; gap: 8px; align-items: center; }
+.modulo h3 { font-size: 0.95rem; margin: 20px 0 8px; color: var(--texto); }
+.contenedor-grafico.bajo { height: 260px; }
+.tabla-resumen { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.tabla-resumen th { text-align: left; background: var(--primario-claro); padding: 6px 8px; }
+.tabla-resumen td { border-bottom: 1px solid var(--borde); padding: 6px 8px; vertical-align: top; }
+.suave { color: var(--texto-suave); font-size: 0.78rem; }
+.nota { margin-top: 8px; }
+.texto-alerta { color: var(--alerta); font-weight: 600; }
+.texto-ok { color: var(--ok); font-weight: 600; }

@@ -78,7 +78,7 @@ Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual
 - **Nadie es dueño de un módulo.** Cualquier integrante puede tomar cualquier tarea y mejorar cualquier parte.
 - Lista de tareas en [`docs/tareas.md`](docs/tareas.md): antes de empezar, anoten su usuario en
   "Tomada por" para no trabajar los dos en lo mismo.
-- `main` siempre funciona. Cada mejora va en su propia rama (`mejora-<tema>`, por ejemplo
+- La rama principal `Proyecto-Final-mediciones` siempre funciona. Cada mejora va en su propia rama (`mejora-<tema>`, por ejemplo
   `mejora-grafico-llegadas`) y entra por Pull Request.
 - El **otro** integrante revisa el PR (abre el dashboard y verifica un número) antes del merge.
 - Commits pequeños y frecuentes: así los dos quedan con commits propios en todo el proyecto.
