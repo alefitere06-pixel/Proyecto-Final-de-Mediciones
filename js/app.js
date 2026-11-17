@@ -92,8 +92,8 @@ function pintarInfoDia() {
 // navegador y saltar de una sección a otra con <a href="#simulador">.
 function prepararPestanas() {
   const nav = document.getElementById("pestanas");
-  const principales = ["inicio", "mapa", "simulador", "citas", "solucion"];
-  const nombres = { mapa: "Mapa", simulador: "Simulador", citas: "Citas", solucion: "Solución" };
+  const principales = ["inicio", "mapa", "pase", "simulador", "citas", "solucion"];
+  const nombres = { mapa: "Mapa", pase: "Pase QR", simulador: "Simulador", citas: "Citas", solucion: "Solución" };
   const visibles = principales.map((id) => MODULOS.find((m) => m.id === id)).filter(Boolean);
   const extras = MODULOS.filter((m) => !principales.includes(m.id));
   nav.innerHTML = visibles.map((m) =>
