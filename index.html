@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gate Balboa · Dashboard de cola y citas</title>
+  <title>Gate Balboa · Fila de camiones</title>
   <link rel="stylesheet" href="css/leaflet.css" />
   <link rel="stylesheet" href="css/estilos.css" />
   <link rel="stylesheet" href="css/temas.css" />
@@ -13,21 +13,21 @@
   <header class="barra">
     <div class="barra-titulo">
       <div class="logo" aria-hidden="true"></div>
-      <h1>Gate Balboa · Dashboard de cola y citas</h1>
-      <span class="sello-simulado">DATOS SIMULADOS</span>
+      <h1>Gate Balboa · La fila de camiones del puerto</h1>
+      <span class="sello-simulado" data-glosario="simulados" title="Números creados por un programa para practicar">DATOS SIMULADOS</span>
     </div>
     <nav id="pestanas" class="pestanas" aria-label="Módulos"></nav>
   </header>
 
   <main>
     <section class="filtros">
-      <label>Día analizado
+      <label>Elegir día
         <select id="filtro-dia"></select>
       </label>
       <span id="info-dia" class="info-dia"></span>
     </section>
 
-    <p class="titulo-seccion">Situación actual del día (sin mejoras) · los módulos 2, 4 y 5 simulan escenarios</p>
+    <p class="titulo-seccion">Cómo está hoy la entrada del puerto, sin ningún cambio. Verde = bien, rojo = mal. Toquen la <b>i</b> para ver qué significa cada cosa.</p>
     <!-- Tarjetas KPI: se llenan desde js/app.js con las fórmulas de js/kpi.js -->
     <section id="tarjetas-kpi" class="tarjetas" aria-label="KPI principales"></section>
 
@@ -37,7 +37,7 @@
 
   <footer class="pie">
     Proyecto semestral · Medición y Rendimiento de Terminales Portuarias · UMIP ·
-    Todos los datos son <strong>simulados</strong> (data/generar_datos.py, semilla fija).
+    Todos los números son <strong>simulados</strong>: los creó un programa con reglas realistas para practicar (data/generar_datos.py).
   </footer>
   </div>
 
@@ -50,6 +50,7 @@
   <script src="js/animacion.js"></script>
   <script src="js/temas.js"></script>
   <script src="js/ilustraciones.js"></script>
+  <script src="js/glosario.js"></script>
   <script>const MODULOS = [];</script>
   <script src="js/modulos/llegadas.js"></script>
   <script src="js/modulos/simulador.js"></script>

@@ -49,7 +49,7 @@ function promedioPorDiaSemana(transaccion) {
 
 MODULOS.push({
   id: "llegadas",
-  titulo: "Llegadas",
+  titulo: "¿Cuántos llegan?",
   dueno: "Todo el grupo",
   rama: "mejora-llegadas",
 
@@ -79,7 +79,7 @@ MODULOS.push({
       registros.reduce((s, r) => s + r[t], 0));
 
     contenedor.innerHTML = `
-      <h2>Llegadas de camiones (λ)</h2>
+      <h2>¿Cuántos camiones llegan y a qué hora?</h2>
       <div class="controles-fila">
         <label>Tipo de transacción
           <select id="lleg-transaccion">
@@ -101,13 +101,13 @@ MODULOS.push({
             <tr><th colspan="2">Resumen del día ${estado.dia}</th></tr>
             <tr><td>Llegadas del día${filtro === "todas" ? "" : " (" + NOMBRE_TRANSACCION[filtro] + ")"}</td>
                 <td><strong>${fmt(lambdaDia.reduce((a, b) => a + b, 0))}</strong> camiones</td></tr>
-            <tr><td>Hora pico</td>
+            <tr><td>Hora con más camiones${ayuda("pico")}</td>
                 <td><strong>${horaTexto(horaMax)}</strong> · λ = ${fmt(lambdaDia[horaMax])} camiones/h</td></tr>
-            <tr><td>Horas con λ &gt; μ·c<br><span class="suave">(ahí se forma la cola)</span></td>
+            <tr><td>Horas en que llegan más de los que la puerta atiende<br><span class="suave">(ahí empieza la fila)</span></td>
                 <td class="${horasCola.length ? "texto-alerta" : "texto-ok"}">
                   ${horasCola.length ? horasCola.map((h) => horaTexto(h) +
                     (kpi.capacidades[h] === 0 ? " (garita cerrada)" : "")).join(", ") : "Ninguna"}</td></tr>
-            <tr><td>Días con buque vs sin buque</td>
+            <tr><td>Días con barco grande vs sin barco${ayuda("buque")}</td>
                 <td><strong>${difBuque >= 0 ? "+" : ""}${fmt(difBuque, 1)} %</strong> llegadas
                 <br><span class="suave">${fmt(promCon)} vs ${fmt(promSin)} camiones/día</span></td></tr>
             <tr><td>Mezcla del día</td>
@@ -115,14 +115,14 @@ MODULOS.push({
                     Vacío ${fmt(mezcla[2] / tot * 100)} %</td></tr>
           </table>
           <p class="suave nota">Las horas pico (3 con más llegadas) se resaltan en el gráfico.
-          La comparación λ &gt; μ·c usa todas las transacciones, porque los carriles atienden a todas.</p>
+          Cuando la barra pasa la línea roja, llegan más camiones de los que la puerta puede atender: ahí crece la fila.</p>
         </div>
         <div>
           <div class="contenedor-grafico"><canvas id="graf-llegadas-hora"></canvas></div>
         </div>
       </div>
 
-      <h3>Promedio de llegadas por día de la semana</h3>
+      <h3>¿Qué días llegan más camiones? (promedio)</h3>
       <div class="contenedor-grafico bajo"><canvas id="graf-llegadas-semana"></canvas></div>
       <p class="suave nota">Datos simulados · 30 días · data/generar_datos.py</p>`;
 
@@ -147,7 +147,7 @@ MODULOS.push({
 
     const series = [{
       type: "bar",
-      label: "Llegadas del día (λ)",
+      label: "Camiones que llegan",
       data: HORAS_VISIBLES.map((h) => lambdaDia[h]),
       backgroundColor: HORAS_VISIBLES.map((h) => (pico.includes(h) ? cPico : cPrimario)),
       order: 3,
@@ -161,7 +161,7 @@ MODULOS.push({
     }
     if (filtro === "todas") {
       series.push({
-        type: "line", label: "Capacidad de la garita (μ·c)",
+        type: "line", label: "Lo que la puerta puede atender",
         data: HORAS_VISIBLES.map((h) => Math.round(kpi.capacidades[h] * 10) / 10),
         borderColor: cAlerta, borderDash: [6, 4], pointRadius: 0, stepped: "middle", order: 2,
       });
@@ -184,8 +184,8 @@ MODULOS.push({
       data: {
         labels: DIAS_SEMANA,
         datasets: [
-          { label: "Con buque", data: sem.conBuque, backgroundColor: cPico },
-          { label: "Sin buque", data: sem.sinBuque, backgroundColor: cPrimario },
+          { label: "Con barco grande", data: sem.conBuque, backgroundColor: cPico },
+          { label: "Sin barco", data: sem.sinBuque, backgroundColor: cPrimario },
         ],
       },
       options: {

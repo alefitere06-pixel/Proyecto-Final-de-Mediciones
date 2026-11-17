@@ -8,7 +8,7 @@
 // =============================================================================
 
 const TTT_ESTADO = { verPropuesta: false };
-const ETAPAS_TTT = ["Espera afuera", "Gate de entrada", "Patio", "Gate de salida"];
+const ETAPAS_TTT = ["Esperando afuera", "Pasando la puerta", "Adentro (carga/descarga)", "Saliendo"];
 
 // Desglose del TTT por hora y promedio ponderado por llegadas para un día
 function desgloseTTT(dia, esc) {
@@ -39,7 +39,7 @@ const ESC_PROPUESTA = () => escPropuesta();
 
 MODULOS.push({
   id: "ttt",
-  titulo: "Truck Turn Time",
+  titulo: "Tiempo total del camión",
   dueno: "Todo el grupo",
   rama: "mejora-ttt",
 
@@ -58,28 +58,28 @@ MODULOS.push({
       <td class="${p.ttt <= M.ttt_min ? "mejor" : "peor"}">${fmt(p.ttt, 1)}</td></tr>`;
 
     contenedor.innerHTML = `
-      <h2>Truck Turn Time (TTT)</h2>
+      <h2>¿Cuánto tiempo pasa un camión en total?${ayuda("ttt")}</h2>
       <label class="check"><input type="checkbox" id="ttt-propuesta" ${TTT_ESTADO.verPropuesta ? "checked" : ""}>
-        Ver con la propuesta Gate Inteligente (3 palancas activas)</label>
+        Ver cómo quedaría con nuestra propuesta</label>
       ${htmlTarjetas([
-        { nombre: "TTT promedio del día", valor: fmt(d.ttt) + " min", meta: `meta ≤ ${M.ttt_min} min`, cumple: d.ttt <= M.ttt_min },
+        { nombre: "Tiempo total promedio", ayuda: "ttt", valor: fmt(d.ttt) + " min", meta: `meta ≤ ${M.ttt_min} min`, cumple: d.ttt <= M.ttt_min },
         ...ETAPAS_TTT.map((nombre, i) => ({ nombre, valor: fmt(d.etapas[i], 1) + " min",
           meta: fmt(d.etapas[i] / d.ttt * 100) + " % del TTT" })),
       ]).replace('class="tarjetas"', 'class="tarjetas compactas"')}
-      <div class="respuesta"><strong>¿Dónde se pierde el tiempo?</strong>
+      <div class="respuesta"><strong>¿En qué se pierde el tiempo?</strong>
         La etapa más larga es <strong>${ETAPAS_TTT[iMax].toLowerCase()}</strong> (${fmt(d.etapas[iMax], 1)} min).
-        La espera afuera es <strong>desperdicio puro</strong> (Lean: espera): no agrega valor al camión ni a la terminal.
+        Esperar afuera es <strong>tiempo perdido</strong>${ayuda("lean")}: nadie gana nada mientras el camión está parado.
         Con la propuesta, el TTT del día pasa de <strong>${fmt(actual.ttt)}</strong> a <strong class="mejor">${fmt(propuesta.ttt)} min</strong>
         (−${fmt(actual.ttt - propuesta.ttt)} min por camión).</div>
       <div class="rejilla-2">
         <div><div class="contenedor-grafico"><canvas id="graf-ttt-dona"></canvas></div></div>
         <div><div class="contenedor-grafico"><canvas id="graf-ttt-horas"></canvas></div></div>
       </div>
-      <h3>Días con buque vs sin buque (situación actual, promedio en minutos)</h3>
+      <h3>Días con barco grande vs sin barco (minutos, hoy sin cambios)</h3>
       <div class="tabla-scroll"><table class="tabla-horas">
-        <tr><th>Grupo</th>${ETAPAS_TTT.map((e) => `<th>${e}</th>`).join("")}<th>TTT</th></tr>
-        ${filaPeriodo("Días con buque", buque)}
-        ${filaPeriodo("Días sin buque", sinBuque)}
+        <tr><th>Grupo</th>${ETAPAS_TTT.map((e) => `<th>${e}</th>`).join("")}<th>Total</th></tr>
+        ${filaPeriodo("Días con barco grande", buque)}
+        ${filaPeriodo("Días sin barco", sinBuque)}
       </table></div>
       <p class="suave nota">Datos simulados. TTT ponderado por llegadas (las horas con más camiones pesan más).</p>`;
 
@@ -104,7 +104,7 @@ MODULOS.push({
         ],
       },
       options: {
-        plugins: { title: { display: true, text: "TTT por hora de llegada (barras apiladas por etapa)" } },
+        plugins: { title: { display: true, text: "Tiempo total según la hora en que llega el camión" } },
         scales: { x: { stacked: true }, y: { stacked: true, title: { display: true, text: "minutos" } } },
       },
     });

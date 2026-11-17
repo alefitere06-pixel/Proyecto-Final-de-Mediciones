@@ -20,22 +20,23 @@ let MAPA = null;
 
 MODULOS.unshift({   // unshift: queda como primera pestaña
   id: "mapa",
-  titulo: "Mapa y cola en vivo",
+  titulo: "Mapa y fila en vivo",
   dueno: "Todo el grupo",
   rama: "mejora-mapa",
 
   render(contenedor, estado) {
     contenedor.innerHTML = `
-      <h2>El problema en el mapa · Puerto de Balboa, Panamá</h2>
+      <h2>¿Dónde está el problema? · Puerto de Balboa, Panamá</h2>
       <div class="rejilla-2 mapa-rejilla">
         <div class="mapa-texto">
-          <p><strong>¿Qué pasa?</strong> En horas pico llegan más camiones de los que la garita puede atender.
-          La cola crece por la vía de acceso y, cuando ya no cabe, <span class="peor">sale a la vía pública</span>
-          cerca del <strong>Puente de las Américas</strong>.</p>
-          <p><strong>¿Por qué?</strong> La terminal no tiene un área de espera fuera de la vía (problema de diseño)
-          y todos los camiones llegan a la misma hora.</p>
-          <p><strong>Nuestra idea:</strong> <span class="mejor">Gate Inteligente</span> — citas que se ajustan a la
-          capacidad real de la garita, un pre-estacionamiento con llamado por app y premiar la doble transacción.</p>
+          <p><strong>¿Qué pasa?</strong> Los camiones que traen o recogen contenedores entran al puerto por una puerta llamada
+          <strong>garita</strong>${ayuda("garita")}. En las horas de más tráfico llegan más camiones de los que la puerta puede revisar,
+          y se forma una fila. Cuando la fila ya no cabe en su carril, <span class="peor">los camiones quedan en la calle</span>
+          cerca del <strong>Puente de las Américas</strong> y bloquean el tránsito.</p>
+          <p><strong>¿Por qué pasa?</strong> El puerto no tiene un lugar para que los camiones esperen fuera de la calle,
+          y casi todos llegan a la misma hora.</p>
+          <p><strong>Nuestra idea:</strong> <span class="mejor">Gate Inteligente</span> — 1) los camiones reservan una hora para llegar (citas),
+          2) esperan en un estacionamiento fuera de la calle y una app los llama, y 3) se premia hacer dos trámites en un solo viaje.</p>
           <p class="suave">Puntos del mapa aproximados: arrástrenlos para corregirlos; las coordenadas aparecen al hacer clic.</p>
         </div>
         <div>
@@ -43,7 +44,7 @@ MODULOS.unshift({   // unshift: queda como primera pestaña
           <p id="mapa-aviso" class="suave nota"></p>
         </div>
       </div>
-      <h3>Animación: la cola durante el día ${estado.dia}</h3>
+      <h3>Mira cómo crece la fila durante el día ${estado.dia} (cada cuadrito es un camión)</h3>
       <div id="anim-mapa"></div>`;
 
     this.dibujarMapa(contenedor);

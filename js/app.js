@@ -37,27 +37,28 @@ function definirTarjetas(k, citasDia) {
   const cumplimiento = KPI.cumplimientoCitas(citasDia.dentro_franja, citasDia.usadas);
   const noShow = KPI.noShow(citasDia.reservadas - citasDia.usadas, citasDia.reservadas);
   return [
-    { nombre: "Espera promedio (Wq)", valor: fmt(k.wqPromedio) + " min", meta: `meta ≤ ${M.wq_min} min`, cumple: k.wqPromedio <= M.wq_min },
-    { nombre: "Cola máxima (Lq)", valor: fmt(k.lqMax) + " camiones", meta: `límite vía ${M.lq_max}`, cumple: k.lqMax <= M.lq_max },
-    { nombre: `Utilización pico (ρ) ${horaTexto(k.horaPico)}`, valor: fmt(k.rhoPico) + " %", meta: `meta ≤ ${M.rho_pct} %`, cumple: k.rhoPico <= M.rho_pct },
-    { nombre: "Truck Turn Time (TTT)", valor: fmt(k.tttPromedio) + " min", meta: `meta ≤ ${M.ttt_min} min`, cumple: k.tttPromedio <= M.ttt_min },
-    { nombre: "Horas con desborde", valor: fmt(k.horasDesborde) + " h/día", meta: `meta ${M.desborde_h}`, cumple: k.horasDesborde <= M.desborde_h },
-    { nombre: "Cumplimiento de citas", valor: fmt(cumplimiento, 1) + " %", meta: `meta ≥ ${M.cumplimiento_pct} % (piloto)`, cumple: cumplimiento >= M.cumplimiento_pct },
-    { nombre: "No-show", valor: fmt(noShow, 1) + " %", meta: `meta ≤ ${M.noshow_pct} % (piloto)`, cumple: noShow <= M.noshow_pct },
+    { nombre: "Espera promedio", ayuda: "espera", valor: fmt(k.wqPromedio) + " min", meta: `ideal: ${M.wq_min} min o menos`, cumple: k.wqPromedio <= M.wq_min,
+      explica: `Cada camión esperó unos ${fmt(k.wqPromedio)} minutos para entrar.` },
+    { nombre: "Camiones esperando (máximo)", ayuda: "fila", valor: fmt(k.lqMax), meta: `solo caben ${M.lq_max} en el carril de espera`, cumple: k.lqMax <= M.lq_max,
+      explica: k.lqMax > M.lq_max ? `${fmt(k.lqMax - M.lq_max)} quedaron en la calle.` : "La fila cupo en su carril." },
+    { nombre: "¿Qué tan llena está la puerta?", ayuda: "ocupacion", valor: fmt(k.rhoPico) + " %", meta: `sano: ${M.rho_pct} % o menos`, cumple: k.rhoPico <= M.rho_pct,
+      explica: k.rhoPico > 100 ? `A las ${horaTexto(k.horaPico)} llegan más camiones de los que puede atender.` : `A las ${horaTexto(k.horaPico)}, la hora con más camiones.` },
+    { nombre: "Tiempo total del camión", ayuda: "ttt", valor: fmt(k.tttPromedio) + " min", meta: `ideal: ${M.ttt_min} min o menos`, cumple: k.tttPromedio <= M.ttt_min,
+      explica: "Desde que llega a la fila hasta que sale del puerto." },
+    { nombre: "Horas con fila en la calle", ayuda: "desborde", valor: fmt(k.horasDesborde) + " h", meta: `ideal: ${M.desborde_h} horas`, cumple: k.horasDesborde <= M.desborde_h,
+      explica: "Horas en que la fila bloqueó la calle." },
+    { nombre: "Llegan a su hora (citas)", ayuda: "cumplimiento", valor: fmt(cumplimiento, 1) + " %", meta: `ideal: ${M.cumplimiento_pct} % o más · prueba piloto`, cumple: cumplimiento >= M.cumplimiento_pct,
+      explica: "De los camiones con cita, cuántos llegaron a su hora." },
+    { nombre: "Citas sin usar", ayuda: "noShow", valor: fmt(noShow, 1) + " %", meta: `ideal: ${M.noshow_pct} % o menos · prueba piloto`, cumple: noShow <= M.noshow_pct,
+      explica: "Reservaron turno y no llegaron." },
   ];
 }
 
 function pintarTarjetas() {
   const k = kpiDelDia(registrosDelDia(ESTADO.dia));
   const citasDia = DATOS.citas_piloto.find((c) => c.dia === ESTADO.dia);
-  const html = definirTarjetas(k, citasDia).map((t) => `
-    <div class="tarjeta ${t.cumple ? "" : "no-cumple"}">
-      <div class="nombre">${t.nombre}</div>
-      <div class="valor">${t.valor}</div>
-      <div class="meta">${t.meta}</div>
-      <div class="estado">${t.cumple ? "✓ cumple" : "✗ no cumple"}</div>
-    </div>`).join("");
-  document.getElementById("tarjetas-kpi").innerHTML = html;
+  document.getElementById("tarjetas-kpi").innerHTML = htmlTarjetas(definirTarjetas(k, citasDia))
+    .replace(/^<div class="tarjetas">/, "").replace(/<\/div>$/, "");
 }
 
 // ---- Filtro de día ----------------------------------------------------------
@@ -76,8 +77,8 @@ function prepararFiltroDia() {
 function pintarInfoDia() {
   const d = DATOS.dias.find((x) => x.dia === ESTADO.dia);
   document.getElementById("info-dia").innerHTML =
-    `${fmt(d.llegadas)} camiones llegaron · ` +
-    (d.dia_buque ? `<span class="etiqueta-buque">día de buque</span>` : "día sin buque");
+    `${fmt(d.llegadas)} camiones llegaron este día · ` +
+    (d.dia_buque ? `<span class="etiqueta-buque">llegó un barco grande (día de buque)</span>${ayuda("buque")}` : "no llegó barco grande");
 }
 
 // ---- Pestañas ---------------------------------------------------------------
@@ -131,10 +132,11 @@ function avisoEnConstruccion(contenedor, modulo, tareas, prompt) {
 function htmlTarjetas(lista) {
   return `<div class="tarjetas">` + lista.map((t) => `
     <div class="tarjeta ${t.cumple === false ? "no-cumple" : t.cumple === undefined ? "neutra" : ""}">
-      <div class="nombre">${t.nombre}</div>
+      <div class="nombre">${t.nombre}${t.ayuda ? ayuda(t.ayuda) : ""}</div>
       <div class="valor">${t.valor}</div>
       <div class="meta">${t.meta ?? ""}</div>
-      ${t.cumple === undefined ? "" : `<div class="estado">${t.cumple ? "✓ cumple" : "✗ no cumple"}</div>`}
+      ${t.cumple === undefined ? "" : `<div class="estado">${t.cumple ? "✓ Bien" : "✗ Mal"}</div>`}
+      ${t.explica ? `<div class="explica">${t.explica}</div>` : ""}
     </div>`).join("") + `</div>`;
 }
 

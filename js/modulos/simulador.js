@@ -26,7 +26,7 @@ function carrilesNecesarios(dia, servicioMin, extraPicoPct) {
 
 MODULOS.push({
   id: "simulador",
-  titulo: "Simulador de cola",
+  titulo: "Simulador de la fila",
   dueno: "Todo el grupo",
   rama: "mejora-simulador",
 
@@ -36,17 +36,17 @@ MODULOS.push({
     const serv = SIM_ESTADO.servicioMin ?? Math.round(servReal * 10) / 10;
 
     contenedor.innerHTML = `
-      <h2>Simulador de cola</h2>
+      <h2>Simulador: ¿qué pasa si cambiamos algo?</h2>
       <div class="rejilla-2">
         <div class="panel-control">
-          <h3>Escenario (controles)</h3>
-          ${htmlSlider("sim-carriles", "Carriles de garita abiertos", 1, 6, 1, SIM_ESTADO.carriles)}
-          ${htmlSlider("sim-servicio", "Tiempo de servicio promedio", 2, 6, 0.1, serv, " min")}
-          ${htmlSlider("sim-pico", "Llegadas extra en hora pico", 0, 50, 5, SIM_ESTADO.extraPicoPct, " %")}
-          ${htmlSlider("sim-via", "Capacidad de la vía de acceso", 20, 80, 5, SIM_ESTADO.capacidadVia, " camiones")}
-          <button id="sim-reset" class="boton">Volver a la situación actual</button>
-          <p class="suave nota">Situación actual: 5 carriles, servicio real del día
-          (${fmt(servReal, 2)} min en promedio), vía de 40 camiones.</p>
+          <h3>Muevan los controles 👇</h3>
+          ${htmlSlider("sim-carriles", "Ventanillas abiertas en la puerta", 1, 6, 1, SIM_ESTADO.carriles)}
+          ${htmlSlider("sim-servicio", "Minutos para revisar cada camión", 2, 6, 0.1, serv, " min")}
+          ${htmlSlider("sim-pico", "Camiones extra en horas de más tráfico", 0, 50, 5, SIM_ESTADO.extraPicoPct, " %")}
+          ${htmlSlider("sim-via", "Camiones que caben en el carril de espera", 20, 80, 5, SIM_ESTADO.capacidadVia, " camiones")}
+          <button id="sim-reset" class="boton">Volver a como está hoy</button>
+          <p class="suave nota">Hoy: 5 ventanillas abiertas, cada camión tarda unos
+          ${fmt(servReal, 1)} min en la puerta y caben 40 camiones en el carril de espera.</p>
         </div>
         <div>
           <div id="sim-tarjetas"></div>
@@ -54,11 +54,11 @@ MODULOS.push({
         </div>
       </div>
       <div id="sim-respuesta" class="respuesta"></div>
-      <h3>Llegadas (λ) vs capacidad de la garita (μ·c)</h3>
+      <h3>Camiones que llegan vs camiones que la puerta puede atender</h3>
       <div class="contenedor-grafico bajo"><canvas id="graf-sim-lambda"></canvas></div>
-      <h3>Detalle hora por hora</h3>
+      <h3>Hora por hora</h3>
       <div class="tabla-scroll" id="sim-tabla"></div>
-      <p class="suave nota">Datos simulados. Filas en rojo = horas con desborde (la cola no cabe en la vía de acceso).</p>`;
+      <p class="suave nota">Datos simulados. Filas en rojo = la fila no cupo en su carril y salió a la calle.</p>`;
 
     const actualizar = () => this.actualizar(contenedor, estado);
     conectarSlider(contenedor, "sim-carriles", (v) => { SIM_ESTADO.carriles = v; actualizar(); });
@@ -86,12 +86,12 @@ MODULOS.push({
 
     // --- Tarjetas del escenario ---
     contenedor.querySelector("#sim-tarjetas").innerHTML = htmlTarjetas([
-      { nombre: "Wq promedio", valor: fmt(k.wqPromedio) + " min", meta: `meta ≤ ${M.wq_min}`, cumple: k.wqPromedio <= M.wq_min },
-      { nombre: "Wq máximo", valor: fmt(k.wqMax) + " min", meta: "peor hora" },
-      { nombre: "Cola máxima (Lq)", valor: fmt(k.lqMax), meta: `vía ${capVia}`, cumple: k.lqMax <= capVia },
-      { nombre: `ρ pico (${horaTexto(k.horaPico)})`, valor: fmt(k.rhoPico) + " %", meta: `meta ≤ ${M.rho_pct} %`, cumple: k.rhoPico <= M.rho_pct },
-      { nombre: "Horas con desborde", valor: fmt(k.horasDesborde) + " h", meta: "meta 0", cumple: k.horasDesborde <= M.desborde_h },
-      { nombre: "Camiones en vía pública", valor: fmt(k.viaPublicaMax), meta: "máximo · meta 0", cumple: k.viaPublicaMax <= 0 },
+      { nombre: "Espera promedio", ayuda: "espera", valor: fmt(k.wqPromedio) + " min", meta: `ideal: ${M.wq_min} min o menos`, cumple: k.wqPromedio <= M.wq_min },
+      { nombre: "Espera en la peor hora", valor: fmt(k.wqMax) + " min", meta: "quien llega en la peor hora" },
+      { nombre: "Camiones esperando (máx.)", ayuda: "fila", valor: fmt(k.lqMax), meta: `caben ${capVia} en el carril`, cumple: k.lqMax <= capVia },
+      { nombre: `Qué tan llena está la puerta (${horaTexto(k.horaPico)})`, ayuda: "ocupacion", valor: fmt(k.rhoPico) + " %", meta: `sano: ${M.rho_pct} % o menos`, cumple: k.rhoPico <= M.rho_pct },
+      { nombre: "Horas con fila en la calle", ayuda: "desborde", valor: fmt(k.horasDesborde) + " h", meta: "ideal: 0", cumple: k.horasDesborde <= M.desborde_h },
+      { nombre: "Camiones en la calle", ayuda: "calle", valor: fmt(k.viaPublicaMax), meta: "máximo · ideal: 0", cumple: k.viaPublicaMax <= 0 },
     ]).replace('class="tarjetas"', 'class="tarjetas compactas"');
 
     // --- Gráfico de cola ---
@@ -99,14 +99,14 @@ MODULOS.push({
       data: {
         labels: horas.map(horaTexto),
         datasets: [
-          { type: "bar", label: "Camiones en cola (Lq)", data: horas.map((h) => Math.round(k.colas[h])),
+          { type: "bar", label: "Camiones esperando", data: horas.map((h) => Math.round(k.colas[h])),
             backgroundColor: horas.map((h) => (k.colas[h] > capVia ? color("alerta") : color("primario"))), order: 2 },
-          { type: "line", label: `Límite vía de acceso (${capVia})`, data: horas.map(() => capVia),
+          { type: "line", label: `Caben en el carril de espera (${capVia})`, data: horas.map(() => capVia),
             borderColor: color("aviso"), borderDash: [6, 4], pointRadius: 0, order: 1 },
         ],
       },
       options: {
-        plugins: { title: { display: true, text: `Cola por hora · día ${estado.dia} (rojo = desborde)` } },
+        plugins: { title: { display: true, text: `Camiones esperando por hora · día ${estado.dia} (rojo = la fila salió a la calle)` } },
         scales: { y: { beginAtZero: true, title: { display: true, text: "camiones" } } },
       },
     });
@@ -117,9 +117,9 @@ MODULOS.push({
       data: {
         labels: horas.map(horaTexto),
         datasets: [
-          { label: "Llegadas (λ)", data: horas.map((h) => Math.round(k.llegadas[h])), borderColor: color("primario"), backgroundColor: color("primario"), tension: 0.3 },
-          { label: "Capacidad (μ·c)", data: horas.map((h) => Math.round(k.capacidades[h])), borderColor: color("alerta"), borderDash: [6, 4], pointRadius: 0, stepped: "middle" },
-          { label: "85 % de la capacidad (meta ρ)", data: horas.map((h) => Math.round(k.capacidades[h] * 0.85)), borderColor: color("ok"), borderDash: [2, 3], pointRadius: 0, stepped: "middle" },
+          { label: "Llegan", data: horas.map((h) => Math.round(k.llegadas[h])), borderColor: color("primario"), backgroundColor: color("primario"), tension: 0.3 },
+          { label: "La puerta puede atender", data: horas.map((h) => Math.round(k.capacidades[h])), borderColor: color("alerta"), borderDash: [6, 4], pointRadius: 0, stepped: "middle" },
+          { label: "Límite sano (85 %)", data: horas.map((h) => Math.round(k.capacidades[h] * 0.85)), borderColor: color("ok"), borderDash: [2, 3], pointRadius: 0, stepped: "middle" },
         ],
       },
       options: { scales: { y: { beginAtZero: true, title: { display: true, text: "camiones/h" } } } },
@@ -135,7 +135,7 @@ MODULOS.push({
         <td>${fmt(KPI.camionesEnViaPublica(k.colas[h], capVia))}</td></tr>`;
     }).join("");
     contenedor.querySelector("#sim-tabla").innerHTML = `<table class="tabla-horas">
-      <tr><th>Hora</th><th>λ</th><th>μ·c</th><th>ρ</th><th>Lq</th><th>Wq (min)</th><th>En vía pública</th></tr>
+      <tr><th>Hora</th><th>Llegan</th><th>Puede atender</th><th>Qué tan llena</th><th>Esperando</th><th>Espera (min)</th><th>En la calle</th></tr>
       ${filas}</table>`;
 
     // --- Respuestas a las preguntas del enunciado ---
@@ -147,12 +147,12 @@ MODULOS.push({
     });
     const horasCola = horas.filter((h) => k.colas[h] > 0.5);
     contenedor.querySelector("#sim-respuesta").innerHTML = `
-      <strong>¿En qué horas se forma la cola?</strong>
+      <strong>¿A qué hora hay fila?</strong>
       ${horasCola.length ? `${tramosHorarios(horasCola)}
-        (máximo ${fmt(k.lqMax)} camiones; ${fmt(k.viaPublicaMax)} quedan en la vía pública).` : "No se forma cola con este escenario."}<br>
-      <strong>¿Cuántos carriles hacen falta para ρ ≤ ${M.rho_pct} % en la hora pico?</strong>
-      Este día: <strong>${necesarioDia.carriles ?? "más de 12"}</strong> carriles.
-      Peor día de los 30 (día ${peor.dia}): <strong>${peor.carriles > 12 ? "más de 12" : peor.carriles}</strong> carriles
-      ${peor.carriles > 6 ? `— <span class="peor">la garita solo tiene 6 instalados: abrir carriles no alcanza</span>.` : "."}`;
+        (máximo ${fmt(k.lqMax)} camiones; ${fmt(k.viaPublicaMax)} quedan en la calle).` : "Con estos valores no se forma fila."}<br>
+      <strong>¿Cuántas ventanillas harían falta para que la puerta no pase del ${M.rho_pct} % en la hora de más tráfico?</strong>
+      Este día: <strong>${necesarioDia.carriles ?? "más de 12"}</strong> ventanillas.
+      Peor día de los 30 (día ${peor.dia}): <strong>${peor.carriles > 12 ? "más de 12" : peor.carriles}</strong> ventanillas
+      ${peor.carriles > 6 ? `— <span class="peor">la puerta solo tiene 6: abrir más ventanillas no alcanza</span>.` : "."}`;
   },
 });

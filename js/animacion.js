@@ -33,9 +33,9 @@ function crearAnimacionCola(contenedor, opciones) {
       <div class="anim-reloj" id="${prefijo}-reloj">04:00</div>
       <input type="range" class="anim-barra" id="${prefijo}-barra" min="${H_INI}" max="${H_FIN}" step="0.05" value="${H_INI}" aria-label="Hora del día">
     </div>
-    ${filaHTML("actual", "Situación actual", false)}
-    ${filaHTML("prop", "Con Gate Inteligente (TAS dinámico + cola virtual + doble transacción)", true)}
-    <p class="suave nota">Día ${dia} · cada camioncito = 1 camión en cola · datos simulados.</p>`;
+    ${filaHTML("actual", "😟 Hoy, sin cambios", false)}
+    ${filaHTML("prop", "😀 Con nuestra propuesta (citas + estacionamiento de espera + dos trámites en un viaje)", true)}
+    <p class="suave nota">Día ${dia} · cada cuadrito = 1 camión esperando · datos simulados.</p>`;
 
   function filaHTML(id, titulo, conPre) {
     return `<div class="anim-fila">
@@ -65,13 +65,13 @@ function crearAnimacionCola(contenedor, opciones) {
     const svg = contenedor.querySelector(`#${prefijo}-${id}-svg`);
     // Puente y vía pública
     el("rect", { x: 10, y: 50, width: 420, height: 34, class: "via-publica" }, svg);
-    el("text", { x: 14, y: 44, class: "anim-etq peor" }, svg, "◀ Vía pública · hacia el Puente de las Américas");
+    el("text", { x: 14, y: 44, class: "anim-etq peor" }, svg, "◀ La calle · hacia el Puente de las Américas");
     // Vía de acceso
     el("rect", { x: 430, y: 50, width: 360, height: 34, class: "via-acceso" }, svg);
-    el("text", { x: 434, y: 44, class: "anim-etq" }, svg, `Vía de acceso (${capVia} camiones)`);
+    el("text", { x: 434, y: 44, class: "anim-etq" }, svg, `Carril de espera (caben ${capVia} camiones)`);
     // Garita y terminal
     el("rect", { x: 792, y: 40, width: 14, height: 54, class: "garita" }, svg);
-    el("text", { x: 806, y: 106, class: "anim-etq", "text-anchor": "end" }, svg, "Garita ▲");
+    el("text", { x: 806, y: 106, class: "anim-etq", "text-anchor": "end" }, svg, "Puerta ▲");
     el("rect", { x: 812, y: 22, width: 80, height: 90, rx: 4, class: "terminal" }, svg);
     el("text", { x: 852, y: 62, class: "anim-etq centro blanco" }, svg, "Terminal");
     el("text", { x: 852, y: 76, class: "anim-etq centro blanco" }, svg, "Balboa");
@@ -90,7 +90,7 @@ function crearAnimacionCola(contenedor, opciones) {
     const extra = el("text", { x: 14, y: 100, class: "anim-etq peor fuerte" }, svg, "");
     if (conPre) {
       el("rect", { x: 430, y: 112, width: 360, height: 56, rx: 4, class: "pre-est" }, svg);
-      el("text", { x: 434, y: 106, class: "anim-etq mejor" }, svg, `Pre-estacionamiento · cola virtual (${capPre} camiones, fuera de la vía)`);
+      el("text", { x: 434, y: 106, class: "anim-etq mejor" }, svg, `Estacionamiento de espera (${capPre} camiones, fuera de la calle)`);
       for (let i = 0; i < capPre; i++) {
         const col = Math.floor(i / 3), fila = i % 3;
         slots.pre.push(camion(svg, 772 - col * 17.5, 116 + fila * 16, "en-pre"));
@@ -126,11 +126,11 @@ function crearAnimacionCola(contenedor, opciones) {
       const h = Math.min(Math.floor(t), 23);
       const espera = k.esperas[h];
       contenedor.querySelector(`#${prefijo}-${id}-datos`).innerHTML = `
-        <span><strong>${n}</strong> en cola</span>
-        ${pre ? `<span class="mejor"><strong>${enPre}</strong> en pre-estacionamiento</span>` : ""}
-        <span class="${enPublica ? "peor" : "mejor"}"><strong>${enPublica}</strong> en la vía pública</span>
-        <span>Espera de quien llega a esta hora: <strong>${espera === null ? "—" : fmt(espera)} min</strong></span>
-        <span>Garita: ${fmt(k.capacidades[h])} camiones/h · llegan ${fmt(k.llegadas[h])}/h</span>`;
+        <span><strong>${n}</strong> camiones esperando</span>
+        ${pre ? `<span class="mejor"><strong>${enPre}</strong> en el estacionamiento</span>` : ""}
+        <span class="${enPublica ? "peor" : "mejor"}"><strong>${enPublica}</strong> en la calle</span>
+        <span>Si llegas a esta hora esperas: <strong>${espera === null ? "—" : fmt(espera)} min</strong></span>
+        <span>La puerta atiende ${fmt(k.capacidades[h])} por hora y llegan ${fmt(k.llegadas[h])}</span>`;
     });
   }
 

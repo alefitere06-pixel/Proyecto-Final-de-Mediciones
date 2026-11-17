@@ -30,7 +30,7 @@ const DIAPOSITIVAS = [
       <div class="pres-portada">
         <div class="pres-etiqueta">Proyecto semestral · UMIP · Medición y Rendimiento de Terminales Portuarias</div>
         <h1>Gate Inteligente</h1>
-        <p class="pres-sub">Cómo sacar de la vía pública la cola de camiones de la garita de Balboa</p>
+        <p class="pres-sub">Cómo sacar de la calle la fila de camiones del puerto de Balboa</p>
         <p class="pres-equipo">${INTEGRANTES.join(" · ")}</p>
         <span class="sello-simulado">DATOS SIMULADOS</span>
       </div>`,
@@ -39,13 +39,13 @@ const DIAPOSITIVAS = [
     titulo: "El problema",
     html: (d) => `
       <h2>El problema</h2>
-      <p class="pres-lead">En horas pico, la cola para entrar a la garita de Balboa no cabe en la vía de acceso
-      y <strong class="peor">sale a la vía pública</strong>, cerca del Puente de las Américas.</p>
+      <p class="pres-lead">En las horas de más tráfico, la fila de camiones para entrar al puerto de Balboa no cabe en su carril
+      y <strong class="peor">queda en la calle</strong>, cerca del Puente de las Américas.</p>
       <div class="pres-numeros">
         <div><span class="peor">${fmt(d.actual.wqPromedio)} min</span>espera promedio<br><small>meta ≤ 30</small></div>
-        <div><span class="peor">${fmt(d.actual.viaPublicaMax)}</span>camiones en la vía pública<br><small>meta 0</small></div>
-        <div><span class="peor">${fmt(d.actual.horasDesborde, 1)} h</span>al día con desborde<br><small>meta 0</small></div>
-        <div><span class="peor">${fmt(d.actual.rhoPico)} %</span>utilización en hora pico<br><small>meta ≤ 85 %</small></div>
+        <div><span class="peor">${fmt(d.actual.viaPublicaMax)}</span>camiones en la calle<br><small>meta 0</small></div>
+        <div><span class="peor">${fmt(d.actual.horasDesborde, 1)} h</span>al día con fila en la calle<br><small>meta 0</small></div>
+        <div><span class="peor">${fmt(d.actual.rhoPico)} %</span>de ocupación de la puerta<br><small>meta ≤ 85 %</small></div>
       </div>
       <p class="suave">Promedio de los días con buque · datos simulados.</p>`,
   },
@@ -55,10 +55,10 @@ const DIAPOSITIVAS = [
       <h2>¿Por qué pasa? (causa raíz)</h2>
       <div class="pres-dos">
         <ol class="pres-lista">
-          <li>Llegan más camiones (λ) de los que la garita atiende (μ·c).</li>
+          <li>Llegan más camiones de los que la puerta puede revisar.</li>
           <li>Todos llegan a la misma hora: no hay citas.</li>
-          <li>Abrir carriles no alcanza: harían falta 11 y hay 6.</li>
-          <li><strong>Diseño:</strong> no hay área de espera fuera de la vía.</li>
+          <li>Abrir ventanillas no alcanza: harían falta 11 y hay 6.</li>
+          <li><strong>Diseño:</strong> no hay lugar para esperar fuera de la calle.</li>
         </ol>
         <div class="pres-grafico"><canvas id="pres-graf-lambda"></canvas></div>
       </div>`,
@@ -67,8 +67,8 @@ const DIAPOSITIVAS = [
       crearGrafico("pres-graf-lambda", {
         type: "line",
         data: { labels: horas.map(horaTexto), datasets: [
-          { label: "Llegan (λ)", data: horas.map((h) => d.dia2.llegadas[h]), borderColor: color("primario"), backgroundColor: color("primario"), tension: 0.3 },
-          { label: "La garita atiende (μ·c)", data: horas.map((h) => Math.round(d.dia2.capacidades[h])), borderColor: color("alerta"), borderDash: [6, 4], pointRadius: 0, stepped: "middle" },
+          { label: "Llegan", data: horas.map((h) => d.dia2.llegadas[h]), borderColor: color("primario"), backgroundColor: color("primario"), tension: 0.3 },
+          { label: "La puerta puede atender", data: horas.map((h) => Math.round(d.dia2.capacidades[h])), borderColor: color("alerta"), borderDash: [6, 4], pointRadius: 0, stepped: "middle" },
         ] },
         options: { plugins: { title: { display: true, text: "Día 2 (martes con buque)" } }, scales: { y: { beginAtZero: true } } },
       });
@@ -77,17 +77,17 @@ const DIAPOSITIVAS = [
   {
     titulo: "Cómo lo medimos",
     html: () => `
-      <h2>Cómo lo medimos: KPI del curso</h2>
+      <h2>Cómo lo medimos: indicadores del curso</h2>
       <table class="pres-tabla">
         <tr><th>KPI</th><th>Fórmula</th><th>Meta</th></tr>
-        <tr><td>Utilización (ρ)</td><td>λ ÷ (μ·c)</td><td>≤ 85 %</td></tr>
-        <tr><td>Cola (Lq)</td><td>Cola(t+1) = máx[0; Cola(t) + λ − μc]</td><td>≤ 40 camiones</td></tr>
-        <tr><td>Espera (Wq)</td><td>Ley de Little: Lq ÷ λ</td><td>≤ 30 min</td></tr>
-        <tr><td>Truck Turn Time</td><td>espera + gate + patio + salida</td><td>≤ 90 min</td></tr>
-        <tr><td>Horas con desborde</td><td>horas con cola &gt; vía de acceso</td><td>0 h/día</td></tr>
-        <tr><td>Cumplimiento de citas</td><td>en su franja ÷ con cita × 100</td><td>≥ 85 %</td></tr>
-        <tr><td>No-show</td><td>citas no usadas ÷ reservadas × 100</td><td>≤ 10 %</td></tr>
-        <tr><td>Camiones en vía pública</td><td>máx(0; cola − espacio de espera)</td><td>0</td></tr>
+        <tr><td>Qué tan llena está la puerta (ρ)</td><td>λ ÷ (μ·c)</td><td>≤ 85 %</td></tr>
+        <tr><td>Camiones esperando (Lq)</td><td>Cola(t+1) = máx[0; Cola(t) + λ − μc]</td><td>≤ 40 camiones</td></tr>
+        <tr><td>Minutos de espera (Wq)</td><td>Ley de Little: Lq ÷ λ</td><td>≤ 30 min</td></tr>
+        <tr><td>Tiempo total del camión (TTT)</td><td>espera + gate + patio + salida</td><td>≤ 90 min</td></tr>
+        <tr><td>Horas con fila en la calle</td><td>horas con cola &gt; vía de acceso</td><td>0 h/día</td></tr>
+        <tr><td>Llegan a su hora (citas)</td><td>en su franja ÷ con cita × 100</td><td>≥ 85 %</td></tr>
+        <tr><td>Reservan y no llegan (no-show)</td><td>citas no usadas ÷ reservadas × 100</td><td>≤ 10 %</td></tr>
+        <tr><td>Camiones en la calle</td><td>máx(0; cola − espacio de espera)</td><td>0</td></tr>
       </table>`,
   },
   {
@@ -115,12 +115,12 @@ const DIAPOSITIVAS = [
     html: () => `
       <h2>Nuestra solución: Gate Inteligente</h2>
       <div class="pres-palancas">
-        <div><div class="pres-icono">📅</div><h3>TAS dinámico</h3>
-          <p>Citas que se ajustan a la capacidad real de cada hora: μ·c × 0,85. Nivela las llegadas (heijunka).</p></div>
-        <div><div class="pres-icono">📲</div><h3>Cola virtual</h3>
-          <p>Pre-estacionamiento fuera de la vía; una app llama al camión cuando hay espacio.</p></div>
-        <div><div class="pres-icono">🔁</div><h3>Doble transacción</h3>
-          <p>Descuento por entregar exportación y retirar importación en la misma visita: menos viajes.</p></div>
+        <div><div class="pres-icono">📅</div><h3>Citas inteligentes</h3>
+          <p>Cada camión reserva una hora; cada hora ofrece solo los cupos que la puerta puede atender.</p></div>
+        <div><div class="pres-icono">📲</div><h3>Estacionamiento de espera</h3>
+          <p>Los camiones esperan fuera de la calle; una app los llama cuando hay espacio.</p></div>
+        <div><div class="pres-icono">🔁</div><h3>Dos trámites en un viaje</h3>
+          <p>Descuento a quien deja un contenedor y se lleva otro en la misma visita: menos viajes.</p></div>
       </div>
       <p class="pres-lead">Sin construir carriles nuevos: usamos mejor la capacidad que ya existe.</p>`,
   },
@@ -139,23 +139,23 @@ const DIAPOSITIVAS = [
         <td class="${cl(c, d.clasico[c])}">${fmt(d.clasico[c], dec)}</td>
         <td class="${cl(c, d.propuesta[c])}"><strong>${fmt(d.propuesta[c], dec)}</strong></td><td>${meta}</td></tr>`;
       return `
-      <h2>Resultados (promedio días con buque)</h2>
+      <h2>Resultados (días con barco grande)</h2>
       <div class="pres-dos">
         <table class="pres-tabla">
-          <tr><th>KPI</th><th>Actual</th><th>TAS clásico</th><th>Gate Inteligente</th><th>Meta</th></tr>
-          ${fila("Espera Wq (min)", "wqPromedio", 0, "≤ 30")}
-          ${fila("Cola máxima", "lqMax", 0, "≤ 40")}
-          ${fila("Desborde (h/día)", "horasDesborde", 1, "0")}
-          ${fila("En vía pública", "viaPublicaMax", 0, "0")}
-          ${fila("TTT (min)", "tttPromedio", 0, "≤ 90")}
-          ${fila("ρ pico (%)", "rhoPico", 0, "≤ 85")}
+          <tr><th>Indicador</th><th>Hoy</th><th>Citas normales</th><th>Gate Inteligente</th><th>Ideal</th></tr>
+          ${fila("Espera (min)", "wqPromedio", 0, "≤ 30")}
+          ${fila("Camiones esperando", "lqMax", 0, "≤ 40")}
+          ${fila("Horas con fila en la calle", "horasDesborde", 1, "0")}
+          ${fila("En la calle", "viaPublicaMax", 0, "0")}
+          ${fila("Tiempo total (min)", "tttPromedio", 0, "≤ 90")}
+          ${fila("Puerta llena (%)", "rhoPico", 0, "≤ 85")}
         </table>
         <div class="pres-grafico"><canvas id="pres-graf-cascada"></canvas></div>
       </div>`;
     },
     despues: () => {
       if (typeof pasosCascada === "function") {
-        graficoCascada("pres-graf-cascada", pasosCascada(diasConBuque()), "wqPromedio", "Aporte de cada palanca a la espera (min)", "min");
+        graficoCascada("pres-graf-cascada", pasosCascada(diasConBuque()), "wqPromedio", "Minutos de espera que quita cada idea", "min");
       }
     },
   },
@@ -180,9 +180,9 @@ const DIAPOSITIVAS = [
         <li>El problema no es solo de carriles: es <strong>cuándo</strong> llegan los camiones y <strong>dónde</strong> esperan.</li>
         <li>Gate Inteligente baja la espera de ${fmt(d.actual.wqPromedio)} a <strong class="mejor">${fmt(d.propuesta.wqPromedio, 1)} min</strong>
           y deja <strong class="mejor">${fmt(d.propuesta.viaPublicaMax)}</strong> camiones en la vía pública.</li>
-        <li>El TAS dinámico supera al TAS clásico porque mira la capacidad real de la garita.</li>
-        <li>Pendiente: ρ pico queda en ${fmt(d.propuesta.rhoPico)} % (meta 85 %) → abrir el 6.º carril en horas pico de días de buque.</li>
-        <li>Riesgo: si el no-show sube, el beneficio baja → penalidad y confirmación 2 h antes.</li>
+        <li>Las citas inteligentes funcionan mejor que las normales porque miran cuánto puede atender la puerta.</li>
+        <li>Pendiente: la puerta sigue al ${fmt(d.propuesta.rhoPico)} % en la peor hora (ideal 85 %) → abrir la 6.ª ventanilla en días con barco grande.</li>
+        <li>Riesgo: si muchos reservan y no llegan, se pierde parte del beneficio → multa y confirmar 2 h antes.</li>
       </ul>`,
   },
   {

@@ -22,29 +22,29 @@ function escTAS(modo) {
 
 MODULOS.push({
   id: "citas",
-  titulo: "Citas (TAS)",
+  titulo: "Sistema de citas",
   dueno: "Todo el grupo",
   rama: "mejora-citas",
 
   render(contenedor, estado) {
     const c = CITAS_ESTADO;
     contenedor.innerHTML = `
-      <h2>Sistema de citas (TAS) · clásico vs dinámico</h2>
+      <h2>Sistema de citas: reservar una hora para llegar${ayuda("citas")}</h2>
       <div class="rejilla-2">
         <div class="panel-control">
-          <h3>Supuestos del TAS</h3>
-          ${htmlSlider("tas-cita", "Camiones con cita", 0, 100, 5, c.pctCita, " %")}
-          ${htmlSlider("tas-punt", "Puntualidad (llegan en su franja)", 50, 100, 5, c.puntualidad, " %")}
-          ${htmlSlider("tas-noshow", "No-show (citas no usadas)", 0, 50, 5, c.noShow, " %")}
-          ${htmlSlider("tas-flex", "Flexibilidad del transportista (mover la cita ±)", 0, 4, 1, c.flexibilidadH, " h")}
-          ${htmlSlider("tas-fija", "TAS clásico: capacidad fija por franja", 20, 100, 5, c.capacidadFija, " camiones/h")}
+          <h3>Muevan los controles 👇</h3>
+          ${htmlSlider("tas-cita", "Camiones que reservan cita", 0, 100, 5, c.pctCita, " %")}
+          ${htmlSlider("tas-punt", "Llegan a su hora", 50, 100, 5, c.puntualidad, " %")}
+          ${htmlSlider("tas-noshow", "Reservan y no llegan", 0, 50, 5, c.noShow, " %")}
+          ${htmlSlider("tas-flex", "Horas que el chofer acepta mover su cita", 0, 4, 1, c.flexibilidadH, " h")}
+          ${htmlSlider("tas-fija", "Citas normales: cupos fijos por hora", 20, 100, 5, c.capacidadFija, " camiones/h")}
           <label class="slider"><span>Mostrar en los gráficos</span>
             <select id="tas-modo">
-              <option value="dinamica">TAS dinámico (propuesta)</option>
-              <option value="fija">TAS clásico (capacidad fija)</option>
+              <option value="dinamica">Citas inteligentes (nuestra propuesta)</option>
+              <option value="fija">Citas normales (cupos fijos)</option>
             </select></label>
-          <p class="suave nota"><strong>TAS dinámico:</strong> cada hora ofrece tantas citas como
-          μ·c × 0,85 menos los camiones sin cita que se esperan. Así la franja no se llena por encima de la meta de ρ.
+          <p class="suave nota"><strong>Citas inteligentes:</strong> cada hora solo ofrece los cupos que la puerta puede atender
+          (sin pasar del 85 %), restando los camiones que vienen sin cita.
           Un transportista solo acepta mover su cita unas horas (flexibilidad); si no hay espacio, llega a su hora.</p>
         </div>
         <div>
@@ -54,9 +54,9 @@ MODULOS.push({
       </div>
       <div id="tas-respuesta" class="respuesta"></div>
       <div class="rejilla-2 parejo">
-        <div><h3>Llegadas por hora: sin TAS vs con TAS</h3>
+        <div><h3>A qué hora llegan: sin citas vs con citas</h3>
           <div class="contenedor-grafico bajo"><canvas id="graf-tas-llegadas"></canvas></div></div>
-        <div><h3>¿Qué pasa si el no-show es alto? (promedio días de buque)</h3>
+        <div><h3>¿Y si muchos reservan y no llegan? (días con barco grande)</h3>
           <div class="contenedor-grafico bajo"><canvas id="graf-tas-noshow"></canvas></div></div>
       </div>
       <p class="suave nota">Datos simulados. Supuestos del modelo en el README (los no-show y los impuntuales llegan a su hora original, sin cita).</p>`;
@@ -91,31 +91,31 @@ MODULOS.push({
         return `<td class="${ok}">${v === undefined ? "—" : fmt(v, dec)}</td>`;
       }).join("")}<td>${meta}</td></tr>`;
     contenedor.querySelector("#tas-tabla").innerHTML = `<div class="tabla-scroll"><table class="tabla-horas">
-      <tr><th>KPI · día ${estado.dia}</th><th>Sin TAS</th><th>TAS clásico</th><th>TAS dinámico</th><th>Meta</th></tr>
-      ${fila("Espera promedio Wq (min)", (k) => k.wqPromedio, `≤ ${M.wq_min}`, (v) => v <= M.wq_min)}
-      ${fila("Cola máxima Lq (camiones)", (k) => k.lqMax, `≤ ${M.lq_max}`, (v) => v <= M.lq_max)}
-      ${fila("Horas con desborde", (k) => k.horasDesborde, "0", (v) => v <= M.desborde_h)}
-      ${fila("ρ en hora pico (%)", (k) => k.rhoPico, `≤ ${M.rho_pct}`, (v) => v <= M.rho_pct)}
-      ${fila("Camiones en vía pública (máx)", (k) => k.viaPublicaMax, "0", (v) => v <= 0)}
-      ${fila("Cumplimiento de citas (%)", (k) => k.cumplimiento, `≥ ${M.cumplimiento_pct}`, (v) => v >= M.cumplimiento_pct, 1)}
-      ${fila("No-show (%)", (k) => k.noShow, `≤ ${M.noshow_pct}`, (v) => v <= M.noshow_pct, 1)}
+      <tr><th>Día ${estado.dia}</th><th>Sin citas</th><th>Citas normales</th><th>Citas inteligentes</th><th>Ideal</th></tr>
+      ${fila("Espera promedio (min)", (k) => k.wqPromedio, `≤ ${M.wq_min}`, (v) => v <= M.wq_min)}
+      ${fila("Camiones esperando (máx.)", (k) => k.lqMax, `≤ ${M.lq_max}`, (v) => v <= M.lq_max)}
+      ${fila("Horas con fila en la calle", (k) => k.horasDesborde, "0", (v) => v <= M.desborde_h)}
+      ${fila("Qué tan llena está la puerta (%)", (k) => k.rhoPico, `≤ ${M.rho_pct}`, (v) => v <= M.rho_pct)}
+      ${fila("Camiones en la calle (máx.)", (k) => k.viaPublicaMax, "0", (v) => v <= 0)}
+      ${fila("Llegan a su hora (%)", (k) => k.cumplimiento, `≥ ${M.cumplimiento_pct}`, (v) => v >= M.cumplimiento_pct, 1)}
+      ${fila("Reservan y no llegan (%)", (k) => k.noShow, `≤ ${M.noshow_pct}`, (v) => v <= M.noshow_pct, 1)}
     </table></div>`;
 
     const horas = Array.from({ length: 19 }, (_, i) => i + 4);
-    const nombreCon = c.modoGrafico === "fija" ? "con TAS clásico" : "con TAS dinámico";
+    const nombreCon = c.modoGrafico === "fija" ? "con citas normales" : "con citas inteligentes";
 
     // --- Gráfico como la maqueta: cola sin TAS (barras) vs con TAS (línea) ---
     crearGrafico("graf-tas-cola", {
       data: {
         labels: horas.map(horaTexto),
         datasets: [
-          { type: "bar", label: "Cola sin TAS", data: horas.map((h) => Math.round(sin.colas[h])), backgroundColor: "#b9c4cf", order: 3 },
-          { type: "line", label: "Cola " + nombreCon, data: horas.map((h) => Math.round(con.colas[h])), borderColor: color("primario"), backgroundColor: color("primario"), tension: 0.3, order: 1 },
-          { type: "line", label: "Límite vía de acceso", data: horas.map(() => capVia), borderColor: color("alerta"), borderDash: [6, 4], pointRadius: 0, order: 2 },
+          { type: "bar", label: "Fila sin citas", data: horas.map((h) => Math.round(sin.colas[h])), backgroundColor: "#b9c4cf", order: 3 },
+          { type: "line", label: "Fila " + nombreCon, data: horas.map((h) => Math.round(con.colas[h])), borderColor: color("primario"), backgroundColor: color("primario"), tension: 0.3, order: 1 },
+          { type: "line", label: "Caben en el carril de espera", data: horas.map(() => capVia), borderColor: color("alerta"), borderDash: [6, 4], pointRadius: 0, order: 2 },
         ],
       },
       options: {
-        plugins: { title: { display: true, text: `Camiones en cola por hora · sin TAS vs ${nombreCon}` } },
+        plugins: { title: { display: true, text: `Camiones esperando por hora · sin citas vs ${nombreCon}` } },
         scales: { y: { beginAtZero: true, title: { display: true, text: "camiones" } } },
       },
     });
@@ -125,9 +125,9 @@ MODULOS.push({
       data: {
         labels: horas.map(horaTexto),
         datasets: [
-          { type: "bar", label: "Llegadas sin TAS", data: horas.map((h) => Math.round(sin.llegadas[h])), backgroundColor: "#b9c4cf" },
-          { type: "bar", label: "Llegadas " + nombreCon, data: horas.map((h) => Math.round(con.llegadas[h])), backgroundColor: color("primario") },
-          { type: "line", label: "Capacidad μ·c", data: horas.map((h) => Math.round(sin.capacidades[h])), borderColor: color("alerta"), borderDash: [6, 4], pointRadius: 0, stepped: "middle" },
+          { type: "bar", label: "Sin citas", data: horas.map((h) => Math.round(sin.llegadas[h])), backgroundColor: "#b9c4cf" },
+          { type: "bar", label: nombreCon[0].toUpperCase() + nombreCon.slice(1), data: horas.map((h) => Math.round(con.llegadas[h])), backgroundColor: color("primario") },
+          { type: "line", label: "La puerta puede atender", data: horas.map((h) => Math.round(sin.capacidades[h])), borderColor: color("alerta"), borderDash: [6, 4], pointRadius: 0, stepped: "middle" },
         ],
       },
       options: { scales: { y: { beginAtZero: true, title: { display: true, text: "camiones/h" } } } },
@@ -144,14 +144,14 @@ MODULOS.push({
       data: {
         labels: niveles.map((n) => n + " %"),
         datasets: [
-          { label: "Wq " + nombreCon + " (min)", data: sens.map((s) => Math.round(s.wqPromedio * 10) / 10), borderColor: color("primario"), backgroundColor: color("primario"), yAxisID: "y" },
-          { label: "Wq sin TAS (min)", data: niveles.map(() => Math.round(sinBuque.wqPromedio * 10) / 10), borderColor: "#8a96a3", borderDash: [4, 4], pointRadius: 0, yAxisID: "y" },
-          { label: "Horas con desborde", data: sens.map((s) => Math.round(s.horasDesborde * 10) / 10), borderColor: color("alerta"), backgroundColor: color("alerta"), yAxisID: "y2" },
+          { label: "Espera " + nombreCon + " (min)", data: sens.map((s) => Math.round(s.wqPromedio * 10) / 10), borderColor: color("primario"), backgroundColor: color("primario"), yAxisID: "y" },
+          { label: "Espera sin citas (min)", data: niveles.map(() => Math.round(sinBuque.wqPromedio * 10) / 10), borderColor: "#8a96a3", borderDash: [4, 4], pointRadius: 0, yAxisID: "y" },
+          { label: "Horas con fila en la calle", data: sens.map((s) => Math.round(s.horasDesborde * 10) / 10), borderColor: color("alerta"), backgroundColor: color("alerta"), yAxisID: "y2" },
         ],
       },
       options: {
         scales: {
-          x: { title: { display: true, text: "no-show" } },
+          x: { title: { display: true, text: "% que reserva y no llega" } },
           y: { beginAtZero: true, title: { display: true, text: "minutos" } },
           y2: { beginAtZero: true, position: "right", grid: { drawOnChartArea: false }, title: { display: true, text: "h/día" } },
         },
@@ -161,15 +161,15 @@ MODULOS.push({
     // --- Respuestas ---
     const alto = sens[sens.length - 1];
     contenedor.querySelector("#tas-respuesta").innerHTML = `
-      <strong>¿Cuánto bajan la espera y el desborde con un TAS?</strong>
+      <strong>¿Cuánto ayudan las citas?</strong>
       Día ${estado.dia}: Wq pasa de <strong>${fmt(sin.wqPromedio)}</strong> min a
-      <strong>${fmt(fija.wqPromedio)}</strong> (TAS clásico) y <strong class="mejor">${fmt(din.wqPromedio)}</strong> (TAS dinámico);
-      horas con desborde: ${fmt(sin.horasDesborde)} → ${fmt(fija.horasDesborde)} → <strong class="mejor">${fmt(din.horasDesborde)}</strong>.
-      El TAS clásico ofrece las mismas citas todas las horas y no mira los camiones sin cita; el dinámico ajusta las citas
-      a la capacidad real de cada hora.<br>
-      <strong>¿Y si el no-show es alto?</strong> Con 50 % de no-show (días de buque) la espera sube a
-      <strong>${fmt(alto.wqPromedio)}</strong> min y el desborde a <strong>${fmt(alto.horasDesborde, 1)}</strong> h/día:
-      las franjas reservadas quedan vacías y esos camiones llegan igual a la hora pico sin estar previstos.
-      Por eso la propuesta incluye <strong>penalizar el no-show</strong> y liberar la cita si no se confirma 2 h antes.`;
+      <strong>${fmt(fija.wqPromedio)}</strong> (citas normales) y <strong class="mejor">${fmt(din.wqPromedio)}</strong> (citas inteligentes);
+      horas con fila en la calle: ${fmt(sin.horasDesborde)} → ${fmt(fija.horasDesborde)} → <strong class="mejor">${fmt(din.horasDesborde)}</strong>.
+      Las citas normales ofrecen los mismos cupos todas las horas; las inteligentes ofrecen solo los cupos
+      que la puerta puede atender en cada hora.<br>
+      <strong>¿Y si muchos reservan y no llegan?</strong> Si la mitad no llega (días con barco grande) la espera sube a
+      <strong>${fmt(alto.wqPromedio)}</strong> min y la fila en la calle a <strong>${fmt(alto.horasDesborde, 1)}</strong> h al día:
+      los cupos reservados quedan vacíos y esos camiones llegan igual, a la hora de más tráfico.
+      Por eso proponemos <strong>cobrar una multa a quien no llega</strong> y liberar la cita si no se confirma 2 h antes.`;
   },
 });
