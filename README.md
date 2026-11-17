@@ -6,12 +6,13 @@ Proyecto semestral · **Medición y Rendimiento de Terminales Portuarias** · Un
 > ⚠️ Todos los datos del dashboard son **simulados**.
 
 ## Integrantes
-| Nombre | Usuario GitHub | Módulo a cargo |
-|---|---|---|
-| _(nombre pendiente)_ | alefitere06-pixel | _(por asignar)_ |
-| _(nombre pendiente)_ | tejadaoperaciones-star | _(por asignar)_ |
-| _(pendiente)_ | | _(por asignar)_ |
-| _(pendiente)_ | | _(por asignar)_ |
+| Nombre | Usuario GitHub |
+|---|---|
+| _(nombre pendiente)_ | alefitere06-pixel |
+| _(nombre pendiente)_ | tejadaoperaciones-star |
+
+El proyecto **no está dividido por integrante**: cada uno puede mejorar cualquier parte
+(ver [Cómo trabajamos](#cómo-trabajamos-git)).
 
 ## El problema
 En horas pico se forma una cola de camiones para entrar a la garita de la terminal de Balboa.
@@ -39,13 +40,13 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
    Chart.js está guardado en `js/lib/` y los datos en `data/llegadas.js`.
 
 ## Módulos
-| # | Módulo | Qué muestra | Rama |
-|---|---|---|---|
-| 1 | Llegadas | Perfil de llegadas por hora y día, horas pico, filtro por transacción | `modulo-llegadas` |
-| 2 | Simulador de cola | Carriles, servicio y llegadas → Lq, Wq, ρ y horas con desborde | `modulo-simulador` |
-| 3 | Truck Turn Time | Desglose del TTT por etapa y por hora | `modulo-ttt` |
-| 4 | Citas (TAS) | TAS dinámico: franjas, sin TAS vs con TAS, cumplimiento y no-show | `modulo-citas` |
-| 5 | Mejora | A3 Lean y gráfico cascada de las 3 palancas | `modulo-mejora` |
+| # | Módulo | Qué muestra |
+|---|---|---|
+| 1 | Llegadas | Perfil de llegadas por hora y día, horas pico, filtro por transacción |
+| 2 | Simulador de cola | Carriles, servicio y llegadas → Lq, Wq, ρ y horas con desborde |
+| 3 | Truck Turn Time | Desglose del TTT por etapa y por hora |
+| 4 | Citas (TAS) | TAS dinámico: franjas, sin TAS vs con TAS, cumplimiento y no-show |
+| 5 | Mejora | A3 Lean y gráfico cascada de las 3 palancas |
 
 ## Datos simulados
 Se generan con `python data/generar_datos.py` (Python 3, sin librerías extra). Usa **semilla fija (42)**:
@@ -74,6 +75,12 @@ Fichas completas en [`docs/fichas_kpi.md`](docs/fichas_kpi.md). Fórmulas en `js
 Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual.md).
 
 ## Cómo trabajamos (Git)
-- `main` siempre funciona. Cada integrante trabaja su módulo en su rama y abre un Pull Request.
-- Otro integrante revisa el PR (abre el dashboard y verifica un número) antes del merge.
+- **Nadie es dueño de un módulo.** Cualquier integrante puede tomar cualquier tarea y mejorar cualquier parte.
+- Lista de tareas en [`docs/tareas.md`](docs/tareas.md): antes de empezar, anoten su usuario en
+  "Tomada por" para no trabajar los dos en lo mismo.
+- `main` siempre funciona. Cada mejora va en su propia rama (`mejora-<tema>`, por ejemplo
+  `mejora-grafico-llegadas`) y entra por Pull Request.
+- El **otro** integrante revisa el PR (abre el dashboard y verifica un número) antes del merge.
+- Commits pequeños y frecuentes: así los dos quedan con commits propios en todo el proyecto.
+- Ambos deben poder explicar cualquier KPI y cualquier módulo (lo exige la defensa).
 - Prompts importantes y correcciones a la IA: [`docs/bitacora_ia.md`](docs/bitacora_ia.md).

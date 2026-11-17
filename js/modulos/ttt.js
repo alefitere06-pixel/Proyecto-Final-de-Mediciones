@@ -1,13 +1,13 @@
 // Módulo 3 · Truck Turn Time
-// Responsable: Integrante 3 · Rama: modulo-ttt
+// Abierto a todo el grupo · Rama sugerida: mejora-ttt
 // TTT = espera afuera + gate de entrada + patio + gate de salida  (KPI.ttt en js/kpi.js)
 // Datos por hora: servicio_min (gate entrada), patio_min, gate_salida_min; la espera
 // sale de kpiDelDia(...).esperas.
 MODULOS.push({
   id: "ttt",
   titulo: "Truck Turn Time",
-  dueno: "Integrante 3",
-  rama: "modulo-ttt",
+  dueno: "Todo el grupo",
+  rama: "mejora-ttt",
   render(contenedor, estado) {
     // TODO: reemplazar este aviso por el módulo real.
     avisoEnConstruccion(contenedor, this, [

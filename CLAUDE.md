@@ -53,5 +53,6 @@ data/generar_datos.py   genera data/llegadas.js y data/llegadas.json
 docs/fichas_kpi.md      ficha de cada KPI
 docs/bitacora_ia.md     prompts importantes y decisiones
 docs/verificacion_manual.md  3 KPI verificados a mano
+docs/tareas.md          lista de tareas compartida (nadie es dueño de un módulo)
 presentacion/           diapositivas en PDF
 ```

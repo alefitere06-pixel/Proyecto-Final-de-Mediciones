@@ -113,8 +113,8 @@ function avisoEnConstruccion(contenedor, modulo, tareas, prompt) {
   contenedor.innerHTML = `
     <h2>${modulo.titulo}</h2>
     <div class="en-construccion">
-      <p><strong>Módulo en construcción.</strong> Responsable: ${modulo.dueno} ·
-      Rama sugerida: <code>${modulo.rama}</code></p>
+      <p><strong>Módulo en construcción.</strong> Abierto a todo el grupo: cualquiera puede mejorarlo
+      (anoten su usuario en <code>docs/tareas.md</code>) · Rama sugerida: <code>${modulo.rama}</code></p>
       <p>Qué debe mostrar y hacer:</p>
       <ul>${tareas.map((t) => `<li>${t}</li>`).join("")}</ul>
       <p>Prompt sugerido para el agente de IA:</p>

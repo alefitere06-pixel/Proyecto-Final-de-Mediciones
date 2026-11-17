@@ -1,12 +1,12 @@
 // Módulo 1 · Llegadas
-// Responsable: Integrante 1 · Rama: modulo-llegadas
+// Abierto a todo el grupo · Rama sugerida: mejora-llegadas
 // Datos disponibles: DATOS.horas (dia, fecha, dia_semana, dia_buque, hora, llegadas,
 //   importacion, exportacion, vacio), DATOS.dias. Use crearGrafico(idCanvas, config).
 MODULOS.push({
   id: "llegadas",
   titulo: "Llegadas",
-  dueno: "Integrante 1",
-  rama: "modulo-llegadas",
+  dueno: "Todo el grupo",
+  rama: "mejora-llegadas",
   render(contenedor, estado) {
     // TODO: reemplazar este aviso por el módulo real.
     avisoEnConstruccion(contenedor, this, [

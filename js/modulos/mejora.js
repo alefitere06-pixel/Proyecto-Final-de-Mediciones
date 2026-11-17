@@ -1,5 +1,5 @@
 // Módulo 5 · Mejora (A3 Lean) · Propuesta "Gate Inteligente: 3 palancas"
-// Responsable: todo el grupo (coordina Integrante 1) · Rama: modulo-mejora
+// Abierto a todo el grupo · Rama sugerida: mejora-propuesta-a3
 //   Palanca 1: TAS dinámico (módulo 4)
 //   Palanca 2: Cola virtual con pre-estacionamiento fuera de la vía + llamada por app
 //   Palanca 3: Incentivo de doble transacción (menos visitas por contenedor)
@@ -7,7 +7,7 @@ MODULOS.push({
   id: "mejora",
   titulo: "Mejora",
   dueno: "Todo el grupo",
-  rama: "modulo-mejora",
+  rama: "mejora-propuesta-a3",
   render(contenedor, estado) {
     // TODO: reemplazar este aviso por el módulo real.
     avisoEnConstruccion(contenedor, this, [

@@ -1,12 +1,12 @@
 // Módulo 2 · Simulador de cola
-// Responsable: Integrante 2 · Rama: modulo-simulador
+// Abierto a todo el grupo · Rama sugerida: mejora-simulador
 // Use kpiDelDia(registrosDelDia(dia), { carriles, servicioMin, capacidadVia, llegadas })
 // que ya calcula colas, ρ, Wq, horas con desborde (fórmulas en js/kpi.js).
 MODULOS.push({
   id: "simulador",
   titulo: "Simulador de cola",
-  dueno: "Integrante 2",
-  rama: "modulo-simulador",
+  dueno: "Todo el grupo",
+  rama: "mejora-simulador",
   render(contenedor, estado) {
     // TODO: reemplazar este aviso por el módulo real.
     avisoEnConstruccion(contenedor, this, [

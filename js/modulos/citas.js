@@ -1,12 +1,12 @@
 // Módulo 4 · Citas (TAS dinámico)
-// Responsable: Integrante 4 · Rama: modulo-citas
+// Abierto a todo el grupo · Rama sugerida: mejora-citas
 // Supuestos del piloto en DATOS.supuestos (pct_con_cita, puntualidad, no_show)
 // y resultados diarios en DATOS.citas_piloto (reservadas, usadas, dentro_franja).
 MODULOS.push({
   id: "citas",
   titulo: "Citas (TAS)",
-  dueno: "Integrante 4",
-  rama: "modulo-citas",
+  dueno: "Todo el grupo",
+  rama: "mejora-citas",
   render(contenedor, estado) {
     // TODO: reemplazar este aviso por el módulo real.
     avisoEnConstruccion(contenedor, this, [
