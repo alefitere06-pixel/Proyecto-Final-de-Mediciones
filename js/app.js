@@ -138,7 +138,23 @@ function pintarModulo() {
   Object.entries(ANIMACIONES).forEach(([k, a]) => { if (k !== "anim-pres") a.detener(); });
   contenedor.innerHTML = "";
   m.render(contenedor, ESTADO);
-  if (m.intro) contenedor.insertAdjacentHTML("afterbegin", `<p class="intro-modulo">${m.intro}</p>`);
+  if (m.intro && !["inicio", "mapa", "pase", "solucion"].includes(m.id)) {
+    const titulo = Array.from(contenedor.children).find((elemento) => elemento.tagName === "H2");
+    if (titulo) {
+      const cabecera = document.createElement("header");
+      const etiqueta = document.createElement("span");
+      const introduccion = document.createElement("p");
+      cabecera.className = "cabecera-modulo-foto";
+      etiqueta.className = "seccion-etiqueta";
+      etiqueta.textContent = "SMART GATE BALBOA";
+      titulo.classList.add("cabecera-modulo-titulo");
+      introduccion.textContent = m.intro;
+      cabecera.append(etiqueta, titulo, introduccion);
+      contenedor.insertAdjacentElement("afterbegin", cabecera);
+    } else {
+      contenedor.insertAdjacentHTML("afterbegin", `<p class="intro-modulo">${m.intro}</p>`);
+    }
+  }
 
   // Migas: Inicio › Sección
   document.getElementById("migas").innerHTML = m.id === "inicio" ? "" :

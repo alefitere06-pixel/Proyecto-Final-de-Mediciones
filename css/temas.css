@@ -1082,6 +1082,43 @@ body:not([data-modulo="inicio"]) #contenido-modulo::after {
   background: linear-gradient(180deg, rgba(3,25,35,.56), rgba(3,25,35,.88) 42%, rgba(3,25,35,.95));
 }
 
+/* Cabecera fotográfica: la información principal flota directamente sobre la imagen. */
+.cabecera-modulo-foto {
+  position: relative;
+  isolation: isolate;
+  min-height: clamp(330px, 48vw, 540px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: -16px -16px 22px;
+  padding: clamp(28px, 5vw, 64px);
+  overflow: hidden;
+  border-radius: 0 0 24px 24px;
+  background:
+    linear-gradient(90deg, rgba(2,22,32,.94) 0%, rgba(2,22,32,.65) 48%, rgba(2,22,32,.14) 100%),
+    linear-gradient(0deg, rgba(2,22,32,.88) 0%, transparent 68%),
+    var(--arte-modulo) center / cover no-repeat;
+  box-shadow: 0 24px 48px rgba(0,0,0,.26);
+  color: #fff;
+}
+.cabecera-modulo-foto .cabecera-modulo-titulo {
+  max-width: 760px;
+  margin: 11px 0 12px;
+  color: #fff;
+  font-size: clamp(2.15rem, 4.8vw, 4.8rem);
+  line-height: .98;
+  letter-spacing: -.045em;
+  text-shadow: 0 3px 22px rgba(0,0,0,.38);
+}
+.cabecera-modulo-foto > p {
+  max-width: 680px;
+  margin: 0;
+  color: rgba(255,255,255,.82);
+  font-size: 1rem;
+  line-height: 1.55;
+  text-shadow: 0 2px 14px rgba(0,0,0,.30);
+}
+
 /* Las tarjetas analíticas dejan pasar parte de la fotografía sin perder lectura. */
 :root[data-tema="logistica"] .tarjeta,
 :root[data-tema="logistica"] .tarjeta.no-cumple,
@@ -1162,6 +1199,11 @@ body:not([data-modulo="inicio"]) #contenido-modulo::after {
 
 @media (max-width: 650px) {
   body:not([data-modulo="inicio"]) #contenido-modulo::before { background-position: center top; }
+  .cabecera-modulo-foto {
+    min-height: 410px;
+    padding: 28px 21px;
+    background-position: 60% center;
+  }
   .mapa-portada { background-position: 62% center; }
   .solucionador { background-attachment: scroll; }
   .pase-portada::before { background-position: 62% center; }

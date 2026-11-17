@@ -59,7 +59,7 @@ export default {
     return new Response(decodificar(recurso), {
       headers: {
         "content-type": TIPOS[extension] || "application/octet-stream",
-        "cache-control": html ? "no-cache" : "public, max-age=604800, immutable",
+        "cache-control": "no-cache",
         "x-content-type-options": "nosniff",
         "referrer-policy": "strict-origin-when-cross-origin",
       },
