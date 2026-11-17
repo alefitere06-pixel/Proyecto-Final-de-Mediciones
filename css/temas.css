@@ -376,3 +376,835 @@ details.mas[open] > summary { margin-bottom: 12px; }
 .diapositiva .mf-svg { max-height: 60vh; }
 .diapositiva .mf-cuerpo { grid-template-columns: minmax(0, 1fr) 240px; }
 @media print { .diapositiva .mf-svg { max-height: 120mm; } }
+
+/* =============================================================================
+   Dirección editorial ilustrada · inspirada en portales marítimos panameños
+   ============================================================================= */
+:root[data-tema="logistica"] body {
+  background:
+    linear-gradient(rgba(4, 25, 36, .78), rgba(4, 25, 36, .88)),
+    url("../img/balboa-smart-gate-hero.png") center top / cover fixed;
+}
+:root[data-tema="logistica"] .app {
+  background: linear-gradient(180deg, rgba(247,250,250,.98), rgba(232,239,240,.98));
+  backdrop-filter: blur(10px);
+}
+:root[data-tema="logistica"] .barra {
+  position: relative;
+  z-index: 60;
+  background: rgba(247,250,250,.92);
+  border-bottom: 1px solid rgba(20,37,45,.08);
+  backdrop-filter: blur(16px);
+}
+
+/* Portada a pantalla completa con puntos explicativos */
+.hero-balboa.hero-puerto-interactivo {
+  --hero-x: 0px;
+  --hero-y: 0px;
+  position: relative;
+  isolation: isolate;
+  grid-template-columns: minmax(0, .88fr) minmax(420px, 1.12fr);
+  min-height: 590px;
+  background: #061f2c;
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 28px 70px rgba(3,24,35,.28);
+}
+.hero-balboa.hero-puerto-interactivo::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: -20px;
+  background: url("../img/balboa-smart-gate-hero.png") center center / cover no-repeat;
+  transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(1.045);
+  transition: transform .45s cubic-bezier(.2,.8,.2,1);
+  will-change: transform;
+}
+.hero-balboa.hero-puerto-interactivo::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(4,24,34,.98) 0%, rgba(4,24,34,.90) 38%, rgba(4,24,34,.33) 66%, rgba(4,24,34,.18) 100%),
+    linear-gradient(0deg, rgba(4,24,34,.60) 0%, transparent 42%);
+}
+.hero-puerto-interactivo .hero-balboa-contenido {
+  position: relative;
+  z-index: 2;
+  padding: clamp(34px, 5vw, 72px);
+  justify-content: flex-end;
+}
+.hero-puerto-interactivo .hero-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid rgba(127,224,211,.34);
+  border-radius: 999px;
+  background: rgba(4,37,48,.45);
+  backdrop-filter: blur(10px);
+}
+.hero-puerto-interactivo .hero-etiqueta::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #65d3c9;
+  box-shadow: 0 0 0 5px rgba(101,211,201,.14);
+}
+.hero-puerto-interactivo h2 {
+  max-width: 720px;
+  margin-top: 18px;
+  font-size: clamp(2.45rem, 4.5vw, 5rem);
+  line-height: .94;
+  text-wrap: balance;
+  text-shadow: 0 3px 24px rgba(0,0,0,.28);
+}
+.hero-puerto-interactivo .hero-balboa-contenido > p { max-width: 610px; color: rgba(255,255,255,.84); }
+.hero-puerto-interactivo .hero-acciones .boton { transition: transform .18s, box-shadow .18s, background .18s; }
+.hero-puerto-interactivo .hero-acciones .boton:hover { transform: translateY(-2px); opacity: 1; }
+.hero-puerto-interactivo .hero-principal { box-shadow: 0 10px 24px rgba(243,179,64,.22); }
+.hero-puerto-interactivo .hero-metricas {
+  max-width: 630px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 18px;
+  background: rgba(2,22,31,.44);
+  backdrop-filter: blur(14px);
+}
+.hero-puerto-interactivo .hero-metricas > div { padding: 0 10px; border-top: 0; border-left: 1px solid rgba(255,255,255,.14); }
+.hero-puerto-interactivo .hero-metricas > div:first-child { border-left: 0; }
+.hero-escena { position: relative; z-index: 3; min-height: 590px; }
+.hero-instruccion {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  padding: 8px 11px;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 999px;
+  background: rgba(3,28,39,.50);
+  color: rgba(255,255,255,.82);
+  backdrop-filter: blur(12px);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.hero-punto {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.hero-punto-buque { left: 7%; top: 47%; }
+.hero-punto-flujo { left: 46%; top: 66%; }
+.hero-punto-garita { right: 5%; top: 55%; }
+.hero-pulso {
+  position: relative;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #f3b340;
+  box-shadow: 0 0 0 5px rgba(243,179,64,.20), 0 4px 14px rgba(0,0,0,.35);
+}
+.hero-pulso::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 50%;
+  animation: heroPulso 2.2s ease-out infinite;
+}
+.punto-etiqueta {
+  padding: 6px 9px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 999px;
+  background: rgba(3,27,38,.64);
+  box-shadow: 0 8px 20px rgba(0,0,0,.18);
+  backdrop-filter: blur(12px);
+  font-size: .72rem;
+  font-weight: 800;
+}
+.punto-info {
+  position: absolute;
+  left: 0;
+  top: 34px;
+  width: 220px;
+  padding: 12px 13px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 14px;
+  background: rgba(3,28,39,.92);
+  box-shadow: 0 16px 34px rgba(0,0,0,.28);
+  color: rgba(255,255,255,.78);
+  font-size: .72rem;
+  line-height: 1.45;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity .18s, visibility .18s, transform .18s;
+  pointer-events: none;
+}
+.hero-punto-garita .punto-info { left: auto; right: 0; }
+.punto-info strong { display: block; margin-bottom: 4px; color: #fff; font-size: .82rem; }
+.hero-punto:hover .punto-info,
+.hero-punto:focus-visible .punto-info,
+.hero-punto[aria-expanded="true"] .punto-info { opacity: 1; visibility: visible; transform: translateY(0); }
+.hero-punto:focus-visible { outline: 2px solid #fff; outline-offset: 6px; border-radius: 999px; }
+.hero-ruta-animada {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 42px;
+  height: 2px;
+  overflow: visible;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.52) 18%, rgba(243,179,64,.9) 80%, transparent);
+}
+.hero-camion {
+  position: absolute;
+  top: -9px;
+  left: 0;
+  width: 30px;
+  height: 13px;
+  border-radius: 3px 2px 2px 3px;
+  background: #f3b340;
+  box-shadow: 0 4px 10px rgba(0,0,0,.32);
+  animation: heroTrayecto 8s ease-in-out infinite;
+}
+.hero-camion::before { content: ""; position: absolute; right: -9px; bottom: 0; width: 10px; height: 10px; border-radius: 2px 3px 2px 0; background: #fff; }
+.hero-camion::after { content: ""; position: absolute; left: 4px; bottom: -4px; width: 5px; height: 5px; border-radius: 50%; background: #081d27; box-shadow: 22px 0 #081d27, 31px 0 #081d27; }
+.hero-credito { position: absolute; right: 18px; bottom: 12px; color: rgba(255,255,255,.55); font-size: .58rem; }
+@keyframes heroPulso { 0% { transform: scale(.65); opacity: .9; } 75%, 100% { transform: scale(1.6); opacity: 0; } }
+@keyframes heroTrayecto { 0% { left: 0; opacity: 0; } 8%, 86% { opacity: 1; } 94%, 100% { left: calc(100% - 38px); opacity: 0; } }
+
+/* El asesor reutiliza la ilustración para que el sitio se sienta como una historia continua. */
+.sol-encabezado { position: relative; isolation: isolate; overflow: hidden; background: #082f3b; }
+.sol-encabezado::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: -30% -5%;
+  background: url("../img/balboa-smart-gate-hero.png") 72% 62% / cover no-repeat;
+  filter: saturate(.78);
+}
+.sol-encabezado::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(4,28,39,.98) 0%, rgba(4,28,39,.88) 54%, rgba(4,28,39,.40) 100%);
+}
+
+@media (max-width: 1000px) {
+  .hero-balboa.hero-puerto-interactivo { grid-template-columns: 1fr; min-height: 760px; }
+  .hero-puerto-interactivo .hero-balboa-contenido { min-height: 520px; justify-content: center; padding-bottom: 24px; }
+  .hero-escena { min-height: 240px; }
+  .hero-punto-buque { left: 18%; top: 22%; }
+  .hero-punto-flujo { left: 48%; top: 45%; }
+  .hero-punto-garita { right: 7%; top: 29%; }
+}
+@media (max-width: 620px) {
+  :root[data-tema="logistica"] body { padding: 0; background-attachment: scroll; }
+  :root[data-tema="logistica"] .app { border-radius: 0; }
+  .hero-balboa.hero-puerto-interactivo { min-height: 720px; border-radius: 20px; }
+  .hero-puerto-interactivo .hero-balboa-contenido { min-height: 510px; padding: 32px 22px 20px; }
+  .hero-puerto-interactivo h2 { font-size: clamp(2.35rem, 12vw, 3.7rem); }
+  .hero-puerto-interactivo .hero-metricas { gap: 0; padding: 12px 5px; }
+  .hero-puerto-interactivo .hero-metricas > div { padding: 0 8px; }
+  .hero-puerto-interactivo .hero-metricas dd { font-size: 1.18rem; }
+  .hero-escena { min-height: 210px; }
+  .hero-instruccion { left: 18px; right: auto; top: 5px; }
+  .hero-punto-buque { left: 7%; top: 31%; }
+  .hero-punto-flujo { left: 42%; top: 51%; }
+  .hero-punto-garita { right: 4%; top: 34%; }
+  .punto-etiqueta { font-size: .64rem; padding: 5px 7px; }
+  .punto-info { width: min(190px, 70vw); }
+  .hero-punto-flujo .punto-info { left: 50%; transform: translate(-50%, -6px); }
+  .hero-punto-flujo:hover .punto-info,
+  .hero-punto-flujo:focus-visible .punto-info,
+  .hero-punto-flujo[aria-expanded="true"] .punto-info { transform: translate(-50%, 0); }
+  .hero-credito { left: 18px; right: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-balboa.hero-puerto-interactivo::before { transition: none; transform: scale(1.03); }
+  .hero-pulso::after, .hero-camion { animation: none; }
+  .hero-camion { left: 55%; opacity: 1; }
+}
+
+/* =============================================================================
+   Experiencia ilustrada continua + Pase Smart Gate
+   Las superficies de lectura son vidrio azul; el blanco se reserva para el QR,
+   porque el contraste es necesario para que una cámara pueda reconocerlo.
+   ============================================================================= */
+:root[data-tema="logistica"] {
+  --vidrio-oscuro: rgba(4, 28, 39, .84);
+  --vidrio-medio: rgba(10, 52, 63, .78);
+  --vidrio-claro: rgba(224, 239, 240, .91);
+  --linea-vidrio: rgba(255, 255, 255, .15);
+}
+:root[data-tema="logistica"] .app {
+  background: linear-gradient(180deg, rgba(3, 23, 33, .84), rgba(4, 31, 41, .91));
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .34);
+}
+:root[data-tema="logistica"] .barra {
+  background: rgba(3, 25, 35, .84);
+  color: #f6fbfb;
+  border-bottom-color: var(--linea-vidrio);
+}
+:root[data-tema="logistica"] .barra .logo { border-color: #f6fbfb; }
+:root[data-tema="logistica"] .pestanas { background: rgba(255, 255, 255, .08); }
+:root[data-tema="logistica"] .pestanas a,
+:root[data-tema="logistica"] .nav-mas > summary { color: rgba(255, 255, 255, .72); }
+:root[data-tema="logistica"] .pestanas a:hover,
+:root[data-tema="logistica"] .nav-mas > summary:hover { color: #fff; background: rgba(255,255,255,.08); }
+:root[data-tema="logistica"] .pestanas a.activa,
+:root[data-tema="logistica"] .nav-mas.activa > summary,
+:root[data-tema="logistica"] .nav-mas[open] > summary {
+  background: rgba(101, 211, 201, .18);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(101, 211, 201, .26);
+}
+:root[data-tema="logistica"] .nav-mas > div {
+  background: rgba(3, 27, 38, .97);
+  border-color: var(--linea-vidrio);
+  box-shadow: 0 18px 45px rgba(0,0,0,.3);
+}
+:root[data-tema="logistica"] main { color: #eef8f8; }
+:root[data-tema="logistica"] .filtros label,
+:root[data-tema="logistica"] .info-dia,
+:root[data-tema="logistica"] .migas,
+:root[data-tema="logistica"] .pie { color: rgba(255,255,255,.67); }
+:root[data-tema="logistica"] .migas a { color: #83e1d6; }
+:root[data-tema="logistica"] select {
+  color: #fff;
+  background: rgba(255,255,255,.09);
+  border-color: rgba(255,255,255,.22);
+}
+:root[data-tema="logistica"] select option { color: #14252d; background: #e8f1f2; }
+
+/* Cada módulo conserva una imagen portuaria como fondo, no una hoja blanca. */
+body { --arte-modulo: url("../img/balboa-smart-gate-hero.png"); }
+body[data-modulo="pase"],
+body[data-modulo="citas"],
+body[data-modulo="solucion"] { --arte-modulo: url("../img/pase-smart-gate-qr.png"); }
+body:not([data-modulo="inicio"]) #contenido-modulo {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  background: #062632;
+  box-shadow: 0 24px 56px rgba(0,0,0,.26);
+}
+body:not([data-modulo="inicio"]) #contenido-modulo::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background: var(--arte-modulo) center top / cover no-repeat;
+  opacity: .46;
+  transform: scale(1.015);
+}
+body:not([data-modulo="inicio"]) #contenido-modulo::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(3,25,35,.67), rgba(3,25,35,.94) 44%, rgba(3,25,35,.98));
+}
+
+/* Vidrio legible para los módulos analíticos, sin bloques blancos puros. */
+:root[data-tema="logistica"] .tarjeta,
+:root[data-tema="logistica"] .tarjeta.no-cumple,
+:root[data-tema="logistica"] .panel-control,
+:root[data-tema="logistica"] .rejilla-a3 > section,
+:root[data-tema="logistica"] .anim-fila,
+.mapa-portada,
+.solucionador,
+.sol-opcion > span,
+.sol-diagnostico,
+.sol-metrica,
+.sol-plan-generado,
+.sol-conclusion,
+.plan-operativo,
+.comparacion-plan > div,
+.resumen-simple,
+.explora-tarjeta {
+  background: var(--vidrio-claro);
+  border-color: rgba(210,232,234,.54);
+  backdrop-filter: blur(14px);
+}
+.intro-modulo,
+details.mas > summary,
+.kpi-plegable > summary,
+.nav-pie a {
+  background: rgba(228, 242, 243, .90);
+  backdrop-filter: blur(12px);
+}
+.intro-modulo {
+  border: 1px solid var(--linea-vidrio);
+  background: rgba(5, 43, 54, .82);
+  color: rgba(255,255,255,.80);
+}
+body[data-modulo="pase"] .intro-modulo { display: none; }
+#contenido-modulo > h2 { color: #fff; }
+.lg-dia,
+.lg-dia.activo,
+.mf-dato,
+.guia-paso {
+  background: rgba(225,239,240,.88);
+  backdrop-filter: blur(12px);
+}
+.lg-filtros button.activo,
+.mf-modos button.activo,
+.sol-respaldo-enlaces a,
+.boton-glosario,
+.boton.secundario {
+  background: #dcecee;
+}
+.glosario-caja { background: #e4eff0; }
+.rutas-cabecera h3,
+.rutas-cabecera p { color: #fff; }
+.mensaje-clave,
+.ruta-inteligente,
+.ruta-inteligente.destacada {
+  color: #f4fbfb;
+  background: var(--vidrio-oscuro);
+  border: 1px solid var(--linea-vidrio);
+  box-shadow: 0 16px 36px rgba(0,0,0,.20);
+  backdrop-filter: blur(14px);
+}
+.mensaje-clave a,
+.ruta-inteligente > summary::after { color: #7fe0d5; }
+.ruta-inteligente summary small { color: rgba(255,255,255,.65); }
+.ruta-icono { background: rgba(101,211,201,.16); color: #7fe0d5; }
+.ruta-ramas { border-top-color: var(--linea-vidrio); }
+.ruta-ramas a,
+.ruta-ramas button { color: rgba(255,255,255,.84); }
+.ruta-ramas a:hover,
+.ruta-ramas button:hover { background: rgba(101,211,201,.12); color: #8be8de; }
+
+/* ---------- Pase Smart Gate ---------- */
+.pase-portada {
+  position: relative;
+  isolation: isolate;
+  min-height: 510px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, .32fr);
+  gap: 24px;
+  align-items: end;
+  margin: -16px -16px 0;
+  padding: clamp(34px, 6vw, 76px);
+  overflow: hidden;
+  color: #fff;
+}
+.pase-portada::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background: url("../img/pase-smart-gate-qr.png") 62% center / cover no-repeat;
+}
+.pase-portada::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(3,24,34,.98) 0%, rgba(3,24,34,.86) 43%, rgba(3,24,34,.22) 75%),
+    linear-gradient(0deg, rgba(3,24,34,.83), transparent 48%);
+}
+.pase-portada-texto { max-width: 720px; }
+.pase-portada h2 {
+  max-width: 660px;
+  margin: 13px 0 16px;
+  color: #fff;
+  font-size: clamp(2.4rem, 5vw, 5.2rem);
+  line-height: .94;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}
+.pase-portada p { max-width: 650px; margin: 0; color: rgba(255,255,255,.78); font-size: 1.02rem; line-height: 1.6; }
+.pase-portada-acciones { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-top: 25px; }
+.pase-portada-acciones .boton { padding: 12px 19px; background: #f3b340; color: #17242a; font-weight: 800; }
+.pase-portada-acciones a { color: #fff; font-size: .85rem; font-weight: 750; }
+.pase-beneficio {
+  justify-self: end;
+  min-width: 180px;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 20px;
+  background: rgba(3,29,40,.58);
+  backdrop-filter: blur(16px);
+  text-align: center;
+}
+.pase-beneficio strong,
+.pase-beneficio span,
+.pase-beneficio b { display: block; }
+.pase-beneficio strong { color: #fff; font-size: 1.65rem; }
+.pase-beneficio span { margin: 5px 0; color: rgba(255,255,255,.6); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
+.pase-beneficio b { color: #79e0d5; font-size: 2.35rem; }
+.pase-nota {
+  margin: 18px 0;
+  padding: 13px 16px;
+  border: 1px solid rgba(243,179,64,.32);
+  border-radius: 14px;
+  background: rgba(102,66,8,.46);
+  color: rgba(255,255,255,.82);
+  font-size: .79rem;
+  line-height: 1.45;
+  backdrop-filter: blur(12px);
+}
+.pase-nota strong { color: #ffd989; }
+.pase-aporte {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.pase-aporte > div {
+  min-height: 120px;
+  padding: 18px;
+  border: 1px solid var(--linea-vidrio);
+  border-radius: 18px;
+  background: var(--vidrio-medio);
+  backdrop-filter: blur(14px);
+}
+.pase-aporte span { color: #65d3c9; font-size: .72rem; font-weight: 850; letter-spacing: .12em; }
+.pase-aporte strong,
+.pase-aporte small { display: block; }
+.pase-aporte strong { margin: 14px 0 5px; color: #fff; }
+.pase-aporte small { color: rgba(255,255,255,.64); }
+.pase-flujo {
+  overflow: hidden;
+  border: 1px solid var(--linea-vidrio);
+  border-radius: 24px;
+  background: rgba(4,29,40,.86);
+  box-shadow: 0 24px 50px rgba(0,0,0,.23);
+  backdrop-filter: blur(20px);
+  scroll-margin-top: 24px;
+}
+.pase-pasos { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--linea-vidrio); }
+.pase-pasos button {
+  min-height: 72px;
+  border: 0;
+  border-right: 1px solid var(--linea-vidrio);
+  background: rgba(255,255,255,.035);
+  color: rgba(255,255,255,.62);
+  font: inherit;
+  font-size: .82rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+.pase-pasos button:last-child { border-right: 0; }
+.pase-pasos button span {
+  display: inline-grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  margin-right: 7px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 50%;
+}
+.pase-pasos button.activo { background: rgba(101,211,201,.14); color: #fff; }
+.pase-pasos button.activo span { background: #65d3c9; color: #062833; border-color: #65d3c9; }
+.pase-pasos button.listo:not(.activo) { color: #86e5a0; }
+.pase-pasos button.listo:not(.activo) span { border-color: #86e5a0; }
+.pase-aviso { margin: 0; padding: 11px 20px; background: rgba(101,211,201,.08); color: #9be7df; font-size: .76rem; text-align: center; }
+.pase-panel { padding: clamp(24px, 4vw, 46px); }
+.pase-panel[hidden] { display: none; }
+.pase-panel-cabecera { max-width: 760px; margin-bottom: 24px; }
+.pase-panel-cabecera h3 { margin: 8px 0; color: #fff; font-size: clamp(1.5rem, 3vw, 2.5rem); }
+.pase-panel-cabecera p { margin: 0; color: rgba(255,255,255,.65); line-height: 1.5; }
+.pase-formulario { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.pase-formulario > label { color: rgba(255,255,255,.75); font-size: .76rem; font-weight: 700; }
+.pase-formulario input:not([type="checkbox"]) {
+  width: 100%;
+  margin-top: 7px;
+  padding: 12px 13px;
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 12px;
+  outline: 0;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font: inherit;
+}
+.pase-formulario input::placeholder { color: rgba(255,255,255,.38); }
+.pase-formulario input:focus { border-color: #65d3c9; box-shadow: 0 0 0 3px rgba(101,211,201,.12); }
+.pase-resumen-linea { grid-column: 1 / -1; margin: 0; color: #8ce4da; font-size: .78rem; }
+.pase-accion {
+  grid-column: 1 / -1;
+  justify-self: start;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 19px;
+  background: #f3b340;
+  color: #17242a;
+  font: inherit;
+  font-size: .84rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+.pase-accion:hover { transform: translateY(-1px); }
+.pase-validaciones { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.pase-validaciones > label {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  padding: 15px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 14px;
+  background: rgba(255,255,255,.055);
+  cursor: pointer;
+}
+.pase-validaciones input { margin-top: 4px; accent-color: #65d3c9; }
+.pase-validaciones strong,
+.pase-validaciones small { display: block; }
+.pase-validaciones strong { color: #fff; font-size: .82rem; }
+.pase-validaciones small { margin-top: 3px; color: rgba(255,255,255,.55); font-size: .7rem; line-height: 1.35; }
+.pase-qr-zona { display: grid; grid-template-columns: minmax(260px, .72fr) minmax(280px, 1.28fr); gap: 24px; align-items: stretch; }
+.pase-credencial {
+  position: relative;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,.19);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(21,79,90,.95), rgba(7,39,50,.96));
+  box-shadow: 0 20px 40px rgba(0,0,0,.28);
+}
+.pase-demo { display: block; margin-bottom: 12px; color: #f3b340; font-size: .66rem; font-weight: 900; letter-spacing: .15em; text-align: center; }
+.pase-qr {
+  display: grid;
+  place-items: center;
+  min-height: 250px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #fff;
+  color: #29424b;
+}
+.pase-qr svg { width: min(100%, 255px); height: auto; display: block; }
+.pase-qr-espera { max-width: 210px; font-size: .78rem; line-height: 1.45; text-align: center; }
+.pase-qr-datos { display: grid; gap: 4px; margin: 15px 0; color: #fff; text-align: center; }
+.pase-qr-datos span,
+.pase-qr-datos small { color: rgba(255,255,255,.62); font-size: .7rem; }
+.pase-credencial .boton { display: block; width: fit-content; margin: 0 auto; text-decoration: none; }
+.pase-control {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(22px, 4vw, 42px);
+  border: 1px solid var(--linea-vidrio);
+  border-radius: 22px;
+  background: rgba(255,255,255,.055);
+}
+.pase-control h3 { margin: 8px 0; color: #fff; font-size: 1.65rem; }
+.pase-control > p { margin: 0 0 18px; color: rgba(255,255,255,.62); line-height: 1.5; }
+.pase-control .pase-accion { grid-column: auto; }
+.pase-lectura { display: grid; gap: 4px; margin-top: 18px; padding: 15px; border: 1px dashed rgba(255,255,255,.22); border-radius: 14px; color: rgba(255,255,255,.58); }
+.pase-lectura span { font-size: .76rem; }
+.pase-lectura.autorizado { border-style: solid; border-color: rgba(93,218,127,.42); background: rgba(63,174,90,.12); color: #a5edb7; }
+.pase-reiniciar { align-self: flex-start; margin-top: 13px; padding: 5px 0; border: 0; background: transparent; color: rgba(255,255,255,.55); text-decoration: underline; cursor: pointer; }
+.pase-integracion {
+  display: grid;
+  grid-template-columns: minmax(240px, .75fr) minmax(0, 1.25fr);
+  gap: 24px;
+  align-items: center;
+  margin-top: 18px;
+  padding: clamp(23px, 4vw, 40px);
+  border: 1px solid var(--linea-vidrio);
+  border-radius: 22px;
+  background: rgba(8,51,63,.82);
+  backdrop-filter: blur(16px);
+}
+.pase-integracion h3 { margin: 8px 0 0; color: #fff; font-size: 1.5rem; line-height: 1.2; }
+.pase-entidades { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pase-entidades span,
+.pase-entidades b { padding: 9px 11px; border-radius: 999px; font-size: .74rem; }
+.pase-entidades span { border: 1px solid rgba(255,255,255,.16); color: rgba(255,255,255,.72); background: rgba(255,255,255,.055); }
+.pase-entidades span::after { content: " →"; color: #65d3c9; }
+.pase-entidades b { background: #65d3c9; color: #062833; }
+
+@media (max-width: 900px) {
+  .pase-portada { grid-template-columns: 1fr; align-items: end; min-height: 620px; }
+  .pase-beneficio { justify-self: start; }
+  .pase-qr-zona,
+  .pase-integracion { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+  .pase-portada { margin: -16px -16px 0; min-height: 610px; padding: 32px 22px; background-position: 70% center; }
+  .pase-portada h2 { font-size: clamp(2.25rem, 12vw, 3.75rem); }
+  .pase-beneficio { min-width: 155px; padding: 12px; }
+  .pase-aporte,
+  .pase-formulario,
+  .pase-validaciones { grid-template-columns: 1fr; }
+  .pase-pasos button { min-height: 78px; padding: 8px 4px; font-size: .7rem; }
+  .pase-pasos button span { display: grid; margin: 0 auto 5px; }
+  .pase-qr-zona { grid-template-columns: minmax(0, 1fr); }
+  .pase-panel { padding: 24px 17px; }
+}
+
+/* =============================================================================
+   Fondos fotográficos aportados por el equipo
+   Cada parte del recorrido usa una escena distinta para evitar páginas planas.
+   ============================================================================= */
+:root[data-tema="logistica"] { --vidrio-claro: rgba(216, 233, 235, .86); }
+
+body[data-modulo="llegadas"],
+body[data-modulo="ttt"] { --arte-modulo: url("../img/fondo-terminal-buque.webp"); }
+body[data-modulo="mapa"],
+body[data-modulo="simulador"] { --arte-modulo: url("../img/fondo-camion-muelle.webp"); }
+body[data-modulo="citas"],
+body[data-modulo="pase"],
+body[data-modulo="solucion"],
+body[data-modulo="mejora"] { --arte-modulo: url("../img/fondo-camion-contenedor.webp"); }
+
+body:not([data-modulo="inicio"]) #contenido-modulo::before {
+  opacity: .64;
+  background-position: center top;
+}
+body[data-modulo="llegadas"] #contenido-modulo::before,
+body[data-modulo="ttt"] #contenido-modulo::before { background-position: center 18%; }
+body[data-modulo="mapa"] #contenido-modulo::before,
+body[data-modulo="simulador"] #contenido-modulo::before { background-position: 54% center; }
+body[data-modulo="citas"] #contenido-modulo::before,
+body[data-modulo="pase"] #contenido-modulo::before,
+body[data-modulo="solucion"] #contenido-modulo::before,
+body[data-modulo="mejora"] #contenido-modulo::before { background-position: center 58%; }
+body:not([data-modulo="inicio"]) #contenido-modulo::after {
+  background: linear-gradient(180deg, rgba(3,25,35,.56), rgba(3,25,35,.88) 42%, rgba(3,25,35,.95));
+}
+
+/* Cabecera fotográfica: la información principal flota directamente sobre la imagen. */
+.cabecera-modulo-foto {
+  position: relative;
+  isolation: isolate;
+  min-height: clamp(330px, 48vw, 540px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: -16px -16px 22px;
+  padding: clamp(28px, 5vw, 64px);
+  overflow: hidden;
+  border-radius: 0 0 24px 24px;
+  background:
+    linear-gradient(90deg, rgba(2,22,32,.94) 0%, rgba(2,22,32,.65) 48%, rgba(2,22,32,.14) 100%),
+    linear-gradient(0deg, rgba(2,22,32,.88) 0%, transparent 68%),
+    var(--arte-modulo) center / cover no-repeat;
+  box-shadow: 0 24px 48px rgba(0,0,0,.26);
+  color: #fff;
+}
+.cabecera-modulo-foto .cabecera-modulo-titulo {
+  max-width: 760px;
+  margin: 11px 0 12px;
+  color: #fff;
+  font-size: clamp(2.15rem, 4.8vw, 4.8rem);
+  line-height: .98;
+  letter-spacing: -.045em;
+  text-shadow: 0 3px 22px rgba(0,0,0,.38);
+}
+.cabecera-modulo-foto > p {
+  max-width: 680px;
+  margin: 0;
+  color: rgba(255,255,255,.82);
+  font-size: 1rem;
+  line-height: 1.55;
+  text-shadow: 0 2px 14px rgba(0,0,0,.30);
+}
+
+/* Las tarjetas analíticas dejan pasar parte de la fotografía sin perder lectura. */
+:root[data-tema="logistica"] .tarjeta,
+:root[data-tema="logistica"] .tarjeta.no-cumple,
+:root[data-tema="logistica"] .panel-control,
+:root[data-tema="logistica"] .rejilla-a3 > section,
+:root[data-tema="logistica"] .anim-fila,
+.sol-opcion > span,
+.sol-diagnostico,
+.sol-metrica,
+.sol-plan-generado,
+.sol-conclusion,
+.plan-operativo,
+.comparacion-plan > div,
+.resumen-simple,
+.explora-tarjeta {
+  background: rgba(219, 235, 237, .86);
+  box-shadow: 0 14px 32px rgba(2,20,29,.16);
+}
+.lg-dia,
+.lg-dia.activo,
+.mf-dato,
+.guia-paso { background: rgba(219,235,237,.84); }
+
+/* Mapa: la escena del camión se convierte en cabecera fotográfica. */
+.mapa-portada {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.17);
+  background:
+    linear-gradient(90deg, rgba(3,27,38,.96) 0%, rgba(3,27,38,.78) 48%, rgba(3,27,38,.28) 100%),
+    url("../img/fondo-camion-muelle.webp") center / cover no-repeat;
+  box-shadow: 0 22px 50px rgba(0,0,0,.24);
+}
+.mapa-portada h2 { color: #fff; }
+.mapa-portada p { color: rgba(255,255,255,.76); }
+.mapa-enlace-simple { color: #8ee8de; }
+.mapa-foto-real { border: 1px solid rgba(255,255,255,.18); box-shadow: 0 16px 32px rgba(0,0,0,.25); }
+
+/* Solución: misma lógica de portada, con la ruta del camión como contexto. */
+.solucionador {
+  border: 1px solid rgba(255,255,255,.16);
+  background:
+    linear-gradient(rgba(3,26,36,.83), rgba(3,26,36,.94)),
+    url("../img/fondo-camion-contenedor.webp") center / cover fixed;
+  color: #fff;
+}
+.sol-encabezado::before {
+  background-image: url("../img/fondo-camion-contenedor.webp");
+  background-position: center 56%;
+}
+.sol-preguntas legend { color: #fff; }
+.sol-opcion > span,
+.sol-diagnostico,
+.sol-metrica,
+.sol-plan-generado,
+.sol-conclusion { color: var(--texto); }
+.sol-respaldo-enlaces a { background: rgba(220,237,239,.90); }
+
+/* Pase QR: fotografía del camión como protagonista y continuidad en el cierre. */
+.pase-portada::before {
+  background-image: url("../img/fondo-camion-contenedor.webp");
+  background-position: center 58%;
+}
+.pase-portada::after {
+  background:
+    linear-gradient(90deg, rgba(3,24,34,.98) 0%, rgba(3,24,34,.84) 45%, rgba(3,24,34,.18) 78%),
+    linear-gradient(0deg, rgba(3,24,34,.84), transparent 52%);
+}
+.pase-integracion {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(4,37,48,.96), rgba(4,37,48,.72)),
+    url("../img/fondo-terminal-buque.webp") center 56% / cover no-repeat;
+}
+
+@media (max-width: 650px) {
+  body:not([data-modulo="inicio"]) #contenido-modulo::before { background-position: center top; }
+  .cabecera-modulo-foto {
+    min-height: 410px;
+    padding: 28px 21px;
+    background-position: 60% center;
+  }
+  .mapa-portada { background-position: 62% center; }
+  .solucionador { background-attachment: scroll; }
+  .pase-portada::before { background-position: 62% center; }
+}

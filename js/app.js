@@ -92,8 +92,8 @@ function pintarInfoDia() {
 // navegador y saltar de una sección a otra con <a href="#simulador">.
 function prepararPestanas() {
   const nav = document.getElementById("pestanas");
-  const principales = ["inicio", "mapa", "simulador", "citas", "solucion"];
-  const nombres = { mapa: "Mapa", simulador: "Simulador", citas: "Citas", solucion: "Solución" };
+  const principales = ["inicio", "mapa", "pase", "simulador", "citas", "solucion"];
+  const nombres = { mapa: "Mapa", pase: "Pase QR", simulador: "Simulador", citas: "Citas", solucion: "Solución" };
   const visibles = principales.map((id) => MODULOS.find((m) => m.id === id)).filter(Boolean);
   const extras = MODULOS.filter((m) => !principales.includes(m.id));
   nav.innerHTML = visibles.map((m) =>
@@ -138,7 +138,23 @@ function pintarModulo() {
   Object.entries(ANIMACIONES).forEach(([k, a]) => { if (k !== "anim-pres") a.detener(); });
   contenedor.innerHTML = "";
   m.render(contenedor, ESTADO);
-  if (m.intro) contenedor.insertAdjacentHTML("afterbegin", `<p class="intro-modulo">${m.intro}</p>`);
+  if (m.intro && !["inicio", "mapa", "pase", "solucion"].includes(m.id)) {
+    const titulo = Array.from(contenedor.children).find((elemento) => elemento.tagName === "H2");
+    if (titulo) {
+      const cabecera = document.createElement("header");
+      const etiqueta = document.createElement("span");
+      const introduccion = document.createElement("p");
+      cabecera.className = "cabecera-modulo-foto";
+      etiqueta.className = "seccion-etiqueta";
+      etiqueta.textContent = "SMART GATE BALBOA";
+      titulo.classList.add("cabecera-modulo-titulo");
+      introduccion.textContent = m.intro;
+      cabecera.append(etiqueta, titulo, introduccion);
+      contenedor.insertAdjacentElement("afterbegin", cabecera);
+    } else {
+      contenedor.insertAdjacentHTML("afterbegin", `<p class="intro-modulo">${m.intro}</p>`);
+    }
+  }
 
   // Migas: Inicio › Sección
   document.getElementById("migas").innerHTML = m.id === "inicio" ? "" :

@@ -57,9 +57,10 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 ## Navegación (menos cargado)
 - Cada sección es un **enlace** (`index.html#mapa`, `#simulador`, `#mejora`…): se puede compartir y el botón
   "atrás" del navegador funciona.
-- **Inicio** muestra una portada real del Puerto de Balboa y cuatro rutas desplegables: ubicación, simulación,
-  solución y datos. Cada ruta contiene sus enlaces secundarios sin llenar la pantalla.
-- La barra superior deja visibles solo Inicio, Mapa, Simulador, Citas y el **Generador de solución**. Llegadas,
+- **Inicio** muestra una ilustración original e interactiva del Puerto de Balboa y cuatro rutas desplegables:
+  ubicación, simulación, solución y datos. Los puntos sobre la escena explican buque, flujo y garita; cada ruta
+  contiene sus enlaces secundarios sin llenar la pantalla.
+- La barra superior deja visibles Inicio, Mapa, **Pase QR**, Simulador, Citas y el **Generador de solución**. Llegadas,
   TTT y el análisis A3 con gráficos quedan bajo **"Más análisis"**.
 - Cada sección tiene una frase de introducción, migas "Inicio › Sección" y botones **← Anterior / Siguiente →**.
 - Los detalles (tablas hora por hora, gráficos extra, análisis A3 completo) están en **"Ver más"** y los
@@ -80,6 +81,17 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 | 4 | Citas (TAS) | TAS dinámico: franjas, sin TAS vs con TAS, cumplimiento y no-show |
 | 5 | Mejora | A3 Lean y gráfico cascada de las 3 palancas |
 | 6 | Generador de solución | Dos preguntas → diagnóstico, antes/después y plan operativo por etapas, sin gráficos |
+| 7 | Pase Smart Gate | Afiliación demostrativa, expediente único de retiro y QR para simular el carril expedito |
+
+### Pase Smart Gate: un solo trámite de retiro
+El nuevo recorrido convierte cinco validaciones en un solo expediente visible para el transportista:
+afiliación, cita, liberación de naviera, autorización de Aduanas y confirmación de terminal. Cuando todas
+se marcan como completas, el navegador genera un **QR demostrativo** y permite simular su lectura en la garita.
+
+Es un prototipo académico: no guarda ni transmite los datos escritos, no consulta sistemas externos y no
+está conectado con la Autoridad Nacional de Aduanas, navieras ni terminales. El QR contiene solo un identificador
+temporal, placa, contenedor y estado de autorización. La generación local utiliza `qrcode-generator`, incluida en
+`js/lib/qrcode.js` bajo licencia MIT.
 
 ### Aporte de `tejadaoperaciones-star`: plan de ventanilla adicional
 El Módulo 2 permite activar una **ventanilla adicional únicamente en horas pico**
@@ -143,6 +155,11 @@ Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual
 ## Mapa e imágenes
 - El mapa simulado funciona sin internet con `img/mapa-puerto-balboa.png`.
 - Los botones de Google Maps usan **Maps URLs** y no guardan claves ni tokens; necesitan conexión a internet.
+- `img/balboa-smart-gate-hero.png` y `img/pase-smart-gate-qr.png` son ilustraciones originales generadas para
+  este proyecto. La segunda muestra al conductor usando el pase digital en una garita inteligente.
+- `img/fondo-terminal-buque.webp`, `img/fondo-camion-muelle.webp` y `img/fondo-camion-contenedor.webp` fueron
+  aportadas por el equipo y se usan como fondos temáticos. Antes de una publicación externa, el grupo debe
+  confirmar su fuente, licencia y permiso de uso; la primera imagen conserva una marca de agua visible.
 - Portada: *Puerto de Contenedores en Balboa*, Mdesanjur, Wikimedia Commons, CC BY-SA 4.0.
 - Operación de contenedor: U.S. Government Accountability Office, Wikimedia Commons, dominio público.
 
