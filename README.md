@@ -8,10 +8,10 @@ Proyecto semestral · **Medición y Rendimiento de Terminales Portuarias** · Un
 ## Integrantes
 | Nombre | Usuario GitHub | Módulo a cargo |
 |---|---|---|
-| _(pendiente)_ | | 1 · Llegadas |
-| _(pendiente)_ | | 2 · Simulador de cola |
-| _(pendiente)_ | | 3 · Truck Turn Time |
-| _(pendiente)_ | | 4 · Citas (TAS dinámico) |
+| _(nombre pendiente)_ | alefitere06-pixel | _(por asignar)_ |
+| _(nombre pendiente)_ | tejadaoperaciones-star | _(por asignar)_ |
+| _(pendiente)_ | | _(por asignar)_ |
+| _(pendiente)_ | | _(por asignar)_ |
 
 ## El problema
 En horas pico se forma una cola de camiones para entrar a la garita de la terminal de Balboa.
