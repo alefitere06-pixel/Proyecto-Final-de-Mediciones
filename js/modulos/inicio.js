@@ -83,20 +83,35 @@ function renderLogistica(contenedor, estado) {
       </div>
       <div class="hero-escena" aria-label="Ilustración interactiva de la operación del Puerto de Balboa">
         <span class="hero-instruccion">Toca los puntos para entender la operación</span>
-        <button type="button" class="hero-punto hero-punto-buque" data-hero-punto aria-expanded="false">
+        <button type="button" class="hero-punto hero-punto-buque" data-hero-punto="buque" aria-expanded="false" aria-controls="hero-ficha-operacion">
           <span class="hero-pulso" aria-hidden="true"></span><span class="punto-etiqueta">Buque</span>
-          <span class="punto-info"><strong>Más carga</strong>Un día con buque aumenta los movimientos y las llegadas de camiones.</span>
+          <span class="punto-info"><strong>Más carga</strong>Conoce cómo la llegada de un buque cambia la demanda terrestre.</span>
         </button>
-        <button type="button" class="hero-punto hero-punto-flujo" data-hero-punto aria-expanded="false">
+        <button type="button" class="hero-punto hero-punto-flujo" data-hero-punto="flujo" aria-expanded="false" aria-controls="hero-ficha-operacion">
           <span class="hero-pulso" aria-hidden="true"></span><span class="punto-etiqueta">Flujo</span>
-          <span class="punto-info"><strong>Llegadas coordinadas</strong>Las citas distribuyen los camiones para que no lleguen todos a la vez.</span>
+          <span class="punto-info"><strong>Llegadas coordinadas</strong>Revisa cuándo llegan los camiones y por qué se forma la fila.</span>
         </button>
-        <button type="button" class="hero-punto hero-punto-garita" data-hero-punto aria-expanded="false">
+        <button type="button" class="hero-punto hero-punto-garita" data-hero-punto="garita" aria-expanded="false" aria-controls="hero-ficha-operacion">
           <span class="hero-pulso" aria-hidden="true"></span><span class="punto-etiqueta">Garita</span>
-          <span class="punto-info"><strong>Capacidad de entrada</strong>Una sexta ventanilla en horas pico ayuda a mover la cola con rapidez.</span>
+          <span class="punto-info"><strong>Capacidad de entrada</strong>Entiende cómo las ventanillas procesan y autorizan cada camión.</span>
         </button>
         <div class="hero-ruta-animada" aria-hidden="true"><span class="hero-camion"></span></div>
         <small class="hero-credito">Ilustración conceptual creada para Smart Gate Balboa</small>
+      </div>
+    </section>
+
+    <section class="hero-ficha-operacion" id="hero-ficha-operacion" data-tema="buque" aria-live="polite" aria-labelledby="hero-ficha-titulo" tabindex="-1" hidden>
+      <button type="button" class="hero-ficha-cerrar" aria-label="Cerrar información">×</button>
+      <div class="hero-ficha-cabecera">
+        <span class="seccion-etiqueta" id="hero-ficha-etiqueta"></span>
+        <h3 id="hero-ficha-titulo"></h3>
+        <p id="hero-ficha-resumen"></p>
+      </div>
+      <div class="hero-ficha-indicadores" id="hero-ficha-indicadores"></div>
+      <div class="hero-ficha-accion">
+        <strong>¿Qué hacemos?</strong>
+        <p id="hero-ficha-accion-texto"></p>
+        <a class="boton hero-ficha-enlace" id="hero-ficha-enlace" href="#llegadas"></a>
       </div>
     </section>
 
@@ -252,11 +267,81 @@ function renderLogistica(contenedor, estado) {
       heroPuerto.style.setProperty("--hero-y", "0px");
     });
   }
-  contenedor.querySelectorAll("[data-hero-punto]").forEach((punto) => punto.addEventListener("click", () => {
-    const abrir = punto.getAttribute("aria-expanded") !== "true";
+  const fichaOperacion = contenedor.querySelector("#hero-ficha-operacion");
+  const informacionOperacion = {
+    buque: {
+      etiqueta: "BUQUE · OPERACIÓN MARÍTIMA",
+      titulo: "El buque activa la demanda de transporte terrestre",
+      resumen: info.dia_buque
+        ? `El día ${estado.dia} está marcado como día de buque. La descarga y el retiro de contenedores elevan la cantidad de viajes que debe absorber el acceso portuario.`
+        : `El día ${estado.dia} no está marcado como día de buque grande, pero la terminal mantiene movimientos regulares de contenedores y camiones.`,
+      indicadores: [
+        { valor: info.dia_buque ? "Sí" : "No", texto: "Día de buque" },
+        { valor: fmt(info.llegadas), texto: "Camiones previstos" },
+        { valor: horaTexto(k.horaPico), texto: "Hora de mayor demanda" },
+      ],
+      accion: "Cruzar el plan del buque con las citas de retiro permite anticipar la demanda y evitar que todos los camiones lleguen en la misma franja.",
+      enlace: "Ver llegadas y días de buque",
+      destino: "#llegadas",
+    },
+    flujo: {
+      etiqueta: "FLUJO · LLEGADA DE CAMIONES",
+      titulo: "El problema no es solo cuántos llegan, sino cuándo llegan",
+      resumen: `Durante el día ${estado.dia}, el mayor movimiento ocurre cerca de las ${horaTexto(k.horaPico)}. Si muchos conductores llegan sin coordinación, la fila puede superar el espacio disponible y alcanzar la vía pública.`,
+      indicadores: [
+        { valor: fmt(k.lqMax), texto: "Camiones en la fila máxima" },
+        { valor: `${fmt(k.wqPromedio)} min`, texto: "Espera promedio" },
+        { valor: enCalle > 0 ? fmt(enCalle) : "0", texto: "Camiones en la calle" },
+      ],
+      accion: "Las citas y la cola virtual distribuyen las llegadas por horarios. El conductor recibe una franja y se aproxima a la garita cuando existe capacidad.",
+      enlace: "Ver cómo funcionan las citas",
+      destino: "#citas",
+    },
+    garita: {
+      etiqueta: "GARITA · CONTROL DE ACCESO",
+      titulo: "La garita decide la velocidad con que avanza la fila",
+      resumen: `Cada camión requiere validación antes de entrar. En este escenario, la revisión tarda aproximadamente ${fmt(D.servicio, 1)} minutos y la ocupación máxima de la garita alcanza ${fmt(k.rhoPico)} %.`,
+      indicadores: [
+        { valor: "5 de 6", texto: "Ventanillas activas" },
+        { valor: `${fmt(D.servicio, 1)} min`, texto: "Revisión por camión" },
+        { valor: `${fmt(k.rhoPico)} %`, texto: "Ocupación en hora pico" },
+      ],
+      accion: "Abrir la sexta ventanilla en horas pico y validar previamente documentos y QR aumenta la capacidad sin mantener recursos adicionales durante todo el día.",
+      enlace: "Probar mejoras en la garita",
+      destino: "#simulador",
+    },
+  };
+
+  const cerrarFichaOperacion = () => {
+    fichaOperacion.hidden = true;
     contenedor.querySelectorAll("[data-hero-punto]").forEach((otro) => otro.setAttribute("aria-expanded", "false"));
-    punto.setAttribute("aria-expanded", String(abrir));
+  };
+
+  contenedor.querySelectorAll("[data-hero-punto]").forEach((punto) => punto.addEventListener("click", () => {
+    const clave = punto.dataset.heroPunto;
+    const detalle = informacionOperacion[clave];
+    const yaAbierto = punto.getAttribute("aria-expanded") === "true" && !fichaOperacion.hidden;
+    if (yaAbierto) {
+      cerrarFichaOperacion();
+      return;
+    }
+
+    contenedor.querySelectorAll("[data-hero-punto]").forEach((otro) => otro.setAttribute("aria-expanded", String(otro === punto)));
+    fichaOperacion.dataset.tema = clave;
+    fichaOperacion.querySelector("#hero-ficha-etiqueta").textContent = detalle.etiqueta;
+    fichaOperacion.querySelector("#hero-ficha-titulo").textContent = detalle.titulo;
+    fichaOperacion.querySelector("#hero-ficha-resumen").textContent = detalle.resumen;
+    fichaOperacion.querySelector("#hero-ficha-indicadores").innerHTML = detalle.indicadores.map((indicador) =>
+      `<div><strong>${indicador.valor}</strong><span>${indicador.texto}</span></div>`).join("");
+    fichaOperacion.querySelector("#hero-ficha-accion-texto").textContent = detalle.accion;
+    const enlace = fichaOperacion.querySelector("#hero-ficha-enlace");
+    enlace.textContent = `${detalle.enlace} →`;
+    enlace.href = detalle.destino;
+    fichaOperacion.hidden = false;
+    fichaOperacion.focus({ preventScroll: true });
+    fichaOperacion.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }));
+  fichaOperacion.querySelector(".hero-ficha-cerrar").addEventListener("click", cerrarFichaOperacion);
 
   // Tabla filtrable
   const pintarTabla = (f) => {

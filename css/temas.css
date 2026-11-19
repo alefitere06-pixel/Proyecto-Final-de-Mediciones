@@ -560,6 +560,79 @@ details.mas[open] > summary { margin-bottom: 12px; }
 .hero-punto:focus-visible .punto-info,
 .hero-punto[aria-expanded="true"] .punto-info { opacity: 1; visibility: visible; transform: translateY(0); }
 .hero-punto:focus-visible { outline: 2px solid #fff; outline-offset: 6px; border-radius: 999px; }
+.hero-punto[aria-expanded="true"] .punto-etiqueta {
+  color: #052630;
+  background: #7fe0d3;
+  border-color: #b8fff4;
+  box-shadow: 0 0 0 5px rgba(127,224,211,.18), 0 10px 25px rgba(0,0,0,.24);
+}
+.hero-ficha-operacion {
+  --ficha-fondo: url("../img/fondo-terminal-buque.webp");
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(250px, 1.15fr) minmax(280px, .9fr) minmax(260px, .95fr);
+  gap: clamp(18px, 3vw, 36px);
+  align-items: center;
+  margin: 16px 0 28px;
+  padding: clamp(24px, 4vw, 44px);
+  overflow: hidden;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 24px;
+  background:
+    linear-gradient(90deg, rgba(3,25,35,.97) 0%, rgba(3,33,43,.88) 53%, rgba(3,28,38,.76) 100%),
+    var(--ficha-fondo) center / cover no-repeat;
+  box-shadow: 0 22px 48px rgba(3,24,35,.22);
+  scroll-margin-top: 90px;
+}
+.hero-ficha-operacion[data-tema="flujo"] { --ficha-fondo: url("../img/fondo-camion-contenedor.webp"); }
+.hero-ficha-operacion[data-tema="garita"] { --ficha-fondo: url("../img/fondo-camion-muelle.webp"); }
+.hero-ficha-operacion[hidden] { display: none; }
+.hero-ficha-operacion:focus { outline: none; }
+.hero-ficha-cerrar {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 50%;
+  background: rgba(3,24,34,.52);
+  backdrop-filter: blur(10px);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.hero-ficha-cerrar:hover,
+.hero-ficha-cerrar:focus-visible { background: rgba(127,224,211,.24); outline: 2px solid #7fe0d3; outline-offset: 2px; }
+.hero-ficha-cabecera h3 { max-width: 620px; margin: 8px 0 10px; color: #fff; font-size: clamp(1.45rem, 2.6vw, 2.35rem); line-height: 1.06; }
+.hero-ficha-cabecera p,
+.hero-ficha-accion p { margin: 0; color: rgba(255,255,255,.79); line-height: 1.58; }
+.hero-ficha-indicadores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.hero-ficha-indicadores > div {
+  min-width: 0;
+  padding: 15px 11px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 14px;
+  background: rgba(1,24,33,.48);
+  backdrop-filter: blur(12px);
+  text-align: center;
+}
+.hero-ficha-indicadores strong { display: block; color: #7fe0d3; font-size: clamp(1.05rem, 2vw, 1.55rem); line-height: 1.05; }
+.hero-ficha-indicadores span { display: block; margin-top: 6px; color: rgba(255,255,255,.7); font-size: .68rem; line-height: 1.25; }
+.hero-ficha-accion {
+  padding: 18px;
+  border-left: 3px solid #f3b340;
+  border-radius: 0 16px 16px 0;
+  background: rgba(1,24,33,.5);
+  backdrop-filter: blur(12px);
+}
+.hero-ficha-accion > strong { display: block; margin-bottom: 6px; color: #f3b340; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; }
+.hero-ficha-enlace { display: inline-flex; margin-top: 14px; background: #7fe0d3; color: #052630; font-weight: 800; }
+.hero-ficha-enlace:hover { background: #a4f4e8; opacity: 1; }
 .hero-ruta-animada {
   position: absolute;
   left: 8%;
@@ -611,6 +684,8 @@ details.mas[open] > summary { margin-bottom: 12px; }
   .hero-punto-buque { left: 18%; top: 22%; }
   .hero-punto-flujo { left: 48%; top: 45%; }
   .hero-punto-garita { right: 7%; top: 29%; }
+  .hero-ficha-operacion { grid-template-columns: 1fr 1fr; }
+  .hero-ficha-accion { grid-column: 1 / -1; }
 }
 @media (max-width: 620px) {
   :root[data-tema="logistica"] body { padding: 0; background-attachment: scroll; }
@@ -633,6 +708,10 @@ details.mas[open] > summary { margin-bottom: 12px; }
   .hero-punto-flujo:focus-visible .punto-info,
   .hero-punto-flujo[aria-expanded="true"] .punto-info { transform: translate(-50%, 0); }
   .hero-credito { left: 18px; right: auto; }
+  .hero-ficha-operacion { grid-template-columns: 1fr; margin: 12px 0 22px; padding: 27px 20px 22px; border-radius: 20px; }
+  .hero-ficha-accion { grid-column: auto; }
+  .hero-ficha-indicadores { grid-template-columns: 1fr 1fr 1fr; }
+  .hero-ficha-indicadores > div { padding: 12px 7px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-balboa.hero-puerto-interactivo::before { transition: none; transform: scale(1.03); }
