@@ -69,8 +69,8 @@ function renderLogistica(contenedor, estado) {
     <section class="hero-balboa hero-puerto-interactivo" id="hero-puerto">
       <div class="hero-balboa-contenido">
         <span class="hero-etiqueta">GATEFLOW · PUERTO DE BALBOA</span>
-        <h2>El puerto se mueve. La fila también puede hacerlo mejor.</h2>
-        <p>Explora cómo un buque, la llegada de camiones y la capacidad de la garita se conectan. Después genera una solución para evitar que la fila llegue a la calle.</p>
+        <h2>Tecnología que mueve el puerto.</h2>
+        <p>Conectamos buques, camiones y garitas para reducir la congestión y agilizar cada retiro de carga.</p>
         <div class="hero-acciones">
           <a class="boton hero-principal" href="#solucion">Generar una solución</a>
           <a class="boton hero-secundario" href="#mapa">Explorar el puerto</a>
