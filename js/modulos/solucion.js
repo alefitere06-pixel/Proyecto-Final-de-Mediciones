@@ -1,5 +1,5 @@
 // =============================================================================
-// Solucionador Smart Gate · recomendación operativa sin gráficos
+// Solucionador GateFlow · recomendación operativa sin gráficos
 // -----------------------------------------------------------------------------
 // La persona elige el problema principal y el nivel de cambio posible. La página
 // prueba un paquete de medidas con las mismas fórmulas y datos de los demás módulos.
@@ -54,7 +54,7 @@ function paqueteSolucion(nivel) {
       ],
     },
     integral: {
-      nombre: "Plan integral · Gate Inteligente",
+      nombre: "Plan integral · GateFlow",
       escenario: escPalancas({ ...controlLlegadas, colaVirtual: true, doble: true }),
       acciones: [
         ["Esta semana", "Activar capacidad extra solo cuando hace falta", "Sexta ventanilla en horas pico y seguimiento diario de la fila."],

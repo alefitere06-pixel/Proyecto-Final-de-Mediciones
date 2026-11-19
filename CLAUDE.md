@@ -8,7 +8,7 @@ En horas pico se forma una cola de camiones para entrar a la garita de la termin
 Causa de diseño: no existe una vía de espera fuera de la terminal que no afecte el tránsito del
 Puente de las Américas. Cuando la cola supera lo que cabe en la vía de acceso, los camiones ocupan
 la vía pública. El dashboard simula llegadas y cola durante el día, mide tiempos de espera y evalúa
-nuestra propuesta **"Gate Inteligente: 3 palancas"**:
+nuestra propuesta **"GateFlow: 3 palancas"**:
 1. **TAS dinámico**: capacidad por franja = carriles abiertos × μ × 0,85 (meta de ρ).
 2. **Cola virtual**: pre-estacionamiento fuera de la vía + llamada por app → menos camiones en vía pública.
 3. **Doble transacción**: incentivo para entregar export y retirar import en la misma visita → menos llegadas.

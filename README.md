@@ -1,7 +1,7 @@
-# Gate Balboa · Dashboard de cola y citas
+# GateFlow · Plataforma inteligente de acceso portuario
 
 Proyecto semestral · **Medición y Rendimiento de Terminales Portuarias** · Universidad Marítima Internacional de Panamá
-**Idea 1 · Cola para entrar a la garita de Balboa** — Propuesta: **Gate Inteligente (3 palancas)**
+**Idea 1 · Cola para entrar a la garita de Balboa** — Propuesta: **GateFlow (3 palancas)**
 
 > ⚠️ Todos los datos del dashboard son **simulados**.
 
@@ -24,7 +24,7 @@ Con los datos simulados, la situación actual muestra que **los días de buque**
 pico supera la capacidad de la garita (ρ > 100 %), la cola pasa el límite de la vía de acceso y hay
 varias horas de desborde, mientras que los días sin buque la garita casi siempre alcanza.
 
-## Nuestra propuesta: Gate Inteligente (3 palancas)
+## Nuestra propuesta: GateFlow (3 palancas)
 1. **TAS dinámico** — el sistema de citas no usa una capacidad fija por franja: la calcula como
    *carriles abiertos × μ × 0,85*, para que ρ quede bajo la meta en cada franja.
 2. **Cola virtual con pre-estacionamiento** — los camiones esperan en un área fuera de la vía y se
@@ -81,9 +81,9 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 | 4 | Citas (TAS) | TAS dinámico: franjas, sin TAS vs con TAS, cumplimiento y no-show |
 | 5 | Mejora | A3 Lean y gráfico cascada de las 3 palancas |
 | 6 | Generador de solución | Dos preguntas → diagnóstico, antes/después y plan operativo por etapas, sin gráficos |
-| 7 | Pase Smart Gate | Afiliación demostrativa, expediente único de retiro y QR para simular el carril expedito |
+| 7 | Pase GateFlow | Afiliación demostrativa, expediente único de retiro y QR para simular el carril expedito |
 
-### Pase Smart Gate: un solo trámite de retiro
+### Pase GateFlow: un solo trámite de retiro
 El nuevo recorrido convierte cinco validaciones en un solo expediente visible para el transportista:
 afiliación, cita, liberación de naviera, autorización de Aduanas y confirmación de terminal. Cuando todas
 se marcan como completas, el navegador genera un **QR demostrativo** y permite simular su lectura en la garita.
@@ -139,7 +139,7 @@ Ningún escenario usa fórmulas nuevas: solo cambian las entradas (llegadas por 
 espera) y los KPI se calculan con las fórmulas del curso en `js/kpi.js`.
 
 ## Resultados principales (promedio de los días con buque, datos simulados)
-| KPI | Actual | TAS clásico | Gate Inteligente (3 palancas) | Meta |
+| KPI | Actual | TAS clásico | GateFlow (3 palancas) | Meta |
 |---|---|---|---|---|
 | Espera promedio Wq | 31 min | 26 min | 1,5 min | ≤ 30 min |
 | Cola máxima Lq | 80 camiones | 68 | 12 | ≤ 40 |

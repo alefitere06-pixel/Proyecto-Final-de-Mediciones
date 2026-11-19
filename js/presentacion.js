@@ -29,7 +29,7 @@ const DIAPOSITIVAS = [
     html: () => `
       <div class="pres-portada">
         <div class="pres-etiqueta">Proyecto semestral · UMIP · Medición y Rendimiento de Terminales Portuarias</div>
-        <h1>Gate Inteligente</h1>
+        <h1>GateFlow</h1>
         <p class="pres-sub">Cómo sacar de la calle la fila de camiones del puerto de Balboa</p>
         <p class="pres-equipo">${INTEGRANTES.join(" · ")}</p>
         <span class="sello-simulado">DATOS SIMULADOS</span>
@@ -113,7 +113,7 @@ const DIAPOSITIVAS = [
   {
     titulo: "Nuestra solución",
     html: () => `
-      <h2>Nuestra solución: Gate Inteligente</h2>
+      <h2>Nuestra solución: GateFlow</h2>
       <div class="pres-palancas">
         <div><div class="pres-icono">📅</div><h3>Citas inteligentes</h3>
           <p>Cada camión reserva una hora; cada hora ofrece solo los cupos que la puerta puede atender.</p></div>
@@ -142,7 +142,7 @@ const DIAPOSITIVAS = [
       <h2>Resultados (días con barco grande)</h2>
       <div class="pres-dos">
         <table class="pres-tabla">
-          <tr><th>Indicador</th><th>Hoy</th><th>Citas normales</th><th>Gate Inteligente</th><th>Ideal</th></tr>
+          <tr><th>Indicador</th><th>Hoy</th><th>Citas normales</th><th>GateFlow</th><th>Ideal</th></tr>
           ${fila("Espera (min)", "wqPromedio", 0, "≤ 30")}
           ${fila("Camiones esperando", "lqMax", 0, "≤ 40")}
           ${fila("Horas con fila en la calle", "horasDesborde", 1, "0")}
@@ -178,7 +178,7 @@ const DIAPOSITIVAS = [
       <h2>Conclusiones</h2>
       <ul class="pres-lista">
         <li>El problema no es solo de carriles: es <strong>cuándo</strong> llegan los camiones y <strong>dónde</strong> esperan.</li>
-        <li>Gate Inteligente baja la espera de ${fmt(d.actual.wqPromedio)} a <strong class="mejor">${fmt(d.propuesta.wqPromedio, 1)} min</strong>
+        <li>GateFlow baja la espera de ${fmt(d.actual.wqPromedio)} a <strong class="mejor">${fmt(d.propuesta.wqPromedio, 1)} min</strong>
           y deja <strong class="mejor">${fmt(d.propuesta.viaPublicaMax)}</strong> camiones en la vía pública.</li>
         <li>Las citas inteligentes funcionan mejor que las normales porque miran cuánto puede atender la puerta.</li>
         <li>Pendiente: la puerta sigue al ${fmt(d.propuesta.rhoPico)} % en la peor hora (ideal 85 %) → abrir la 6.ª ventanilla en días con barco grande.</li>
@@ -260,7 +260,7 @@ function actualizarReloj() {
 function renderDiapositiva(i, d) {
   const sec = document.createElement("section");
   sec.className = "diapositiva";
-  sec.innerHTML = DIAPOSITIVAS[i].html(d) + `<div class="pres-pie">Gate Balboa · ${i + 1}/${DIAPOSITIVAS.length} · datos simulados</div>`;
+  sec.innerHTML = DIAPOSITIVAS[i].html(d) + `<div class="pres-pie">GateFlow · ${i + 1}/${DIAPOSITIVAS.length} · datos simulados</div>`;
   return sec;
 }
 

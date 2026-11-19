@@ -146,7 +146,7 @@ function pintarModulo() {
       const introduccion = document.createElement("p");
       cabecera.className = "cabecera-modulo-foto";
       etiqueta.className = "seccion-etiqueta";
-      etiqueta.textContent = "SMART GATE BALBOA";
+      etiqueta.textContent = "GATEFLOW · PUERTO DE BALBOA";
       titulo.classList.add("cabecera-modulo-titulo");
       introduccion.textContent = m.intro;
       cabecera.append(etiqueta, titulo, introduccion);

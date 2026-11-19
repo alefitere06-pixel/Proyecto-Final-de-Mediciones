@@ -5,7 +5,7 @@
 // hora, capacidad, capacidad de espera) y luego se calculan los KPI con las
 // fórmulas del curso (kpiDelDia y KPI.* en js/kpi.js).
 //
-// Palancas de la propuesta "Gate Inteligente":
+// Palancas de la propuesta "GateFlow":
 //   1. TAS dinámico .......... redistribuye llegadas con cita a franjas con espacio
 //   2. Cola virtual .......... pre-estacionamiento fuera de la vía (+ capacidad de espera)
 //   3. Doble transacción ..... menos visitas (una visita hace entrega + retiro)

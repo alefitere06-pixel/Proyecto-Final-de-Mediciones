@@ -68,7 +68,7 @@ function renderLogistica(contenedor, estado) {
   contenedor.innerHTML = `
     <section class="hero-balboa hero-puerto-interactivo" id="hero-puerto">
       <div class="hero-balboa-contenido">
-        <span class="hero-etiqueta">SMART GATE · PUERTO DE BALBOA</span>
+        <span class="hero-etiqueta">GATEFLOW · PUERTO DE BALBOA</span>
         <h2>El puerto se mueve. La fila también puede hacerlo mejor.</h2>
         <p>Explora cómo un buque, la llegada de camiones y la capacidad de la garita se conectan. Después genera una solución para evitar que la fila llegue a la calle.</p>
         <div class="hero-acciones">
@@ -96,7 +96,7 @@ function renderLogistica(contenedor, estado) {
           <span class="punto-info"><strong>Capacidad de entrada</strong>Entiende cómo las ventanillas procesan y autorizan cada camión.</span>
         </button>
         <div class="hero-ruta-animada" aria-hidden="true"><span class="hero-camion"></span></div>
-        <small class="hero-credito">Ilustración conceptual creada para Smart Gate Balboa</small>
+        <small class="hero-credito">Ilustración conceptual creada para GateFlow</small>
       </div>
     </section>
 

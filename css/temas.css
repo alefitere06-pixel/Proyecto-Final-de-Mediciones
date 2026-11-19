@@ -720,7 +720,7 @@ details.mas[open] > summary { margin-bottom: 12px; }
 }
 
 /* =============================================================================
-   Experiencia ilustrada continua + Pase Smart Gate
+   Experiencia ilustrada continua + Pase GateFlow
    Las superficies de lectura son vidrio azul; el blanco se reserva para el QR,
    porque el contraste es necesario para que una cámara pueda reconocerlo.
    ============================================================================= */
@@ -872,7 +872,7 @@ body[data-modulo="pase"] .intro-modulo { display: none; }
 .ruta-ramas a:hover,
 .ruta-ramas button:hover { background: rgba(101,211,201,.12); color: #8be8de; }
 
-/* ---------- Pase Smart Gate ---------- */
+/* ---------- Pase GateFlow ---------- */
 .pase-portada {
   position: relative;
   isolation: isolate;

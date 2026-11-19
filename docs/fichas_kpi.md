@@ -1,4 +1,4 @@
-# Fichas de KPI · Gate Balboa (BORRADOR)
+# Fichas de KPI · GateFlow (BORRADOR)
 
 > Borrador para el Hito 2. Cada responsable revisa y completa la ficha de los KPI de su módulo.
 > Fórmulas implementadas en `js/kpi.js`. Fuente de todos los datos: `data/llegadas.js`

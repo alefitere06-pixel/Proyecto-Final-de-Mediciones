@@ -1,5 +1,5 @@
 // =============================================================================
-// Pase Smart Gate · afiliación, expediente único y QR autorizado
+// Pase GateFlow · afiliación, expediente único y QR autorizado
 // -----------------------------------------------------------------------------
 // Prototipo educativo: trabaja solo en la sesión del navegador. No consulta ni
 // sustituye los sistemas oficiales de Aduanas, navieras o terminales.
@@ -46,7 +46,7 @@ function renderPaseQR(contenedor) {
       return;
     }
 
-    const contenido = `SMARTGATE|DEMO|${s.pase.id}|PLACA:${s.afiliado.placa}|CONT:${s.expediente.contenedor}|AUTORIZADO`;
+    const contenido = `GATEFLOW|DEMO|${s.pase.id}|PLACA:${s.afiliado.placa}|CONT:${s.expediente.contenedor}|AUTORIZADO`;
     const qr = qrcode(0, "M");
     qr.addData(contenido);
     qr.make();
@@ -54,8 +54,8 @@ function renderPaseQR(contenedor) {
       cellSize: 5,
       margin: 3,
       scalable: true,
-      alt: "Código QR demostrativo del Pase Smart Gate",
-      title: "Pase Smart Gate autorizado",
+      alt: "Código QR demostrativo del Pase GateFlow",
+      title: "Pase GateFlow autorizado",
     });
     const identificador = document.createElement("strong");
     const referencia = document.createElement("span");
@@ -115,7 +115,7 @@ function renderPaseQR(contenedor) {
       contenedor: String(formulario.get("contenedor")).trim().toUpperCase(),
       validaciones,
     };
-    s.pase = { id: idPase("SG"), autorizado: true };
+    s.pase = { id: idPase("GF"), autorizado: true };
     estadoPaso(2, true);
     estadoPaso(3, true);
     contenedor.querySelector("#pase-aviso").textContent = "Expediente consolidado. Pase expedito autorizado para la demostración.";
@@ -141,7 +141,7 @@ function renderPaseQR(contenedor) {
 
 MODULOS.push({
   id: "pase",
-  titulo: "Pase Smart Gate",
+  titulo: "Pase GateFlow",
   intro: "Prototipo de un solo trámite: afilia al transportista, reúne las autorizaciones y genera un QR para el carril expedito.",
   dueno: "tejadaoperaciones-star",
   rama: "codex/tejada-simulador-cola",
@@ -226,7 +226,7 @@ MODULOS.push({
 
       <section class="pase-integracion">
         <div><span class="seccion-etiqueta">SOLUCIÓN CONSOLIDADA</span><h3>Antes: muchos trámites. Propuesta: un expediente visible para todos.</h3></div>
-        <div class="pase-entidades"><span>Transportista</span><span>Naviera</span><span>Aduanas</span><span>Terminal</span><span>Citas</span><b>Expediente Smart Gate</b></div>
+        <div class="pase-entidades"><span>Transportista</span><span>Naviera</span><span>Aduanas</span><span>Terminal</span><span>Citas</span><b>Expediente GateFlow</b></div>
       </section>`;
 
     renderPaseQR(contenedor);
