@@ -21,10 +21,10 @@
   height: 54px;
   display: block;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 14px;
-  background: rgba(255,255,255,.96);
-  box-shadow: 0 10px 28px rgba(0,0,0,.18);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 .marca-gateflow img {
   position: absolute;
@@ -48,9 +48,9 @@
   width: 190px;
   height: auto;
   flex: 0 0 auto;
-  padding: 0 7px;
-  border-radius: 12px;
-  background: rgba(255,255,255,.94);
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
 }
 .pie-identidad span { max-width: 640px; line-height: 1.5; text-align: left; }
 @media (max-width: 720px) {
@@ -1744,4 +1744,239 @@ body[data-modulo="cliente"] .filtros { display: none; }
 @media (max-width: 480px) {
   .terminal-kpis-completos { grid-template-columns: 1fr; }
   .terminal-modulo-embebido, .terminal-controles-panel, .terminal-decision-panel, .terminal-historial { padding: 17px; }
+}
+
+/* --------------------------------------------------------------------------
+   Identidad corporativa GateFlow · azul marino, rojo y gris metálico
+   -------------------------------------------------------------------------- */
+:root[data-tema="logistica"] {
+  --fondo: #071a33;
+  --fondo-suave: #e8edf3;
+  --panel: #f2f5f8;
+  --texto: #0a2448;
+  --texto-suave: #53677f;
+  --borde: #c8d1dc;
+  --primario: #073b73;
+  --primario-claro: #e1e9f2;
+  --alerta: #c8102e;
+  --alerta-fondo: #fbe9ed;
+  --aviso: #bd8128;
+  --marca-rojo: #c8102e;
+  --marca-azul: #073b73;
+  --marca-plata: #b8c4d0;
+  --vidrio-oscuro: rgba(4, 24, 50, .88);
+  --vidrio-medio: rgba(9, 48, 88, .82);
+  --vidrio-claro: rgba(226, 233, 241, .92);
+  --linea-vidrio: rgba(200, 213, 227, .20);
+}
+
+:root[data-tema="logistica"] body {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(26, 75, 123, .62), transparent 34%),
+    linear-gradient(rgba(3, 16, 35, .84), rgba(3, 20, 43, .94)),
+    url("../img/balboa-smart-gate-hero.png") center top / cover fixed;
+}
+:root[data-tema="logistica"] .app {
+  background: linear-gradient(180deg, rgba(5, 25, 51, .96), rgba(7, 31, 60, .97));
+  border-color: rgba(184,196,208,.28);
+  box-shadow: 0 32px 90px rgba(0, 8, 24, .46);
+}
+
+/* El logo conserva su transparencia; la cabecera completa aporta contraste. */
+:root[data-tema="logistica"] .barra {
+  position: relative;
+  padding: 13px 24px 11px;
+  background: linear-gradient(118deg, #d6dde5 0%, #b7c3cf 58%, #9eacbb 100%);
+  border-bottom: 0;
+  box-shadow: 0 14px 34px rgba(0, 12, 32, .24);
+}
+:root[data-tema="logistica"] .barra::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #073b73 0%, #073b73 68%, #c8102e 68%, #c8102e 100%);
+}
+.marca-gateflow {
+  width: clamp(220px, 22vw, 292px);
+  height: 61px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.marca-gateflow img {
+  left: 0;
+  width: 100%;
+  filter: contrast(1.06) saturate(1.06) drop-shadow(0 2px 1px rgba(255,255,255,.38));
+}
+.marca-gateflow:focus-visible { outline-color: var(--marca-rojo); }
+
+:root[data-tema="logistica"] .pestanas {
+  background: rgba(7,59,115,.09);
+  border: 1px solid rgba(7,59,115,.13);
+}
+:root[data-tema="logistica"] .pestanas a,
+:root[data-tema="logistica"] .nav-mas > summary { color: #183c65; font-weight: 760; }
+:root[data-tema="logistica"] .pestanas a:hover,
+:root[data-tema="logistica"] .nav-mas > summary:hover {
+  color: #8f0b22;
+  background: rgba(200,16,46,.08);
+}
+:root[data-tema="logistica"] .pestanas a.activa,
+:root[data-tema="logistica"] .nav-mas.activa > summary,
+:root[data-tema="logistica"] .nav-mas[open] > summary {
+  color: #fff;
+  background: linear-gradient(135deg, #0a477f, #062e5c);
+  box-shadow: inset 0 -3px 0 #c8102e, 0 7px 18px rgba(7,42,82,.20);
+}
+:root[data-tema="logistica"] .nav-mas > div {
+  background: rgba(4,24,50,.98);
+  border-color: rgba(184,196,208,.24);
+}
+:root[data-tema="logistica"] .pestanas .nav-mas > div a { color: #dce5ef; }
+:root[data-tema="logistica"] .pestanas .nav-mas > div a:hover { color: #fff; background: rgba(200,16,46,.18); }
+
+.hero-etiqueta,
+.seccion-etiqueta,
+.pase-aporte span,
+.terminal-areas a > span,
+.cliente-acciones a > span { color: #ff667c; }
+.hero-puerto-interactivo .hero-etiqueta {
+  border-color: rgba(255,102,124,.40);
+  background: rgba(5,31,64,.58);
+}
+.hero-puerto-interactivo .hero-etiqueta::before,
+.hero-pulso { background: #c8102e; box-shadow: 0 0 0 5px rgba(200,16,46,.18), 0 4px 14px rgba(0,0,0,.35); }
+.hero-punto[aria-expanded="true"] .punto-etiqueta {
+  color: #fff;
+  background: #a70d28;
+  border-color: #f26a7f;
+  box-shadow: 0 0 0 5px rgba(200,16,46,.18), 0 10px 25px rgba(0,0,0,.24);
+}
+.hero-balboa,
+.hero-balboa.hero-puerto-interactivo { background: #061d3b; }
+.hero-balboa.hero-puerto-interactivo::after {
+  background:
+    linear-gradient(90deg, rgba(3,18,43,.99) 0%, rgba(4,26,57,.92) 40%, rgba(4,26,57,.38) 68%, rgba(4,26,57,.18) 100%),
+    linear-gradient(0deg, rgba(3,18,43,.72) 0%, transparent 44%);
+}
+.hero-ficha-operacion,
+.terminal-hero,
+.cliente-hero {
+  background-color: #061d3b;
+  background-blend-mode: normal;
+}
+
+.boton,
+.acceso-principal,
+.cliente-enviar,
+.terminal-guardar-plan,
+.pase-portada-acciones .boton {
+  color: #fff;
+  background: linear-gradient(135deg, #d01938, #a30c27);
+  box-shadow: 0 8px 22px rgba(159,12,38,.22);
+}
+.boton:hover,
+.acceso-principal:hover,
+.cliente-enviar:hover,
+.terminal-guardar-plan:hover { opacity: 1; background: linear-gradient(135deg, #e02242, #b40d2c); }
+.boton.secundario,
+.boton-glosario,
+.sol-respaldo-enlaces a {
+  color: #073b73;
+  background: #dfe6ee;
+  border-color: #9baabc;
+  box-shadow: none;
+}
+.nav-pie a.nav-sig { background: #073b73; }
+
+.mapa-google-seccion {
+  background:
+    linear-gradient(135deg, rgba(3,25,55,.97), rgba(9,54,96,.90)),
+    url("../img/fondo-terminal-buque.webp") center / cover;
+}
+.mapa-google-icono { background: rgba(200,16,46,.82); }
+.mapa-google-controles button { background: rgba(4,31,65,.92); }
+.mapa-google-controles button:hover { background: #a70d28; }
+
+.acceso-panel,
+.terminal-kpi,
+.cliente-resumen article,
+.terminal-grafico-panel,
+.terminal-alertas-panel,
+.cliente-formulario-panel,
+.cliente-solicitudes-panel,
+.terminal-controles-panel,
+.terminal-decision-panel,
+.terminal-historial {
+  background: linear-gradient(145deg, rgba(8,48,89,.96), rgba(3,23,49,.98));
+  border-color: rgba(184,196,208,.18);
+}
+.terminal-subnav { background: rgba(3,24,50,.94); }
+.acceso-tabs button.activo,
+.terminal-subnav button.activo,
+.cliente-ruta > div span,
+.pase-pasos button.activo span,
+.pase-entidades b {
+  color: #fff;
+  background: #c8102e;
+  border-color: #c8102e;
+}
+.acceso-formulario input:focus,
+.cliente-formulario input:focus,
+.cliente-formulario select:focus,
+.pase-formulario input:focus {
+  border-color: #e13b56;
+  box-shadow: 0 0 0 3px rgba(200,16,46,.16);
+}
+.terminal-controles input[type="range"],
+.terminal-palancas input,
+.pase-validaciones input { accent-color: #c8102e; }
+.terminal-dia,
+.cliente-seguro { color: #dce5ef; background: rgba(184,196,208,.12); }
+.terminal-areas a,
+.cliente-acciones a,
+.cliente-ruta { background: rgba(7,44,82,.92); }
+.terminal-areas a:hover,
+.cliente-acciones a:hover { border-color: rgba(225,59,86,.65); }
+.terminal-proyeccion {
+  color: #fff;
+  background: linear-gradient(135deg, #0c4e8d, #07335f);
+  border-left: 4px solid #c8102e;
+}
+.terminal-proyeccion small { color: rgba(255,255,255,.68); }
+
+:root[data-tema="logistica"] .migas a,
+.mensaje-clave a,
+.ruta-inteligente > summary::after,
+.ruta-icono { color: #ff7186; }
+.ruta-icono { background: rgba(200,16,46,.15); }
+.intro-modulo { background: rgba(7,47,88,.88); }
+.tarjeta,
+.panel-control,
+.rejilla-a3 > section,
+.anim-fila,
+.sol-opcion > span,
+.sol-diagnostico,
+.sol-metrica,
+.sol-plan-generado,
+.sol-conclusion,
+.plan-operativo,
+.comparacion-plan > div,
+.resumen-simple,
+.explora-tarjeta { border-color: rgba(151,167,184,.56); background: rgba(226,233,241,.92); }
+
+.pie-identidad img {
+  padding: 0;
+  background: transparent;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.32));
+}
+.pie-identidad span { color: rgba(218,228,238,.70); }
+
+@media (max-width: 720px) {
+  :root[data-tema="logistica"] .barra { padding: 10px 14px 12px; }
+  .marca-gateflow { width: 225px; height: 55px; }
 }
