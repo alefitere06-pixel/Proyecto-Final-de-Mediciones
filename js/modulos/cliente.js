@@ -105,7 +105,7 @@ function renderCustomerUser(contenedor, estado) {
     </section>
 
     <section class="cliente-acciones">
-      <a href="#citas"><span>Calendario</span><strong>Consultar citas disponibles</strong><small>Revisa franjas y capacidad antes de confirmar.</small><b>Ir a Citas →</b></a>
+      <a href="#cliente" data-cliente-enfoque><span>Calendario</span><strong>Solicitar una franja</strong><small>Selecciona fecha y horario dentro de tu solicitud de movimiento.</small><b>Completar solicitud ↑</b></a>
       <a href="#pase"><span>Acceso expedito</span><strong>Completar expediente y Pase QR</strong><small>Consolida las validaciones requeridas para la garita.</small><b>Preparar pase →</b></a>
       <a href="#mapa"><span>Antes de salir</span><strong>Ver acceso al Puerto de Balboa</strong><small>Consulta el recorrido, la zona y el estado de referencia.</small><b>Abrir mapa →</b></a>
     </section>
@@ -127,6 +127,11 @@ function renderCustomerUser(contenedor, estado) {
   contenedor.querySelector("[data-cliente-correo]").textContent = usuario.correo;
   contenedor.querySelector("[data-cliente-salir]").addEventListener("click", () => {
     GateFlowAcceso.cerrarSesion(() => modulo.render(contenedor, estado));
+  });
+  contenedor.querySelector("[data-cliente-enfoque]").addEventListener("click", (evento) => {
+    evento.preventDefault();
+    contenedor.querySelector("[data-cliente-formulario]").scrollIntoView({ behavior: "smooth", block: "center" });
+    contenedor.querySelector("[name='contenedor']").focus({ preventScroll: true });
   });
   contenedor.querySelector("[data-cliente-formulario]").addEventListener("submit", (evento) => {
     evento.preventDefault();

@@ -67,7 +67,7 @@ const GateFlowAcceso = (() => {
     const sesion = leerSesion();
     const nombreRol = esTerminal ? "Terminal User" : "Customer User";
     const descripcion = esTerminal
-      ? "Centro de control para el personal operativo de la terminal."
+      ? "Centro de control para el personal operativo. Una cuenta habilita Dashboard, Llegadas, Capacidad, TTT, Citas y Mejora."
       : "Portal para transportistas, conductores y clientes de carga.";
 
     contenedor.innerHTML = `
@@ -101,7 +101,7 @@ const GateFlowAcceso = (() => {
             <button class="boton acceso-principal" type="submit">Crear ${nombreRol}</button>
           </form>
           <p class="acceso-mensaje" data-acceso-mensaje aria-live="polite"></p>
-          <p class="acceso-nota">Acceso demostrativo para el proyecto académico. No es una autenticación corporativa.</p>
+          <p class="acceso-nota">Registro habilitado para el proyecto académico. La cuenta se guarda en este navegador y no sustituye una autenticación corporativa.</p>
           ${sesion ? `<button type="button" class="acceso-cerrar-sesion" data-acceso-cerrar>Cerrar sesión actual</button>` : ""}
         </div>
       </section>`;
