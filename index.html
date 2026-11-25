@@ -5,15 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GateFlow · Solución inteligente para la fila de camiones</title>
   <meta name="description" content="GateFlow conecta buques, camiones y garitas para reducir la congestión y agilizar cada retiro de carga en el Puerto de Balboa." />
+  <link rel="preload" href="img/gateflow-logo.png" as="image" type="image/png" />
   <link rel="stylesheet" href="css/estilos.css" />
-  <link rel="stylesheet" href="css/temas.css?v=20261125c" />
+  <link rel="stylesheet" href="css/temas.css?v=20261125d" />
 </head>
 <body>
   <div class="app">
   <header class="barra">
     <div class="barra-titulo">
-      <div class="logo" aria-hidden="true"></div>
-      <h1>GateFlow</h1>
+      <a class="marca-gateflow" href="#inicio" aria-label="Ir al inicio de GateFlow">
+        <img src="img/gateflow-logo.png" alt="GateFlow · Soluciones Portuarias" width="2172" height="724" />
+      </a>
+      <h1 class="solo-lectores">GateFlow · Soluciones Portuarias</h1>
     </div>
     <nav id="pestanas" class="pestanas" aria-label="Módulos"></nav>
   </header>
@@ -40,7 +43,10 @@
   </main>
 
   <footer class="pie">
-    GateFlow · Prototipo académico UMIP · Los valores operativos son datos de demostración generados con parámetros documentados y no representan información oficial del Puerto de Balboa.
+    <div class="pie-identidad">
+      <img src="img/gateflow-logo.png" alt="" width="2172" height="724" loading="lazy" />
+      <span>Prototipo académico UMIP · Los valores operativos son datos de demostración generados con parámetros documentados y no representan información oficial del Puerto de Balboa.</span>
+    </div>
   </footer>
   </div>
 

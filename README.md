@@ -155,6 +155,7 @@ Fichas completas en [`docs/fichas_kpi.md`](docs/fichas_kpi.md). Fórmulas en `js
 Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual.md).
 
 ## Mapa e imágenes
+- `img/gateflow-logo.png` es el logotipo oficial aportado por el equipo y se utiliza en la cabecera y el pie del sitio.
 - El mapa simulado funciona sin internet con `img/mapa-puerto-balboa.png`.
 - La vista principal del módulo **Mapa** admite Google Maps vectorial con inclinación 3D, capa oficial de tráfico,
   calles/satélite y controles para centrar Balboa. Necesita internet, una clave restringida de Maps JavaScript API
