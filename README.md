@@ -55,13 +55,13 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 > mapa (coordenadas en `RUTA_FILA` y `PRE_EST`, `js/mapaFila.js`). Citen la fuente del mapa en la presentación.
 
 ## Navegación (menos cargado)
-- Cada sección es un **enlace** (`index.html#mapa`, `#simulador`, `#mejora`…): se puede compartir y el botón
+- Cada sección es un **enlace** (`index.html#mapa`, `#terminal`, `#cliente`…): se puede compartir y el botón
   "atrás" del navegador funciona.
 - **Inicio** muestra una ilustración original e interactiva del Puerto de Balboa y cuatro rutas desplegables:
   ubicación, simulación, solución y datos. Los puntos sobre la escena explican buque, flujo y garita; cada ruta
   contiene sus enlaces secundarios sin llenar la pantalla.
-- La barra superior deja visibles Inicio, Mapa, **Pase QR**, Simulador, Citas y el **Generador de solución**. Llegadas,
-  TTT y el análisis A3 con gráficos quedan bajo **"Más análisis"**.
+- La barra superior deja visibles Inicio, Mapa, **Pase QR**, **Terminal User**, Citas y **Customer User**. El simulador
+  y el generador de solución quedan integrados como herramientas internas del centro operativo. Llegadas, TTT y el análisis A3 quedan bajo **"Más análisis"**.
 - Cada sección tiene una frase de introducción, migas "Inicio › Sección" y botones **← Anterior / Siguiente →**.
 - Los detalles (tablas hora por hora, gráficos extra, análisis A3 completo) están en **"Ver más"** y los
   7 indicadores del día en un botón plegable.
@@ -82,6 +82,8 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 | 5 | Mejora | A3 Lean y gráfico cascada de las 3 palancas |
 | 6 | Generador de solución | Dos preguntas → diagnóstico, antes/después y plan operativo por etapas, sin gráficos |
 | 7 | Pase GateFlow | Afiliación demostrativa, expediente único de retiro y QR para simular el carril expedito |
+| 8 | Terminal User | Acceso por rol, seis KPI operativos, flujo frente a capacidad, alertas y enlaces a las áreas de control |
+| 9 | Customer User | Cuenta de cliente, solicitudes de movimiento, citas, expediente unificado y acceso al Pase QR |
 
 ### Pase GateFlow: un solo trámite de retiro
 El nuevo recorrido convierte cinco validaciones en un solo expediente visible para el transportista:

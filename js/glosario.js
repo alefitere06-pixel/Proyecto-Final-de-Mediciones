@@ -2,7 +2,7 @@
 // glosario.js · Palabras explicadas para cualquier persona (sin saber de puertos)
 // -----------------------------------------------------------------------------
 // ayuda("espera")  -> ícono ⓘ con la explicación (al pasar el mouse o tocarlo)
-// Botón "📖 ¿Qué significa?" en la barra: abre el glosario completo.
+// Los iconos de información abren el detalle del indicador correspondiente.
 // =============================================================================
 
 const GLOSARIO = {
@@ -33,7 +33,7 @@ const GLOSARIO = {
 function ayuda(clave) {
   const g = GLOSARIO[clave];
   if (!g) return "";
-  return `<button type="button" class="ayuda" data-glosario="${clave}" title="${g[0]}: ${g[2]}" aria-label="¿Qué significa ${g[0]}?">i</button>`;
+  return `<button type="button" class="ayuda" data-glosario="${clave}" title="${g[0]}: ${g[2]}" aria-label="Consultar detalle de ${g[0]}">i</button>`;
 }
 
 function abrirGlosario(clave) {
@@ -43,7 +43,7 @@ function abrirGlosario(clave) {
     capa.id = "glosario";
     capa.className = "glosario";
     capa.innerHTML = `<div class="glosario-caja" role="dialog" aria-label="Glosario">
-      <div class="glosario-cabeza"><strong>📖 ¿Qué significa cada palabra?</strong>
+      <div class="glosario-cabeza"><strong>Detalle de indicadores</strong>
         <button class="boton secundario" id="glosario-cerrar">✕ Cerrar</button></div>
       <dl>${Object.entries(GLOSARIO).map(([k, g]) => `<div id="glo-${k}" class="glosario-item">
         <dt>${g[0]} ${g[1] ? `<span class="simbolo">${g[1]}</span>` : ""}</dt><dd>${g[2]}</dd></div>`).join("")}</dl>
@@ -66,11 +66,4 @@ document.addEventListener("click", (e) => {
 });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") { const c = document.getElementById("glosario"); if (c) c.classList.remove("abierto"); }
-});
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.createElement("button");
-  btn.className = "boton-glosario";
-  btn.textContent = "📖 ¿Qué significa?";
-  btn.addEventListener("click", () => abrirGlosario());
-  document.querySelector(".barra-titulo").appendChild(btn);
 });

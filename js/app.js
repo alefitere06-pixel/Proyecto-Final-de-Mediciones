@@ -92,10 +92,11 @@ function pintarInfoDia() {
 // navegador y saltar de una sección a otra con <a href="#simulador">.
 function prepararPestanas() {
   const nav = document.getElementById("pestanas");
-  const principales = ["inicio", "mapa", "pase", "simulador", "citas", "solucion"];
-  const nombres = { mapa: "Mapa", pase: "Pase QR", simulador: "Simulador", citas: "Citas", solucion: "Solución" };
+  const principales = ["inicio", "mapa", "pase", "terminal", "citas", "cliente"];
+  const nombres = { mapa: "Mapa", pase: "Pase QR", terminal: "Terminal User", citas: "Citas", cliente: "Customer User" };
   const visibles = principales.map((id) => MODULOS.find((m) => m.id === id)).filter(Boolean);
-  const extras = MODULOS.filter((m) => !principales.includes(m.id));
+  const internos = ["simulador", "solucion"];
+  const extras = MODULOS.filter((m) => !principales.includes(m.id) && !internos.includes(m.id));
   nav.innerHTML = visibles.map((m) =>
     `<a href="#${m.id}" data-id="${m.id}">${nombres[m.id] || m.titulo}</a>`).join("") +
     `<details class="nav-mas">
@@ -237,7 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
   prepararFiltroDia();
   prepararPestanas();
   const pedido = location.hash.slice(1);
-  ESTADO.moduloActivo = MODULOS.some((m) => m.id === pedido) ? pedido : MODULOS[0].id;
+  ESTADO.moduloActivo = MODULOS.some((m) => m.id === pedido) ? pedido : "inicio";
   mostrarModulo(ESTADO.moduloActivo);
   pintarInfoDia();
   pintarTarjetas();

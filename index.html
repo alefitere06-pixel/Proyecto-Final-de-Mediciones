@@ -6,7 +6,7 @@
   <title>GateFlow · Solución inteligente para la fila de camiones</title>
   <meta name="description" content="GateFlow conecta buques, camiones y garitas para reducir la congestión y agilizar cada retiro de carga en el Puerto de Balboa." />
   <link rel="stylesheet" href="css/estilos.css" />
-  <link rel="stylesheet" href="css/temas.css?v=20261119b" />
+  <link rel="stylesheet" href="css/temas.css?v=20261125a" />
 </head>
 <body>
   <div class="app">
@@ -14,7 +14,6 @@
     <div class="barra-titulo">
       <div class="logo" aria-hidden="true"></div>
       <h1>GateFlow</h1>
-      <span class="sello-simulado" data-glosario="simulados" title="Números creados por un programa para practicar">DATOS SIMULADOS</span>
     </div>
     <nav id="pestanas" class="pestanas" aria-label="Módulos"></nav>
   </header>
@@ -30,7 +29,7 @@
     <!-- Tarjetas KPI (plegadas para no cargar la pantalla): js/app.js con las fórmulas de js/kpi.js -->
     <details id="kpi-plegable" class="kpi-plegable">
       <summary id="kpi-resumen">📊 Indicadores del día</summary>
-      <p class="titulo-seccion">Cómo está hoy la entrada del puerto, sin ningún cambio. Verde = bien, rojo = mal. Toquen la <b>i</b> para ver qué significa cada cosa.</p>
+      <p class="titulo-seccion">Estado actual de la entrada del puerto. Verde = dentro de la meta; rojo = requiere atención. Use la <b>i</b> para consultar detalles.</p>
       <section id="tarjetas-kpi" class="tarjetas" aria-label="Indicadores principales"></section>
     </details>
     <nav id="migas" class="migas" aria-label="Ubicación"></nav>
@@ -41,8 +40,7 @@
   </main>
 
   <footer class="pie">
-    Proyecto semestral · Medición y Rendimiento de Terminales Portuarias · UMIP ·
-    Todos los números son <strong>simulados</strong>: los creó un programa con reglas realistas para practicar (data/generar_datos.py).
+    GateFlow · Prototipo académico UMIP · Los valores operativos son datos de demostración generados con parámetros documentados y no representan información oficial del Puerto de Balboa.
   </footer>
   </div>
 
@@ -56,7 +54,8 @@
   <script src="js/mapaFila.js"></script>
   <script src="js/temas.js"></script>
   <script src="js/ilustraciones.js"></script>
-  <script src="js/glosario.js"></script>
+  <script src="js/glosario.js?v=20261125a"></script>
+  <script src="js/acceso.js?v=20261125a"></script>
   <script>const MODULOS = [];</script>
   <script src="js/modulos/llegadas.js"></script>
   <script src="js/modulos/simulador.js"></script>
@@ -66,8 +65,9 @@
   <script src="js/modulos/solucion.js?v=20261119b"></script>
   <script src="js/modulos/pase.js?v=20261119b"></script>
   <script src="js/modulos/mapa.js"></script>
+  <script src="js/modulos/terminal.js?v=20261125a"></script>
+  <script src="js/modulos/cliente.js?v=20261125a"></script>
   <script src="js/modulos/inicio.js?v=20261119c"></script>
-  <script src="js/presentacion.js?v=20261119b"></script>
-  <script src="js/app.js?v=20261119b"></script>
+  <script src="js/app.js?v=20261125a"></script>
 </body>
 </html>
