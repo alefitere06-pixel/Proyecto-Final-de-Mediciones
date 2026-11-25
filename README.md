@@ -57,9 +57,9 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 ## Navegación (menos cargado)
 - Cada sección es un **enlace** (`index.html#mapa`, `#terminal`, `#cliente`…): se puede compartir y el botón
   "atrás" del navegador funciona.
-- **Inicio** muestra una ilustración original e interactiva del Puerto de Balboa y cuatro rutas desplegables:
-  ubicación, simulación, solución y datos. Los puntos sobre la escena explican buque, flujo y garita; cada ruta
-  contiene sus enlaces secundarios sin llenar la pantalla.
+- **Inicio** muestra una ilustración original e interactiva del Puerto de Balboa y cuatro áreas de servicio:
+  tráfico y accesos, Pase QR, control terminal y gestión del cliente. Los puntos sobre la escena explican buque,
+  flujo y garita sin presentar la plataforma como un “generador de soluciones”.
 - La barra superior deja visibles Inicio, Mapa, **Pase QR**, **Terminal User** y **Customer User**. Se eliminó
   **"Más análisis"**: Llegadas, Capacidad y cola, TTT, Citas TAS y Mejora A3 están integrados dentro de Terminal User y requieren una cuenta Terminal activa.
 - Cada sección tiene una frase de introducción, migas "Inicio › Sección" y botones **← Anterior / Siguiente →**.
@@ -80,10 +80,9 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 | 3 | Truck Turn Time | Desglose del TTT por etapa y por hora |
 | 4 | Citas (TAS) | TAS dinámico: franjas, sin TAS vs con TAS, cumplimiento y no-show |
 | 5 | Mejora | A3 Lean y gráfico cascada de las 3 palancas |
-| 6 | Generador de solución | Dos preguntas → diagnóstico, antes/después y plan operativo por etapas, sin gráficos |
-| 7 | Pase GateFlow | Afiliación demostrativa, expediente único de retiro y QR para simular el carril expedito |
-| 8 | Terminal User | Acceso por rol, ocho KPI operativos, dos gráficas de decisión, controles de escenario y todas las áreas de análisis |
-| 9 | Customer User | Cuenta de cliente, solicitudes de movimiento, citas, expediente unificado y acceso al Pase QR |
+| 6 | Pase GateFlow | Afiliación demostrativa, expediente único de retiro y QR para simular el carril expedito |
+| 7 | Terminal User | Acceso por rol, ocho KPI operativos, dos gráficas de decisión, controles de escenario y todas las áreas de análisis |
+| 8 | Customer User | Cuenta de cliente, solicitudes de movimiento, citas, expediente unificado y acceso al Pase QR |
 
 ### Pase GateFlow: un solo trámite de retiro
 El nuevo recorrido convierte cinco validaciones en un solo expediente visible para el transportista:

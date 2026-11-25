@@ -225,7 +225,7 @@ MODULOS.push({
       </section>
 
       <section class="pase-integracion">
-        <div><span class="seccion-etiqueta">SOLUCIÓN CONSOLIDADA</span><h3>Antes: muchos trámites. Propuesta: un expediente visible para todos.</h3></div>
+        <div><span class="seccion-etiqueta">GESTIÓN CONSOLIDADA</span><h3>Antes: muchos trámites. GateFlow: un expediente visible para todos.</h3></div>
         <div class="pase-entidades"><span>Transportista</span><span>Naviera</span><span>Aduanas</span><span>Terminal</span><span>Citas</span><b>Expediente GateFlow</b></div>
       </section>`;
 

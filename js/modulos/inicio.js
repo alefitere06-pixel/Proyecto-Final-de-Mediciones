@@ -64,22 +64,22 @@ function renderLogistica(contenedor, estado) {
   const cuenta = (e) => filas.filter((f) => f.estadoH === e).length;
 
   const enCalle = Math.round(k.viaPublicaMax);
-  const soloCitas = simularDia(estado.dia, escenario({ tas: { activo: true } }));
   contenedor.innerHTML = `
     <section class="hero-balboa hero-puerto-interactivo" id="hero-puerto">
       <div class="hero-balboa-contenido">
         <span class="hero-etiqueta">GATEFLOW · PUERTO DE BALBOA</span>
         <h2>Tecnología que mueve el puerto.</h2>
-        <p>Conectamos buques, camiones y garitas para reducir la congestión y agilizar cada retiro de carga.</p>
+        <p>Visibilidad, coordinación y acceso inteligente para mantener el flujo de carga en Balboa.</p>
         <div class="hero-acciones">
-          <a class="boton hero-principal" href="#solucion">Generar una solución</a>
-          <a class="boton hero-secundario" href="#mapa">Explorar el puerto</a>
+          <a class="boton hero-principal" href="#capacidades-gateflow">Ver GateFlow en acción</a>
+          <a class="boton hero-secundario" href="#mapa">Ver tráfico y accesos</a>
         </div>
-        <dl class="hero-metricas" aria-label="Resumen del día elegido">
-          <div><dt>Llegadas</dt><dd>${fmt(info.llegadas)}</dd><small>camiones</small></div>
-          <div><dt>Espera actual</dt><dd class="${k.wqPromedio > M.wq_min ? "peor" : "mejor"}">${fmt(k.wqPromedio)}</dd><small>minutos</small></div>
-          <div><dt>Con la solución</dt><dd class="mejor">${fmt(p.wqPromedio)}</dd><small>minutos</small></div>
+        <dl class="hero-metricas hero-metricas-oficiales" aria-label="Cifras oficiales del Puerto de Balboa">
+          <div><dt>Movimiento 2025</dt><dd>2.68 M</dd><small>TEU movilizados</small></div>
+          <div><dt>Crecimiento anual</dt><dd>+2 %</dd><small>frente a 2024</small></div>
+          <div><dt>Capacidad anual</dt><dd>5 M</dd><small>TEU de capacidad</small></div>
         </dl>
+        <p class="hero-fuente">Cifras oficiales 2025: <a href="https://www.amp.gob.pa/noticias/notas-de-prensa/movimiento-portuario-de-contenedores-crece-3-6-en-2025/" target="_blank" rel="noopener">Autoridad Marítima de Panamá</a> · Capacidad: <a href="https://logistics.gatech.pa/en/logistics-platform/logistics-assets/seaports/main-seaports-in-panama/balboa/" target="_blank" rel="noopener">Portal Logístico de Panamá</a></p>
       </div>
       <div class="hero-escena" aria-label="Ilustración interactiva de la operación del Puerto de Balboa">
         <span class="hero-instruccion">Toca los puntos para entender la operación</span>
@@ -120,43 +120,49 @@ function renderLogistica(contenedor, estado) {
       <p>En el día ${estado.dia}, la fila máxima es de <strong>${fmt(k.lqMax)} camiones</strong>. ${enCalle > 0
         ? `<strong>${enCalle} quedarían en la calle</strong> cerca de la zona portuaria.`
         : `La fila cabe en el acceso y <strong>no invade la calle</strong>.`}</p>
-      <a href="#solucion">Generar una solución →</a>
+      <a href="#terminal">Revisar el control operativo →</a>
     </section>
 
-    <div class="rutas-cabecera">
-      <div><span class="seccion-etiqueta">EXPLORAR SIN COMPLICACIONES</span><h3>Elige una ruta</h3></div>
-      <p>Cada ruta abre sus detalles solo cuando los necesitas.</p>
-    </div>
-    <section class="rutas-inteligentes" aria-label="Rutas del dashboard">
-      <details class="ruta-inteligente">
-        <summary><span class="ruta-icono">01</span><span><strong>Ubicar el problema</strong><small>Puerto, accesos y fila de camiones</small></span></summary>
-        <div class="ruta-ramas">
-          <a href="#mapa">Ver la fila simulada</a>
-          <a href="https://www.google.com/maps/search/?api=1&amp;query=Puerto+de+Balboa%2C+Panam%C3%A1" target="_blank" rel="noopener">Abrir Puerto de Balboa en Google Maps ↗</a>
-          <a href="https://www.google.com/maps/@?api=1&amp;map_action=map&amp;center=8.9559%2C-79.5676&amp;zoom=14" target="_blank" rel="noopener">Explorar las vías cercanas ↗</a>
+    <section class="ecosistema-gateflow" id="capacidades-gateflow" aria-labelledby="ecosistema-titulo">
+      <header class="ecosistema-cabecera">
+        <div>
+          <span class="seccion-etiqueta">PLATAFORMA GATEFLOW</span>
+          <h3 id="ecosistema-titulo">Una operación conectada de la vía al contenedor</h3>
         </div>
-      </details>
-      <details class="ruta-inteligente">
-        <summary><span class="ruta-icono">02</span><span><strong>Probar alternativas</strong><small>Cambia ventanillas, servicio y demanda</small></span></summary>
-        <div class="ruta-ramas">
-          <a href="#simulador">Abrir el simulador y evaluar la sexta ventanilla</a>
-        </div>
-      </details>
-      <details class="ruta-inteligente destacada">
-        <summary><span class="ruta-icono">03</span><span><strong>Aplicar la solución</strong><small>Citas + cola virtual + viajes combinados</small></span></summary>
-        <div class="ruta-ramas">
-          <a href="#solucion">Generar un plan para el día elegido</a>
-          <a href="#citas">Explorar el sistema de citas</a>
-        </div>
-      </details>
-      <details class="ruta-inteligente">
-        <summary><span class="ruta-icono">04</span><span><strong>Consultar los datos</strong><small>Indicadores y análisis detallado</small></span></summary>
-        <div class="ruta-ramas">
-          <a href="#llegadas">Llegadas por hora y por día</a>
-          <a href="#ttt">Etapas del recorrido del camión</a>
-          <button type="button" id="abrir-tablero-completo">Abrir el tablero completo del día</button>
-        </div>
-      </details>
+        <p>Cuatro áreas coordinadas para que cada actor consulte, valide y actúe desde un mismo entorno.</p>
+      </header>
+
+      <div class="ecosistema-grid">
+        <a class="ecosistema-servicio" href="#mapa">
+          <span class="ecosistema-numero">01</span><small>ACCESO Y MOVILIDAD</small>
+          <h4>Tráfico y entorno portuario</h4>
+          <p>Consulta Balboa, sus accesos y el estado de las vías antes de movilizar el camión.</p>
+          <b>Ver mapa y accesos <i>→</i></b>
+        </a>
+        <a class="ecosistema-servicio" href="#pase">
+          <span class="ecosistema-numero">02</span><small>VALIDACIÓN DIGITAL</small>
+          <h4>Expediente único y Pase QR</h4>
+          <p>Consolida afiliación, cita, naviera, Aduanas y terminal en un solo recorrido.</p>
+          <b>Consultar Pase GateFlow <i>→</i></b>
+        </a>
+        <a class="ecosistema-servicio" href="#terminal">
+          <span class="ecosistema-numero">03</span><small>CONTROL OPERATIVO</small>
+          <h4>Terminal User</h4>
+          <p>Supervisa KPI, capacidad, cola, tiempos y escenarios desde el centro de decisión.</p>
+          <b>Entrar al control terminal <i>→</i></b>
+        </a>
+        <a class="ecosistema-servicio" href="#cliente">
+          <span class="ecosistema-numero">04</span><small>GESTIÓN DEL CLIENTE</small>
+          <h4>Customer User</h4>
+          <p>Administra solicitudes, citas y documentación del movimiento de carga.</p>
+          <b>Entrar al portal del cliente <i>→</i></b>
+        </a>
+      </div>
+
+      <div class="ecosistema-flujo" aria-label="Recorrido operativo GateFlow">
+        <strong>Un solo recorrido operativo</strong>
+        <ol><li><span>1</span>Planificar</li><li><span>2</span>Validar</li><li><span>3</span>Autorizar</li><li><span>4</span>Ingresar</li></ol>
+      </div>
     </section>
 
     <details class="mas" id="ini-detalle">

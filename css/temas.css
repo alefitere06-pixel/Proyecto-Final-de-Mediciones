@@ -1980,3 +1980,166 @@ body[data-modulo="cliente"] .filtros { display: none; }
   :root[data-tema="logistica"] .barra { padding: 10px 14px 12px; }
   .marca-gateflow { width: 225px; height: 55px; }
 }
+
+/* Inicio · cifras verificadas y presentación profesional de la plataforma. */
+.hero-metricas-oficiales dd { color: #fff; }
+.hero-metricas-oficiales small { color: rgba(255,255,255,.58); }
+.hero-fuente {
+  max-width: 630px;
+  margin: 10px 0 0 !important;
+  color: rgba(255,255,255,.48) !important;
+  font-size: .66rem !important;
+  line-height: 1.45 !important;
+}
+.hero-fuente a { color: #e3ebf3; text-decoration-color: rgba(227,235,243,.42); }
+.hero-fuente a:hover { color: #ff7186; }
+
+.ecosistema-gateflow {
+  position: relative;
+  isolation: isolate;
+  margin: 34px 0 14px;
+  padding: clamp(24px, 4vw, 46px);
+  overflow: hidden;
+  border: 1px solid rgba(184,196,208,.22);
+  border-radius: 25px;
+  background:
+    linear-gradient(125deg, rgba(3,20,43,.98), rgba(7,48,88,.93)),
+    url("../img/fondo-terminal-buque.webp") center / cover;
+  box-shadow: 0 26px 60px rgba(0,10,28,.32);
+  scroll-margin-top: 24px;
+}
+.ecosistema-gateflow::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  width: 38%;
+  height: 4px;
+  background: #c8102e;
+}
+.ecosistema-cabecera {
+  display: flex;
+  justify-content: space-between;
+  gap: 34px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+.ecosistema-cabecera h3 {
+  max-width: 720px;
+  margin: 7px 0 0;
+  color: #fff;
+  font-size: clamp(1.7rem, 3.2vw, 3.1rem);
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+.ecosistema-cabecera > p {
+  max-width: 390px;
+  margin: 0;
+  color: rgba(255,255,255,.62);
+  line-height: 1.55;
+  text-align: right;
+}
+.ecosistema-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 12px;
+}
+.ecosistema-servicio {
+  position: relative;
+  min-height: 265px;
+  display: flex;
+  flex-direction: column;
+  padding: 21px;
+  overflow: hidden;
+  border: 1px solid rgba(184,196,208,.17);
+  border-radius: 17px;
+  background: linear-gradient(155deg, rgba(13,60,105,.86), rgba(3,25,54,.94));
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 15px 34px rgba(0,9,27,.20);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.ecosistema-servicio::after {
+  content: "";
+  position: absolute;
+  right: -42px;
+  bottom: -54px;
+  width: 130px;
+  height: 130px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 50%;
+}
+.ecosistema-servicio:hover,
+.ecosistema-servicio:focus-visible {
+  transform: translateY(-5px);
+  border-color: rgba(255,90,113,.62);
+  box-shadow: 0 20px 42px rgba(0,8,26,.32);
+  outline: none;
+}
+.ecosistema-numero {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 22px;
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 11px;
+  background: rgba(255,255,255,.06);
+  color: #ff7186;
+  font-size: .74rem;
+  font-weight: 900;
+}
+.ecosistema-servicio small {
+  color: #ff7186;
+  font-size: .64rem;
+  font-weight: 850;
+  letter-spacing: .11em;
+}
+.ecosistema-servicio h4 { margin: 8px 0 9px; color: #fff; font-size: 1.08rem; }
+.ecosistema-servicio p { margin: 0; color: rgba(255,255,255,.61); font-size: .79rem; line-height: 1.5; }
+.ecosistema-servicio b {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  padding-top: 20px;
+  color: #e8eef5;
+  font-size: .76rem;
+}
+.ecosistema-servicio b i { margin-left: 5px; color: #ff7186; font-style: normal; }
+.ecosistema-flujo {
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  align-items: center;
+  margin-top: 15px;
+  padding: 16px 18px;
+  border: 1px solid rgba(184,196,208,.15);
+  border-radius: 15px;
+  background: rgba(2,18,40,.54);
+  color: #fff;
+}
+.ecosistema-flujo > strong { font-size: .82rem; }
+.ecosistema-flujo ol { display: flex; flex: 1; justify-content: flex-end; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ecosistema-flujo li { display: flex; gap: 7px; align-items: center; color: rgba(255,255,255,.67); font-size: .73rem; }
+.ecosistema-flujo li:not(:last-child)::after { content: "—"; margin-left: 5px; color: rgba(255,255,255,.24); }
+.ecosistema-flujo li span {
+  width: 23px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(200,16,46,.20);
+  color: #ff7186;
+  font-size: .65rem;
+  font-weight: 900;
+}
+@media (max-width: 1050px) { .ecosistema-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 720px) {
+  .ecosistema-cabecera { align-items: flex-start; flex-direction: column; }
+  .ecosistema-cabecera > p { text-align: left; }
+  .ecosistema-grid { grid-template-columns: 1fr; }
+  .ecosistema-servicio { min-height: 230px; }
+  .ecosistema-flujo { align-items: flex-start; flex-direction: column; }
+  .ecosistema-flujo ol { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+}
