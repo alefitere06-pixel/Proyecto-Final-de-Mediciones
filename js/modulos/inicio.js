@@ -64,27 +64,55 @@ function renderLogistica(contenedor, estado) {
   const cuenta = (e) => filas.filter((f) => f.estadoH === e).length;
 
   const enCalle = Math.round(k.viaPublicaMax);
-  const soloCitas = simularDia(estado.dia, escenario({ tas: { activo: true } }));
   contenedor.innerHTML = `
-    <section class="hero-balboa">
+    <section class="hero-balboa hero-puerto-interactivo" id="hero-puerto">
       <div class="hero-balboa-contenido">
-        <span class="hero-etiqueta">PUERTO DE BALBOA · PANAMÁ</span>
-        <h2>Una entrada portuaria que se anticipa a la fila.</h2>
-        <p>Smart Gate combina citas, una cola virtual y decisiones basadas en datos para que los camiones lleguen cuando la puerta puede atenderlos.</p>
+        <span class="hero-etiqueta">GATEFLOW · PUERTO DE BALBOA</span>
+        <h2>Tecnología que mueve el puerto.</h2>
+        <p>Visibilidad, coordinación y acceso inteligente para mantener el flujo de carga en Balboa.</p>
         <div class="hero-acciones">
-          <a class="boton hero-principal" href="#mapa">Ver el puerto y la fila</a>
-          <a class="boton hero-secundario" href="#simulador">Probar una mejora</a>
+          <a class="boton hero-principal" href="#capacidades-gateflow">Ver GateFlow en acción</a>
+          <a class="boton hero-secundario" href="#mapa">Ver tráfico y accesos</a>
         </div>
-        <dl class="hero-metricas" aria-label="Resumen del día elegido">
-          <div><dt>Llegadas</dt><dd>${fmt(info.llegadas)}</dd><small>camiones</small></div>
-          <div><dt>Espera actual</dt><dd class="${k.wqPromedio > M.wq_min ? "peor" : "mejor"}">${fmt(k.wqPromedio)}</dd><small>minutos</small></div>
-          <div><dt>Con la solución</dt><dd class="mejor">${fmt(p.wqPromedio)}</dd><small>minutos</small></div>
+        <dl class="hero-metricas hero-metricas-oficiales" aria-label="Cifras oficiales del Puerto de Balboa">
+          <div><dt>Movimiento 2025</dt><dd>2.68 M</dd><small>TEU movilizados</small></div>
+          <div><dt>Crecimiento anual</dt><dd>+2 %</dd><small>frente a 2024</small></div>
+          <div><dt>Capacidad anual</dt><dd>5 M</dd><small>TEU de capacidad</small></div>
         </dl>
+        <p class="hero-fuente">Cifras oficiales 2025: <a href="https://www.amp.gob.pa/noticias/notas-de-prensa/movimiento-portuario-de-contenedores-crece-3-6-en-2025/" target="_blank" rel="noopener">Autoridad Marítima de Panamá</a> · Capacidad: <a href="https://logistics.gatech.pa/en/logistics-platform/logistics-assets/seaports/main-seaports-in-panama/balboa/" target="_blank" rel="noopener">Portal Logístico de Panamá</a></p>
       </div>
-      <figure class="hero-balboa-foto">
-        <img src="img/puerto-balboa-contenedores.jpg" alt="Vista real de la terminal de contenedores del Puerto de Balboa, Panamá">
-        <figcaption>Puerto de Balboa · Foto: Mdesanjur, <a href="https://commons.wikimedia.org/wiki/File:Puerto_de_Contenedores_en_Balboa.jpg" target="_blank" rel="noopener">Wikimedia Commons (CC BY-SA 4.0)</a></figcaption>
-      </figure>
+      <div class="hero-escena" aria-label="Ilustración interactiva de la operación del Puerto de Balboa">
+        <span class="hero-instruccion">Toca los puntos para entender la operación</span>
+        <button type="button" class="hero-punto hero-punto-buque" data-hero-punto="buque" aria-expanded="false" aria-controls="hero-ficha-operacion">
+          <span class="hero-pulso" aria-hidden="true"></span><span class="punto-etiqueta">Buque</span>
+          <span class="punto-info"><strong>Más carga</strong>Conoce cómo la llegada de un buque cambia la demanda terrestre.</span>
+        </button>
+        <button type="button" class="hero-punto hero-punto-flujo" data-hero-punto="flujo" aria-expanded="false" aria-controls="hero-ficha-operacion">
+          <span class="hero-pulso" aria-hidden="true"></span><span class="punto-etiqueta">Flujo</span>
+          <span class="punto-info"><strong>Llegadas coordinadas</strong>Revisa cuándo llegan los camiones y por qué se forma la fila.</span>
+        </button>
+        <button type="button" class="hero-punto hero-punto-garita" data-hero-punto="garita" aria-expanded="false" aria-controls="hero-ficha-operacion">
+          <span class="hero-pulso" aria-hidden="true"></span><span class="punto-etiqueta">Garita</span>
+          <span class="punto-info"><strong>Capacidad de entrada</strong>Entiende cómo las ventanillas procesan y autorizan cada camión.</span>
+        </button>
+        <div class="hero-ruta-animada" aria-hidden="true"><span class="hero-camion"></span></div>
+        <small class="hero-credito">Ilustración conceptual creada para GateFlow</small>
+      </div>
+    </section>
+
+    <section class="hero-ficha-operacion" id="hero-ficha-operacion" data-tema="buque" aria-live="polite" aria-labelledby="hero-ficha-titulo" tabindex="-1" hidden>
+      <button type="button" class="hero-ficha-cerrar" aria-label="Cerrar información">×</button>
+      <div class="hero-ficha-cabecera">
+        <span class="seccion-etiqueta" id="hero-ficha-etiqueta"></span>
+        <h3 id="hero-ficha-titulo"></h3>
+        <p id="hero-ficha-resumen"></p>
+      </div>
+      <div class="hero-ficha-indicadores" id="hero-ficha-indicadores"></div>
+      <div class="hero-ficha-accion">
+        <strong>¿Qué hacemos?</strong>
+        <p id="hero-ficha-accion-texto"></p>
+        <a class="boton hero-ficha-enlace" id="hero-ficha-enlace" href="#llegadas"></a>
+      </div>
     </section>
 
     <section class="mensaje-clave ${enCalle > 0 ? "con-alerta" : "sin-alerta"}" aria-label="Diagnóstico sencillo">
@@ -92,43 +120,49 @@ function renderLogistica(contenedor, estado) {
       <p>En el día ${estado.dia}, la fila máxima es de <strong>${fmt(k.lqMax)} camiones</strong>. ${enCalle > 0
         ? `<strong>${enCalle} quedarían en la calle</strong> cerca de la zona portuaria.`
         : `La fila cabe en el acceso y <strong>no invade la calle</strong>.`}</p>
-      <a href="#solucion">Generar una solución →</a>
+      <a href="#terminal">Revisar el control operativo →</a>
     </section>
 
-    <div class="rutas-cabecera">
-      <div><span class="seccion-etiqueta">EXPLORAR SIN COMPLICACIONES</span><h3>Elige una ruta</h3></div>
-      <p>Cada ruta abre sus detalles solo cuando los necesitas.</p>
-    </div>
-    <section class="rutas-inteligentes" aria-label="Rutas del dashboard">
-      <details class="ruta-inteligente">
-        <summary><span class="ruta-icono">01</span><span><strong>Ubicar el problema</strong><small>Puerto, accesos y fila de camiones</small></span></summary>
-        <div class="ruta-ramas">
-          <a href="#mapa">Ver la fila simulada</a>
-          <a href="https://www.google.com/maps/search/?api=1&amp;query=Puerto+de+Balboa%2C+Panam%C3%A1" target="_blank" rel="noopener">Abrir Puerto de Balboa en Google Maps ↗</a>
-          <a href="https://www.google.com/maps/@?api=1&amp;map_action=map&amp;center=8.9559%2C-79.5676&amp;zoom=14" target="_blank" rel="noopener">Explorar las vías cercanas ↗</a>
+    <section class="ecosistema-gateflow" id="capacidades-gateflow" aria-labelledby="ecosistema-titulo">
+      <header class="ecosistema-cabecera">
+        <div>
+          <span class="seccion-etiqueta">PLATAFORMA GATEFLOW</span>
+          <h3 id="ecosistema-titulo">Una operación conectada de la vía al contenedor</h3>
         </div>
-      </details>
-      <details class="ruta-inteligente">
-        <summary><span class="ruta-icono">02</span><span><strong>Probar alternativas</strong><small>Cambia ventanillas, servicio y demanda</small></span></summary>
-        <div class="ruta-ramas">
-          <a href="#simulador">Abrir el simulador y evaluar la sexta ventanilla</a>
-        </div>
-      </details>
-      <details class="ruta-inteligente destacada">
-        <summary><span class="ruta-icono">03</span><span><strong>Aplicar la solución</strong><small>Citas + cola virtual + viajes combinados</small></span></summary>
-        <div class="ruta-ramas">
-          <a href="#solucion">Generar un plan para el día elegido</a>
-          <a href="#citas">Explorar el sistema de citas</a>
-        </div>
-      </details>
-      <details class="ruta-inteligente">
-        <summary><span class="ruta-icono">04</span><span><strong>Consultar los datos</strong><small>Indicadores y análisis detallado</small></span></summary>
-        <div class="ruta-ramas">
-          <a href="#llegadas">Llegadas por hora y por día</a>
-          <a href="#ttt">Etapas del recorrido del camión</a>
-          <button type="button" id="abrir-tablero-completo">Abrir el tablero completo del día</button>
-        </div>
-      </details>
+        <p>Cuatro áreas coordinadas para que cada actor consulte, valide y actúe desde un mismo entorno.</p>
+      </header>
+
+      <div class="ecosistema-grid">
+        <a class="ecosistema-servicio" href="#mapa">
+          <span class="ecosistema-numero">01</span><small>ACCESO Y MOVILIDAD</small>
+          <h4>Tráfico y entorno portuario</h4>
+          <p>Consulta Balboa, sus accesos y el estado de las vías antes de movilizar el camión.</p>
+          <b>Ver mapa y accesos <i>→</i></b>
+        </a>
+        <a class="ecosistema-servicio" href="#pase">
+          <span class="ecosistema-numero">02</span><small>VALIDACIÓN DIGITAL</small>
+          <h4>Expediente único y Pase QR</h4>
+          <p>Consolida afiliación, cita, naviera, Aduanas y terminal en un solo recorrido.</p>
+          <b>Consultar Pase GateFlow <i>→</i></b>
+        </a>
+        <a class="ecosistema-servicio" href="#terminal">
+          <span class="ecosistema-numero">03</span><small>CONTROL OPERATIVO</small>
+          <h4>Terminal User</h4>
+          <p>Supervisa KPI, capacidad, cola, tiempos y escenarios desde el centro de decisión.</p>
+          <b>Entrar al control terminal <i>→</i></b>
+        </a>
+        <a class="ecosistema-servicio" href="#cliente">
+          <span class="ecosistema-numero">04</span><small>GESTIÓN DEL CLIENTE</small>
+          <h4>Customer User</h4>
+          <p>Administra solicitudes, citas y documentación del movimiento de carga.</p>
+          <b>Entrar al portal del cliente <i>→</i></b>
+        </a>
+      </div>
+
+      <div class="ecosistema-flujo" aria-label="Recorrido operativo GateFlow">
+        <strong>Un solo recorrido operativo</strong>
+        <ol><li><span>1</span>Planificar</li><li><span>2</span>Validar</li><li><span>3</span>Autorizar</li><li><span>4</span>Ingresar</li></ol>
+      </div>
     </section>
 
     <details class="mas" id="ini-detalle">
@@ -222,6 +256,98 @@ function renderLogistica(contenedor, estado) {
     detalle.open = true;
     detalle.scrollIntoView({ behavior: "smooth", block: "start" });
   });
+
+  // La portada responde suavemente al cursor y muestra explicaciones puntuales.
+  const heroPuerto = contenedor.querySelector("#hero-puerto");
+  const movimientoPermitido = window.matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)").matches;
+  if (heroPuerto && movimientoPermitido) {
+    heroPuerto.addEventListener("pointermove", (evento) => {
+      const caja = heroPuerto.getBoundingClientRect();
+      const x = ((evento.clientX - caja.left) / caja.width - 0.5) * -14;
+      const y = ((evento.clientY - caja.top) / caja.height - 0.5) * -10;
+      heroPuerto.style.setProperty("--hero-x", `${x}px`);
+      heroPuerto.style.setProperty("--hero-y", `${y}px`);
+    });
+    heroPuerto.addEventListener("pointerleave", () => {
+      heroPuerto.style.setProperty("--hero-x", "0px");
+      heroPuerto.style.setProperty("--hero-y", "0px");
+    });
+  }
+  const fichaOperacion = contenedor.querySelector("#hero-ficha-operacion");
+  const informacionOperacion = {
+    buque: {
+      etiqueta: "BUQUE · OPERACIÓN MARÍTIMA",
+      titulo: "El buque activa la demanda de transporte terrestre",
+      resumen: info.dia_buque
+        ? `El día ${estado.dia} está marcado como día de buque. La descarga y el retiro de contenedores elevan la cantidad de viajes que debe absorber el acceso portuario.`
+        : `El día ${estado.dia} no está marcado como día de buque grande, pero la terminal mantiene movimientos regulares de contenedores y camiones.`,
+      indicadores: [
+        { valor: info.dia_buque ? "Sí" : "No", texto: "Día de buque" },
+        { valor: fmt(info.llegadas), texto: "Camiones previstos" },
+        { valor: horaTexto(k.horaPico), texto: "Hora de mayor demanda" },
+      ],
+      accion: "Cruzar el plan del buque con las citas de retiro permite anticipar la demanda y evitar que todos los camiones lleguen en la misma franja.",
+      enlace: "Ver llegadas y días de buque",
+      destino: "#llegadas",
+    },
+    flujo: {
+      etiqueta: "FLUJO · LLEGADA DE CAMIONES",
+      titulo: "El problema no es solo cuántos llegan, sino cuándo llegan",
+      resumen: `Durante el día ${estado.dia}, el mayor movimiento ocurre cerca de las ${horaTexto(k.horaPico)}. Si muchos conductores llegan sin coordinación, la fila puede superar el espacio disponible y alcanzar la vía pública.`,
+      indicadores: [
+        { valor: fmt(k.lqMax), texto: "Camiones en la fila máxima" },
+        { valor: `${fmt(k.wqPromedio)} min`, texto: "Espera promedio" },
+        { valor: enCalle > 0 ? fmt(enCalle) : "0", texto: "Camiones en la calle" },
+      ],
+      accion: "Las citas y la cola virtual distribuyen las llegadas por horarios. El conductor recibe una franja y se aproxima a la garita cuando existe capacidad.",
+      enlace: "Ver cómo funcionan las citas",
+      destino: "#citas",
+    },
+    garita: {
+      etiqueta: "GARITA · CONTROL DE ACCESO",
+      titulo: "La garita decide la velocidad con que avanza la fila",
+      resumen: `Cada camión requiere validación antes de entrar. En este escenario, la revisión tarda aproximadamente ${fmt(D.servicio, 1)} minutos y la ocupación máxima de la garita alcanza ${fmt(k.rhoPico)} %.`,
+      indicadores: [
+        { valor: "5 de 6", texto: "Ventanillas activas" },
+        { valor: `${fmt(D.servicio, 1)} min`, texto: "Revisión por camión" },
+        { valor: `${fmt(k.rhoPico)} %`, texto: "Ocupación en hora pico" },
+      ],
+      accion: "Abrir la sexta ventanilla en horas pico y validar previamente documentos y QR aumenta la capacidad sin mantener recursos adicionales durante todo el día.",
+      enlace: "Probar mejoras en la garita",
+      destino: "#simulador",
+    },
+  };
+
+  const cerrarFichaOperacion = () => {
+    fichaOperacion.hidden = true;
+    contenedor.querySelectorAll("[data-hero-punto]").forEach((otro) => otro.setAttribute("aria-expanded", "false"));
+  };
+
+  contenedor.querySelectorAll("[data-hero-punto]").forEach((punto) => punto.addEventListener("click", () => {
+    const clave = punto.dataset.heroPunto;
+    const detalle = informacionOperacion[clave];
+    const yaAbierto = punto.getAttribute("aria-expanded") === "true" && !fichaOperacion.hidden;
+    if (yaAbierto) {
+      cerrarFichaOperacion();
+      return;
+    }
+
+    contenedor.querySelectorAll("[data-hero-punto]").forEach((otro) => otro.setAttribute("aria-expanded", String(otro === punto)));
+    fichaOperacion.dataset.tema = clave;
+    fichaOperacion.querySelector("#hero-ficha-etiqueta").textContent = detalle.etiqueta;
+    fichaOperacion.querySelector("#hero-ficha-titulo").textContent = detalle.titulo;
+    fichaOperacion.querySelector("#hero-ficha-resumen").textContent = detalle.resumen;
+    fichaOperacion.querySelector("#hero-ficha-indicadores").innerHTML = detalle.indicadores.map((indicador) =>
+      `<div><strong>${indicador.valor}</strong><span>${indicador.texto}</span></div>`).join("");
+    fichaOperacion.querySelector("#hero-ficha-accion-texto").textContent = detalle.accion;
+    const enlace = fichaOperacion.querySelector("#hero-ficha-enlace");
+    enlace.textContent = `${detalle.enlace} →`;
+    enlace.href = detalle.destino;
+    fichaOperacion.hidden = false;
+    fichaOperacion.focus({ preventScroll: true });
+    fichaOperacion.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }));
+  fichaOperacion.querySelector(".hero-ficha-cerrar").addEventListener("click", cerrarFichaOperacion);
 
   // Tabla filtrable
   const pintarTabla = (f) => {

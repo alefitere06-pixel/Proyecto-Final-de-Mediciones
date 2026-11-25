@@ -1,7 +1,7 @@
-# Gate Balboa · Dashboard de cola y citas
+# GateFlow · Plataforma inteligente de acceso portuario
 
 Proyecto semestral · **Medición y Rendimiento de Terminales Portuarias** · Universidad Marítima Internacional de Panamá
-**Idea 1 · Cola para entrar a la garita de Balboa** — Propuesta: **Gate Inteligente (3 palancas)**
+**Idea 1 · Cola para entrar a la garita de Balboa** — Propuesta: **GateFlow (3 palancas)**
 
 > ⚠️ Todos los datos del dashboard son **simulados**.
 
@@ -24,7 +24,7 @@ Con los datos simulados, la situación actual muestra que **los días de buque**
 pico supera la capacidad de la garita (ρ > 100 %), la cola pasa el límite de la vía de acceso y hay
 varias horas de desborde, mientras que los días sin buque la garita casi siempre alcanza.
 
-## Nuestra propuesta: Gate Inteligente (3 palancas)
+## Nuestra propuesta: GateFlow (3 palancas)
 1. **TAS dinámico** — el sistema de citas no usa una capacidad fija por franja: la calcula como
    *carriles abiertos × μ × 0,85*, para que ρ quede bajo la meta en cada franja.
 2. **Cola virtual con pre-estacionamiento** — los camiones esperan en un área fuera de la vía y se
@@ -55,12 +55,13 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 > mapa (coordenadas en `RUTA_FILA` y `PRE_EST`, `js/mapaFila.js`). Citen la fuente del mapa en la presentación.
 
 ## Navegación (menos cargado)
-- Cada sección es un **enlace** (`index.html#mapa`, `#simulador`, `#mejora`…): se puede compartir y el botón
+- Cada sección es un **enlace** (`index.html#mapa`, `#terminal`, `#cliente`…): se puede compartir y el botón
   "atrás" del navegador funciona.
-- **Inicio** muestra una portada real del Puerto de Balboa y cuatro rutas desplegables: ubicación, simulación,
-  solución y datos. Cada ruta contiene sus enlaces secundarios sin llenar la pantalla.
-- La barra superior deja visibles solo Inicio, Mapa, Simulador, Citas y el **Generador de solución**. Llegadas,
-  TTT y el análisis A3 con gráficos quedan bajo **"Más análisis"**.
+- **Inicio** muestra una ilustración original e interactiva del Puerto de Balboa y cuatro áreas de servicio:
+  tráfico y accesos, Pase QR, control terminal y gestión del cliente. Los puntos sobre la escena explican buque,
+  flujo y garita sin presentar la plataforma como un “generador de soluciones”.
+- La barra superior deja visibles Inicio, Mapa, **Pase QR**, **Terminal User** y **Customer User**. Se eliminó
+  **"Más análisis"**: Llegadas, Capacidad y cola, TTT, Citas TAS y Mejora A3 están integrados dentro de Terminal User y requieren una cuenta Terminal activa.
 - Cada sección tiene una frase de introducción, migas "Inicio › Sección" y botones **← Anterior / Siguiente →**.
 - Los detalles (tablas hora por hora, gráficos extra, análisis A3 completo) están en **"Ver más"** y los
   7 indicadores del día en un botón plegable.
@@ -73,13 +74,25 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 ## Módulos
 | # | Módulo | Qué muestra |
 |---|---|---|
-| 0 | Mapa y cola en vivo | Mapa del Puerto de Balboa + animación de la cola sin y con la propuesta |
+| 0 | Mapa y cola en vivo | Google Maps vectorial inclinado con tráfico real + modelo GateFlow de la fila |
 | 1 | Llegadas | Perfil de llegadas por hora y día, horas pico, filtro por transacción |
 | 2 | Simulador de cola | Carriles, servicio y llegadas → Lq, Wq, ρ y horas con desborde |
 | 3 | Truck Turn Time | Desglose del TTT por etapa y por hora |
 | 4 | Citas (TAS) | TAS dinámico: franjas, sin TAS vs con TAS, cumplimiento y no-show |
 | 5 | Mejora | A3 Lean y gráfico cascada de las 3 palancas |
-| 6 | Generador de solución | Dos preguntas → diagnóstico, antes/después y plan operativo por etapas, sin gráficos |
+| 6 | Pase GateFlow | Afiliación demostrativa, expediente único de retiro y QR para simular el carril expedito |
+| 7 | Terminal User | Acceso por rol, ocho KPI operativos, dos gráficas de decisión, controles de escenario y todas las áreas de análisis |
+| 8 | Customer User | Cuenta de cliente, solicitudes de movimiento, citas, expediente unificado y acceso al Pase QR |
+
+### Pase GateFlow: un solo trámite de retiro
+El nuevo recorrido convierte cinco validaciones en un solo expediente visible para el transportista:
+afiliación, cita, liberación de naviera, autorización de Aduanas y confirmación de terminal. Cuando todas
+se marcan como completas, el navegador genera un **QR demostrativo** y permite simular su lectura en la garita.
+
+Es un prototipo académico: no guarda ni transmite los datos escritos, no consulta sistemas externos y no
+está conectado con la Autoridad Nacional de Aduanas, navieras ni terminales. El QR contiene solo un identificador
+temporal, placa, contenedor y estado de autorización. La generación local utiliza `qrcode-generator`, incluida en
+`js/lib/qrcode.js` bajo licencia MIT.
 
 ### Aporte de `tejadaoperaciones-star`: plan de ventanilla adicional
 El Módulo 2 permite activar una **ventanilla adicional únicamente en horas pico**
@@ -127,7 +140,7 @@ Ningún escenario usa fórmulas nuevas: solo cambian las entradas (llegadas por 
 espera) y los KPI se calculan con las fórmulas del curso en `js/kpi.js`.
 
 ## Resultados principales (promedio de los días con buque, datos simulados)
-| KPI | Actual | TAS clásico | Gate Inteligente (3 palancas) | Meta |
+| KPI | Actual | TAS clásico | GateFlow (3 palancas) | Meta |
 |---|---|---|---|---|
 | Espera promedio Wq | 31 min | 26 min | 1,5 min | ≤ 30 min |
 | Cola máxima Lq | 80 camiones | 68 | 12 | ≤ 40 |
@@ -141,8 +154,21 @@ Fichas completas en [`docs/fichas_kpi.md`](docs/fichas_kpi.md). Fórmulas en `js
 Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual.md).
 
 ## Mapa e imágenes
+- `img/gateflow-logo.png` es el logotipo oficial aportado por el equipo y se utiliza en la cabecera y el pie del sitio.
 - El mapa simulado funciona sin internet con `img/mapa-puerto-balboa.png`.
-- Los botones de Google Maps usan **Maps URLs** y no guardan claves ni tokens; necesitan conexión a internet.
+- La vista principal del módulo **Mapa** admite Google Maps vectorial con inclinación 3D, capa oficial de tráfico,
+  calles/satélite y controles para centrar Balboa. Necesita internet, una clave restringida de Maps JavaScript API
+  y un Map ID vectorial con inclinación y rotación habilitadas.
+- Las credenciales no se guardan en Git: el sitio las recibe mediante las variables de ejecución
+  `GOOGLE_MAPS_API_KEY` y `GOOGLE_MAP_ID`. Si no están configuradas, se muestra una explicación segura y los
+  enlaces externos de Google Maps continúan funcionando.
+- La clave de navegador debe restringirse al dominio publicado de GateFlow y únicamente a **Maps JavaScript API**.
+  El Map ID no es secreto. Google actualiza la capa de tráfico periódicamente y su cobertura depende de la zona.
+- `img/balboa-smart-gate-hero.png` y `img/pase-smart-gate-qr.png` son ilustraciones originales generadas para
+  este proyecto. La segunda muestra al conductor usando el pase digital en una garita inteligente.
+- `img/fondo-terminal-buque.webp`, `img/fondo-camion-muelle.webp` y `img/fondo-camion-contenedor.webp` fueron
+  aportadas por el equipo y se usan como fondos temáticos. Antes de una publicación externa, el grupo debe
+  confirmar su fuente, licencia y permiso de uso; la primera imagen conserva una marca de agua visible.
 - Portada: *Puerto de Contenedores en Balboa*, Mdesanjur, Wikimedia Commons, CC BY-SA 4.0.
 - Operación de contenedor: U.S. Government Accountability Office, Wikimedia Commons, dominio público.
 

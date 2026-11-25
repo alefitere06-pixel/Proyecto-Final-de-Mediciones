@@ -1,5 +1,5 @@
 // =============================================================================
-// Módulo 5 · Mejora (A3 Lean) · Propuesta "Gate Inteligente: 3 palancas"
+// Módulo 5 · Mejora (A3 Lean) · Propuesta "GateFlow: 3 palancas"
 // Abierto a todo el grupo · Rama: mejora-propuesta-a3
 // -----------------------------------------------------------------------------
 //   Palanca 1: TAS dinámico (js/escenarios.js · redistribuirTAS)
@@ -90,7 +90,7 @@ MODULOS.push({
   render(contenedor, estado) {
     const m = MEJORA_ESTADO;
     contenedor.innerHTML = `
-      <h2>Nuestra propuesta: "Gate Inteligente"</h2>
+      <h2>Nuestra propuesta: “GateFlow”</h2>
       <div class="controles-fila">
         <label>Analizar
           <select id="mej-alcance">
@@ -168,7 +168,7 @@ MODULOS.push({
           <strong>Todo a la misma hora:</strong> en unas horas la puerta no da abasto y en otras está casi vacía.</p>
         </section>
         <section>
-          <h3>4 · ¿Qué proponemos? · Gate Inteligente</h3>
+          <h3>4 · ¿Qué proponemos? · GateFlow</h3>
           <ul>
             <li><strong>Citas inteligentes</strong>${ayuda("citasDinamicas")}: cada camión reserva una hora; cada hora solo ofrece los cupos que la puerta puede atender. Multa a quien reserva y no llega.</li>
             <li><strong>Estacionamiento de espera</strong>${ayuda("preEst")}: lugar para ${MEJORA_ESTADO.capacidadPreEst} camiones fuera de la calle; una app los llama cuando hay espacio.</li>

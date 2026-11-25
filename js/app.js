@@ -11,6 +11,27 @@ const ESTADO = {
   moduloActivo: null,
 };
 
+// Las rutas analíticas ya no aparecen como páginas independientes. Si alguien
+// abre un enlace antiguo, se conserva la sección solicitada dentro de Terminal
+// User, donde la sesión por rol controla el acceso.
+const RUTAS_TERMINAL = Object.freeze({
+  llegadas: "llegadas",
+  simulador: "operacion",
+  ttt: "ttt",
+  citas: "citas",
+  mejora: "mejora",
+});
+
+function resolverRutaTerminal(id) {
+  const vista = RUTAS_TERMINAL[id];
+  if (!vista) return id;
+  if (typeof TERMINAL_ESTADO !== "undefined") TERMINAL_ESTADO.vista = vista;
+  if (location.hash.slice(1) !== "terminal") {
+    try { history.replaceState(null, "", "#terminal"); } catch (_) { /* file:// */ }
+  }
+  return "terminal";
+}
+
 // Gráficos de Chart.js activos (para destruirlos antes de redibujar)
 const GRAFICOS = {};
 function crearGrafico(idCanvas, config) {
@@ -92,27 +113,21 @@ function pintarInfoDia() {
 // navegador y saltar de una sección a otra con <a href="#simulador">.
 function prepararPestanas() {
   const nav = document.getElementById("pestanas");
-  const principales = ["inicio", "mapa", "simulador", "citas", "solucion"];
-  const nombres = { mapa: "Mapa", simulador: "Simulador", citas: "Citas", solucion: "Solución" };
+  const principales = ["inicio", "mapa", "pase", "terminal", "cliente"];
+  const nombres = { mapa: "Mapa", pase: "Pase QR", terminal: "Terminal User", cliente: "Customer User" };
   const visibles = principales.map((id) => MODULOS.find((m) => m.id === id)).filter(Boolean);
-  const extras = MODULOS.filter((m) => !principales.includes(m.id));
   nav.innerHTML = visibles.map((m) =>
-    `<a href="#${m.id}" data-id="${m.id}">${nombres[m.id] || m.titulo}</a>`).join("") +
-    `<details class="nav-mas">
-      <summary>Más análisis</summary>
-      <div>${extras.map((m) => `<a href="#${m.id}" data-id="${m.id}">${m.titulo}</a>`).join("")}</div>
-    </details>`;
-  nav.querySelectorAll(".nav-mas a").forEach((a) => a.addEventListener("click", () => {
-    a.closest("details").open = false;
-  }));
+    `<a href="#${m.id}" data-id="${m.id}">${nombres[m.id] || m.titulo}</a>`).join("");
   window.addEventListener("hashchange", () => {
-    const id = location.hash.slice(1) || MODULOS[0].id;  // sin # = Inicio
-    if (MODULOS.some((m) => m.id === id) && id !== ESTADO.moduloActivo) mostrarModulo(id);
+    const solicitado = location.hash.slice(1) || "inicio";
+    const id = resolverRutaTerminal(solicitado);
+    if (MODULOS.some((m) => m.id === id) && (id !== ESTADO.moduloActivo || Boolean(RUTAS_TERMINAL[solicitado]))) mostrarModulo(id);
   });
 }
 
 // Ir a un módulo desde el código (botones, presentación): cambia el enlace
 function activarModulo(id) {
+  id = resolverRutaTerminal(id);
   if (location.hash.slice(1) !== id) {
     try { history.pushState(null, "", "#" + id); } catch (e) { /* file:// sin historial */ }
   }
@@ -120,12 +135,11 @@ function activarModulo(id) {
 }
 
 function mostrarModulo(id) {
+  id = resolverRutaTerminal(id);
   ESTADO.moduloActivo = id;
   document.body.dataset.modulo = id;   // permite estilos por pestaña (ej. ocultar tarjetas en Inicio)
   document.querySelectorAll("#pestanas a").forEach((b) =>
     b.classList.toggle("activa", b.dataset.id === id));
-  const menuMas = document.querySelector("#pestanas .nav-mas");
-  if (menuMas) menuMas.classList.toggle("activa", ["llegadas", "ttt", "mejora"].includes(id));
   pintarModulo();
   window.scrollTo(0, 0);
 }
@@ -138,7 +152,23 @@ function pintarModulo() {
   Object.entries(ANIMACIONES).forEach(([k, a]) => { if (k !== "anim-pres") a.detener(); });
   contenedor.innerHTML = "";
   m.render(contenedor, ESTADO);
-  if (m.intro) contenedor.insertAdjacentHTML("afterbegin", `<p class="intro-modulo">${m.intro}</p>`);
+  if (m.intro && !["inicio", "mapa", "pase", "solucion"].includes(m.id)) {
+    const titulo = Array.from(contenedor.children).find((elemento) => elemento.tagName === "H2");
+    if (titulo) {
+      const cabecera = document.createElement("header");
+      const etiqueta = document.createElement("span");
+      const introduccion = document.createElement("p");
+      cabecera.className = "cabecera-modulo-foto";
+      etiqueta.className = "seccion-etiqueta";
+      etiqueta.textContent = "GATEFLOW · PUERTO DE BALBOA";
+      titulo.classList.add("cabecera-modulo-titulo");
+      introduccion.textContent = m.intro;
+      cabecera.append(etiqueta, titulo, introduccion);
+      contenedor.insertAdjacentElement("afterbegin", cabecera);
+    } else {
+      contenedor.insertAdjacentHTML("afterbegin", `<p class="intro-modulo">${m.intro}</p>`);
+    }
+  }
 
   // Migas: Inicio › Sección
   document.getElementById("migas").innerHTML = m.id === "inicio" ? "" :
@@ -220,8 +250,8 @@ function color(nombre) {
 document.addEventListener("DOMContentLoaded", () => {
   prepararFiltroDia();
   prepararPestanas();
-  const pedido = location.hash.slice(1);
-  ESTADO.moduloActivo = MODULOS.some((m) => m.id === pedido) ? pedido : MODULOS[0].id;
+  const pedido = resolverRutaTerminal(location.hash.slice(1));
+  ESTADO.moduloActivo = MODULOS.some((m) => m.id === pedido) ? pedido : "inicio";
   mostrarModulo(ESTADO.moduloActivo);
   pintarInfoDia();
   pintarTarjetas();
