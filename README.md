@@ -74,7 +74,7 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 ## Módulos
 | # | Módulo | Qué muestra |
 |---|---|---|
-| 0 | Mapa y cola en vivo | Mapa del Puerto de Balboa + animación de la cola sin y con la propuesta |
+| 0 | Mapa y cola en vivo | Google Maps vectorial inclinado con tráfico real + modelo GateFlow de la fila |
 | 1 | Llegadas | Perfil de llegadas por hora y día, horas pico, filtro por transacción |
 | 2 | Simulador de cola | Carriles, servicio y llegadas → Lq, Wq, ρ y horas con desborde |
 | 3 | Truck Turn Time | Desglose del TTT por etapa y por hora |
@@ -156,7 +156,14 @@ Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual
 
 ## Mapa e imágenes
 - El mapa simulado funciona sin internet con `img/mapa-puerto-balboa.png`.
-- Los botones de Google Maps usan **Maps URLs** y no guardan claves ni tokens; necesitan conexión a internet.
+- La vista principal del módulo **Mapa** admite Google Maps vectorial con inclinación 3D, capa oficial de tráfico,
+  calles/satélite y controles para centrar Balboa. Necesita internet, una clave restringida de Maps JavaScript API
+  y un Map ID vectorial con inclinación y rotación habilitadas.
+- Las credenciales no se guardan en Git: el sitio las recibe mediante las variables de ejecución
+  `GOOGLE_MAPS_API_KEY` y `GOOGLE_MAP_ID`. Si no están configuradas, se muestra una explicación segura y los
+  enlaces externos de Google Maps continúan funcionando.
+- La clave de navegador debe restringirse al dominio publicado de GateFlow y únicamente a **Maps JavaScript API**.
+  El Map ID no es secreto. Google actualiza la capa de tráfico periódicamente y su cobertura depende de la zona.
 - `img/balboa-smart-gate-hero.png` y `img/pase-smart-gate-qr.png` son ilustraciones originales generadas para
   este proyecto. La segunda muestra al conductor usando el pase digital en una garita inteligente.
 - `img/fondo-terminal-buque.webp`, `img/fondo-camion-muelle.webp` y `img/fondo-camion-contenedor.webp` fueron

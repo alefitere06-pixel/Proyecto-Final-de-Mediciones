@@ -46,9 +46,27 @@ function decodificar(base64) {
 }
 
 export default {
-  async fetch(request) {
+  async fetch(request, env = {}) {
     const url = new URL(request.url);
     let ruta = decodeURIComponent(url.pathname);
+
+    if (ruta === "/api/maps-config") {
+      const apiKey = env.GOOGLE_MAPS_API_KEY || "";
+      const mapId = env.GOOGLE_MAP_ID || "";
+      return new Response(JSON.stringify({
+        enabled: Boolean(apiKey && mapId),
+        apiKey,
+        mapId,
+      }), {
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          "cache-control": "no-store, max-age=0",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "strict-origin-when-cross-origin",
+        },
+      });
+    }
+
     if (ruta === "/" || ruta.endsWith("/")) ruta += "index.html";
     const recurso = RECURSOS[ruta];
     if (!recurso) return new Response("Página no encontrada", { status: 404 });
