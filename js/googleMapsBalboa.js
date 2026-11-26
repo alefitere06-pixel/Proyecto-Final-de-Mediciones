@@ -147,9 +147,10 @@
       const configuracion = await obtenerConfiguracion();
       if (!configuracion.enabled) {
         semaforo = conectarSemaforo(raiz, null, dia, horaInicial);
+        if (estadoTexto) estadoTexto.textContent = "Google Maps activo · vista estándar";
         mostrarAviso(
           raiz,
-          "Falta activar una clave restringida de Maps JavaScript API y un Map ID vectorial de Google Cloud. La huella y el semáforo ya están preparados."
+          "El mapa ya está visible. Falta la credencial de Google Cloud para activar tráfico, 3D y la huella sobre las calles."
         );
         return;
       }
@@ -271,6 +272,7 @@
         evento.currentTarget.textContent = sateliteActivo ? "Ver calles" : "Ver satélite";
       });
     } catch (error) {
+      if (estadoTexto) estadoTexto.textContent = "Google Maps activo · vista estándar";
       mostrarAviso(raiz, error.message || "No fue posible iniciar el mapa de Google.", "error");
     }
   }

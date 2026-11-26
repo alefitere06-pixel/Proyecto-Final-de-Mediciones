@@ -209,16 +209,13 @@ body[data-modulo="inicio"] #contenido-modulo { background: transparent; border: 
 
 /* Mapa: contexto real + simulación del proyecto */
 .mapa-portada { display: grid; grid-template-columns: minmax(0, .9fr) minmax(380px, 1.1fr); gap: 20px; align-items: stretch; margin-bottom: 24px; padding: 18px; border-radius: 20px; background: #f2f7f7; }
+.mapa-portada.mapa-portada-solo { grid-template-columns: 1fr; }
 .mapa-portada-texto { padding: clamp(8px, 2vw, 22px); display: flex; flex-direction: column; justify-content: center; }
 .mapa-portada h2 { margin: 8px 0 10px; color: var(--texto); font-size: clamp(1.7rem, 3vw, 2.7rem); line-height: 1.05; }
 .mapa-portada p { margin: 0 0 18px; color: var(--texto-suave); line-height: 1.55; }
 .mapa-enlaces { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
 .mapa-enlaces .boton { text-decoration: none; padding: 10px 14px; }
 .mapa-enlace-simple { color: var(--primario); font-size: .82rem; font-weight: 700; }
-.mapa-foto-real { position: relative; min-height: 300px; margin: 0; overflow: hidden; border-radius: 16px; background: #d7e1e3; }
-.mapa-foto-real img { width: 100%; height: 100%; object-fit: cover; object-position: center 55%; display: block; }
-.mapa-foto-real figcaption { position: absolute; left: 10px; right: 10px; bottom: 10px; padding: 6px 8px; border-radius: 8px; background: rgba(7,31,40,.78); color: rgba(255,255,255,.8); font-size: .65rem; }
-.mapa-foto-real a { color: #fff; }
 .mapa-simulacion { padding-top: 4px; }
 .mapa-seccion-cabecera { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 12px; }
 .mapa-seccion-cabecera h3 { margin: 4px 0 0; font-size: 1.35rem; }
@@ -252,20 +249,31 @@ body[data-modulo="inicio"] #contenido-modulo { background: transparent; border: 
 }
 .mapa-google-lienzo { width: 100%; height: 510px; }
 .mapa-google-aviso {
+  position: relative;
   min-height: 510px;
-  display: grid;
-  grid-template-columns: auto minmax(0, 620px);
-  place-content: center;
-  gap: 18px;
-  padding: 28px;
-  background:
-    linear-gradient(90deg, rgba(2,24,34,.94), rgba(2,24,34,.58)),
-    url("../img/fondo-terminal-buque.webp") center 58% / cover;
+  background: #e7edf3;
 }
-.mapa-google-aviso[data-tipo="error"] { background-color: #4c1717; }
-.mapa-google-aviso strong { display: block; margin-bottom: 7px; color: #fff; font-size: clamp(1.15rem, 2vw, 1.55rem); }
-.mapa-google-aviso p { margin: 0 0 8px; color: rgba(255,255,255,.78); line-height: 1.55; }
-.mapa-google-aviso small { color: rgba(255,255,255,.55); }
+.mapa-google-respaldo { width: 100%; height: 510px; display: block; border: 0; }
+.mapa-google-mensaje {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  left: 14px;
+  max-width: min(560px, calc(100% - 28px));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  padding: 15px;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 14px;
+  background: rgba(3,24,52,.92);
+  box-shadow: 0 14px 32px rgba(0,0,0,.28);
+  backdrop-filter: blur(10px);
+}
+.mapa-google-aviso[data-tipo="error"] .mapa-google-mensaje { background: rgba(76,23,23,.94); }
+.mapa-google-mensaje strong { display: block; margin-bottom: 5px; color: #fff; font-size: 1rem; }
+.mapa-google-mensaje p { margin: 0 0 5px; color: rgba(255,255,255,.78); font-size: .78rem; line-height: 1.45; }
+.mapa-google-mensaje small { color: rgba(255,255,255,.55); font-size: .68rem; }
 .mapa-google-icono {
   width: 62px;
   height: 62px;
@@ -276,7 +284,7 @@ body[data-modulo="inicio"] #contenido-modulo { background: transparent; border: 
   background: rgba(12,142,127,.72);
   box-shadow: 0 12px 26px rgba(0,0,0,.28);
   color: #fff;
-  font-size: 1rem;
+  font-size: .7rem;
   font-weight: 900;
   letter-spacing: .08em;
 }
@@ -325,8 +333,9 @@ body[data-modulo="inicio"] #contenido-modulo { background: transparent; border: 
 @media (max-width: 700px) {
   .mapa-google-marco,
   .mapa-google-aviso { min-height: 440px; }
-  .mapa-google-lienzo { height: 440px; }
-  .mapa-google-aviso { grid-template-columns: 1fr; align-content: center; }
+  .mapa-google-lienzo,
+  .mapa-google-respaldo { height: 440px; }
+  .mapa-google-mensaje { grid-template-columns: 1fr; }
   .mapa-google-seccion .mapa-seccion-cabecera p,
   .mapa-leyenda small { text-align: left; }
 }
@@ -1386,8 +1395,6 @@ body:not([data-modulo="inicio"]) #contenido-modulo::after {
 .mapa-portada h2 { color: #fff; }
 .mapa-portada p { color: rgba(255,255,255,.76); }
 .mapa-enlace-simple { color: #8ee8de; }
-.mapa-foto-real { border: 1px solid rgba(255,255,255,.18); box-shadow: 0 16px 32px rgba(0,0,0,.25); }
-
 /* Solución: misma lógica de portada, con la ruta del camión como contexto. */
 .solucionador {
   border: 1px solid rgba(255,255,255,.16);

@@ -172,7 +172,6 @@ Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual
   aportadas por el equipo y se usan como fondos temáticos. Antes de una publicación externa, el grupo debe
   confirmar su fuente, licencia y permiso de uso; la primera imagen conserva una marca de agua visible.
 - Portada: *Puerto de Contenedores en Balboa*, Mdesanjur, Wikimedia Commons, CC BY-SA 4.0.
-- Operación de contenedor: U.S. Government Accountability Office, Wikimedia Commons, dominio público.
 
 ## Cómo trabajamos (Git)
 - **Nadie es dueño de un módulo.** Cualquier integrante puede tomar cualquier tarea y mejorar cualquier parte.

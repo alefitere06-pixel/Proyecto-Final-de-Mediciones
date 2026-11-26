@@ -12,7 +12,7 @@ MODULOS.unshift({   // unshift: queda antes de Llegadas (Inicio se agrega despu�
   intro: "Consulta el tráfico de Google y la huella operativa del acceso al Puerto de Balboa en un solo mapa interactivo.",
   render(contenedor, estado) {
     contenedor.innerHTML = `
-      <section class="mapa-portada">
+      <section class="mapa-portada mapa-portada-solo">
         <div class="mapa-portada-texto">
           <span class="seccion-etiqueta">TRÁFICO REAL + VISTA 3D</span>
           <h2>Balboa se mueve en un mapa vivo</h2>
@@ -22,10 +22,6 @@ MODULOS.unshift({   // unshift: queda antes de Llegadas (Inicio se agrega despu�
             <a class="mapa-enlace-simple" href="https://www.google.com/maps/dir/?api=1&amp;destination=Puerto+de+Balboa%2C+Panam%C3%A1" target="_blank" rel="noopener">Trazar ruta al puerto ↗</a>
           </div>
         </div>
-        <figure class="mapa-foto-real">
-          <img src="img/operacion-contenedor-balboa.jpg" alt="Camión con contenedor pasando por equipo de inspección en el Puerto de Balboa">
-          <figcaption>Operación real en Balboa · Foto: U.S. GAO, <a href="https://commons.wikimedia.org/wiki/File:Figure_3-_Panama_Customs_Examining_a_Container_Using_Imaging_Equipment,_Port_of_Balboa,_Panama_(10408265725).jpg" target="_blank" rel="noopener">dominio público</a></figcaption>
-        </figure>
       </section>
 
       <section class="mapa-google-seccion" aria-labelledby="mapa-google-titulo">
@@ -40,11 +36,20 @@ MODULOS.unshift({   // unshift: queda antes de Llegadas (Inicio se agrega despu�
         <div class="mapa-google-marco">
           <div class="mapa-google-lienzo" data-google-mapa hidden role="application" aria-label="Mapa 3D de Google del área de Balboa con tráfico"></div>
           <div class="mapa-google-aviso" data-google-aviso>
-            <span class="mapa-google-icono" aria-hidden="true">3D</span>
-            <div>
-              <strong>Mapa preparado para conexión segura</strong>
-              <p data-google-detalle>Consultando la configuración de Google Maps…</p>
-              <small>La clave se configura en el servidor y no se guarda en GitHub.</small>
+            <iframe
+              class="mapa-google-respaldo"
+              title="Google Maps del Puerto de Balboa y sus alrededores"
+              src="https://www.google.com/maps?q=Puerto+de+Balboa,+Panam%C3%A1&amp;z=15&amp;output=embed"
+              loading="eager"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen></iframe>
+            <div class="mapa-google-mensaje">
+              <span class="mapa-google-icono" aria-hidden="true">MAP</span>
+              <div>
+                <strong>Puerto de Balboa en Google Maps</strong>
+                <p data-google-detalle>Cargando el mapa interactivo…</p>
+                <small>La vista avanzada añadirá tráfico, 3D y la huella sobre las calles.</small>
+              </div>
             </div>
           </div>
 
