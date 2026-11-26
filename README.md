@@ -155,11 +155,12 @@ Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual
 
 ## Mapa e imágenes
 - `img/gateflow-logo.png` es el logotipo oficial aportado por el equipo y se utiliza en la cabecera y el pie del sitio.
-- El mapa simulado funciona sin internet con `img/mapa-zona-balboa.png` para la vista general y
-  `img/mapa-fila-cuarto-puente.png` para mostrar la fila sobre la vía amarilla de acceso.
-- La vista principal del módulo **Mapa** admite Google Maps vectorial con inclinación 3D, capa oficial de tráfico,
-  calles/satélite y controles para centrar Balboa. Necesita internet, una clave restringida de Maps JavaScript API
-  y un Map ID vectorial con inclinación y rotación habilitadas.
+- La vista principal del módulo **Mapa** usa Google Maps vectorial con inclinación 3D, capa oficial de tráfico,
+  calles/satélite y una huella interactiva del corredor de acceso. La huella cambia a verde, amarillo o rojo con
+  el nivel de cola calculado por el tablero y puede ajustarse por hora.
+- Necesita internet, una clave restringida de Maps JavaScript API y un Map ID vectorial con inclinación y rotación
+  habilitadas. Si el servicio de rutas está disponible, Google ajusta la huella a calles transitables; de lo contrario,
+  se usa una geometría de respaldo sobre el mapa real.
 - Las credenciales no se guardan en Git: el sitio las recibe mediante las variables de ejecución
   `GOOGLE_MAPS_API_KEY` y `GOOGLE_MAP_ID`. Si no están configuradas, se muestra una explicación segura y los
   enlaces externos de Google Maps continúan funcionando.

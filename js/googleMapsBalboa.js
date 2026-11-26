@@ -1,7 +1,24 @@
-// Integración de Google Maps para Balboa.
+// Google Maps para GateFlow: mapa real, tráfico oficial y huella operativa de acceso.
 // La clave y el Map ID se reciben en tiempo de ejecución; nunca se guardan en Git.
 (function () {
-  const CENTRO_BALBOA = { lat: 8.9559, lng: -79.5676 };
+  const CENTRO_BALBOA = { lat: 8.9572, lng: -79.5654 };
+  const ORIGEN_CORREDOR = { lat: 8.9728, lng: -79.5574 };
+  const GARITA_BALBOA = { lat: 8.9510, lng: -79.5659 };
+  const RUTA_RESPALDO = [
+    ORIGEN_CORREDOR,
+    { lat: 8.9696, lng: -79.5591 },
+    { lat: 8.9666, lng: -79.5608 },
+    { lat: 8.9633, lng: -79.5624 },
+    { lat: 8.9600, lng: -79.5637 },
+    { lat: 8.9567, lng: -79.5648 },
+    { lat: 8.9537, lng: -79.5655 },
+    GARITA_BALBOA,
+  ];
+  const NIVELES = {
+    fluido: { etiqueta: "Fluido", color: "#16a34a" },
+    moderado: { etiqueta: "Moderado", color: "#facc15" },
+    congestion: { etiqueta: "Congestionado", color: "#dc2626" },
+  };
   let promesaSdk = null;
 
   async function obtenerConfiguracion() {
@@ -57,32 +74,95 @@
     if (detalle) detalle.textContent = mensaje;
   }
 
-  async function montar(raiz) {
+  function horaActualPanama() {
+    const partes = new Intl.DateTimeFormat("es-PA", {
+      timeZone: "America/Panama",
+      hour: "2-digit",
+      hourCycle: "h23",
+    }).formatToParts(new Date());
+    const hora = Number(partes.find((parte) => parte.type === "hour")?.value ?? 12);
+    return Math.max(4, Math.min(22, hora));
+  }
+
+  function estadoOperativo(dia, hora) {
+    const capacidad = Number(
+      (typeof DATOS !== "undefined" ? DATOS.supuestos?.capacidad_via_camiones : null) ?? 40
+    );
+    let cola = 0;
+    try {
+      if (typeof simularDia === "function" && typeof escenario === "function") {
+        const operacion = simularDia(dia, escenario());
+        cola = Math.max(0, Math.round(Number(operacion.colas?.[hora] ?? 0)));
+      }
+    } catch (_) {
+      cola = 0;
+    }
+    const nivel = cola > capacidad ? "congestion" : cola > capacidad * 0.25 ? "moderado" : "fluido";
+    return { ...NIVELES[nivel], nivel, cola, capacidad, hora };
+  }
+
+  function pintarEstado(raiz, huella, dia, hora) {
+    const lectura = estadoOperativo(dia, hora);
+    huella?.setOptions({ strokeColor: lectura.color });
+
+    const resumen = raiz.querySelector("[data-huella-resumen]");
+    const titulo = raiz.querySelector("[data-huella-estado]");
+    const detalle = raiz.querySelector("[data-huella-detalle]");
+    const horaTexto = raiz.querySelector("[data-huella-hora-valor]");
+    if (resumen) resumen.dataset.nivel = lectura.nivel;
+    if (titulo) titulo.textContent = lectura.etiqueta;
+    if (detalle) detalle.textContent = `${lectura.cola} camiones en cola · capacidad vial ${lectura.capacidad}`;
+    if (horaTexto) horaTexto.textContent = `${String(lectura.hora).padStart(2, "0")}:00`;
+    return lectura;
+  }
+
+  function conectarSemaforo(raiz, huella, dia, horaInicial) {
+    const barra = raiz.querySelector("[data-huella-hora]");
+    const ahora = raiz.querySelector("[data-huella-ahora]");
+    const controlador = { estado: null };
+    controlador.actualizar = (hora) => {
+      const normalizada = Math.max(4, Math.min(22, Number(hora)));
+      if (barra) barra.value = normalizada;
+      controlador.estado = pintarEstado(raiz, huella, dia, normalizada);
+      return controlador.estado;
+    };
+    barra?.addEventListener("input", () => controlador.actualizar(barra.value));
+    ahora?.addEventListener("click", () => controlador.actualizar(horaActualPanama()));
+    controlador.actualizar(horaInicial);
+    return controlador;
+  }
+
+  async function montar(raiz, opciones = {}) {
     const lienzo = raiz.querySelector("[data-google-mapa]");
     const aviso = raiz.querySelector("[data-google-aviso]");
     const controles = raiz.querySelector("[data-google-controles]");
-    const estado = raiz.querySelector("[data-google-estado]");
+    const estadoTexto = raiz.querySelector("[data-google-estado]");
+    const dia = Number(opciones.dia || 1);
+    const horaInicial = horaActualPanama();
     if (!lienzo) return;
+
+    let semaforo = { estado: pintarEstado(raiz, null, dia, horaInicial) };
 
     try {
       const configuracion = await obtenerConfiguracion();
       if (!configuracion.enabled) {
+        semaforo = conectarSemaforo(raiz, null, dia, horaInicial);
         mostrarAviso(
           raiz,
-          "La interfaz ya está preparada. Falta conectar una clave de Maps JavaScript API y un Map ID vectorial de Google Cloud."
+          "Falta activar una clave restringida de Maps JavaScript API y un Map ID vectorial de Google Cloud. La huella y el semáforo ya están preparados."
         );
         return;
       }
 
       await cargarSdk(configuracion);
-      const { Map, TrafficLayer } = await google.maps.importLibrary("maps");
+      const { Map, TrafficLayer, Polyline, InfoWindow, LatLngBounds } = await google.maps.importLibrary("maps");
       const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
       const mapa = new Map(lienzo, {
         center: CENTRO_BALBOA,
-        zoom: 16,
-        tilt: 60,
-        heading: 22,
+        zoom: 15,
+        tilt: 52,
+        heading: 18,
         mapId: configuracion.mapId,
         mapTypeControl: false,
         fullscreenControl: true,
@@ -97,26 +177,80 @@
       let vistaInclinada = true;
       let sateliteActivo = false;
 
-      new AdvancedMarkerElement({
+      const bordeHuella = new Polyline({
         map: mapa,
-        position: CENTRO_BALBOA,
-        title: "Terminal de Balboa · área de operación",
+        path: RUTA_RESPALDO,
+        strokeColor: "#071a2f",
+        strokeOpacity: 0.78,
+        strokeWeight: 12,
+        clickable: false,
+        zIndex: 6,
+      });
+      const huella = new Polyline({
+        map: mapa,
+        path: RUTA_RESPALDO,
+        strokeColor: NIVELES.fluido.color,
+        strokeOpacity: 0.96,
+        strokeWeight: 7,
+        clickable: true,
+        zIndex: 7,
+      });
+
+      semaforo = conectarSemaforo(raiz, huella, dia, horaInicial);
+
+      new AdvancedMarkerElement({ map: mapa, position: ORIGEN_CORREDOR, title: "Inicio del corredor de acceso" });
+      new AdvancedMarkerElement({ map: mapa, position: GARITA_BALBOA, title: "Garita de acceso · Balboa" });
+
+      const encuadrar = (ruta) => {
+        const limites = new LatLngBounds();
+        ruta.forEach((punto) => limites.extend(punto));
+        mapa.fitBounds(limites, 58);
+        window.setTimeout(() => {
+          if (vistaInclinada) {
+            mapa.setTilt(52);
+            mapa.setHeading(18);
+          }
+        }, 250);
+      };
+      encuadrar(RUTA_RESPALDO);
+
+      // Google ajusta la huella a calles transitables. Si no responde, se conserva
+      // la geometría de respaldo sobre el mismo mapa real.
+      if (google.maps.DirectionsService) {
+        const servicioRuta = new google.maps.DirectionsService();
+        servicioRuta.route({
+          origin: ORIGEN_CORREDOR,
+          destination: GARITA_BALBOA,
+          travelMode: google.maps.TravelMode.DRIVING,
+        }, (resultado, estadoRuta) => {
+          const ruta = resultado?.routes?.[0]?.overview_path;
+          if (estadoRuta === "OK" && ruta?.length) {
+            bordeHuella.setPath(ruta);
+            huella.setPath(ruta);
+            encuadrar(ruta);
+          }
+        });
+      }
+
+      const globo = new InfoWindow();
+      huella.addListener("click", (evento) => {
+        const lectura = semaforo.estado || estadoOperativo(dia, horaInicial);
+        globo.setPosition(evento.latLng);
+        globo.setContent(`<strong>Huella de acceso GateFlow</strong><br>${lectura.etiqueta}: ${lectura.cola} camiones a las ${String(lectura.hora).padStart(2, "0")}:00.`);
+        globo.open({ map: mapa });
       });
 
       lienzo.hidden = false;
       aviso.hidden = true;
       controles.hidden = false;
-      estado.textContent = `Tráfico Google activo · consulta iniciada ${new Date().toLocaleTimeString("es-PA", { hour: "2-digit", minute: "2-digit" })}`;
+      estadoTexto.textContent = `Tráfico Google activo · ${new Date().toLocaleTimeString("es-PA", { hour: "2-digit", minute: "2-digit", timeZone: "America/Panama" })}`;
 
-      raiz.querySelector("[data-mapa-centro]")?.addEventListener("click", () => {
-        mapa.setCenter(CENTRO_BALBOA);
-        mapa.setZoom(16);
-      });
+      raiz.querySelector("[data-mapa-centro]")?.addEventListener("click", () => encuadrar(huella.getPath().getArray()));
 
       raiz.querySelector("[data-mapa-3d]")?.addEventListener("click", (evento) => {
         vistaInclinada = !vistaInclinada;
-        mapa.setTilt(vistaInclinada ? 60 : 0);
-        mapa.setHeading(vistaInclinada ? 22 : 0);
+        mapa.setTilt(vistaInclinada ? 52 : 0);
+        mapa.setHeading(vistaInclinada ? 18 : 0);
         evento.currentTarget.textContent = vistaInclinada ? "Vista cenital" : "Activar vista 3D";
         evento.currentTarget.setAttribute("aria-pressed", String(vistaInclinada));
       });
@@ -126,9 +260,9 @@
         capaTrafico.setMap(traficoVisible ? mapa : null);
         evento.currentTarget.textContent = traficoVisible ? "Ocultar tráfico" : "Mostrar tráfico";
         evento.currentTarget.setAttribute("aria-pressed", String(traficoVisible));
-        estado.textContent = traficoVisible
-          ? "Tráfico Google activo · Google actualiza la capa periódicamente"
-          : "Capa de tráfico oculta";
+        estadoTexto.textContent = traficoVisible
+          ? "Tráfico Google activo · actualización periódica"
+          : "Capa de tráfico de Google oculta";
       });
 
       raiz.querySelector("[data-mapa-tipo]")?.addEventListener("click", (evento) => {
