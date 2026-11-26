@@ -7,7 +7,6 @@
 const GateFlowAcceso = (() => {
   const CLAVE_USUARIOS = "gateflow_usuarios_demo_v1";
   const CLAVE_SESION = "gateflow_sesion_demo_v1";
-  const CODIGO_TERMINAL = "GF-OPS-2026";
 
   function leerUsuarios() {
     try { return JSON.parse(localStorage.getItem(CLAVE_USUARIOS) || "[]"); }
@@ -62,8 +61,94 @@ const GateFlowAcceso = (() => {
     if (alCerrar) alCerrar();
   }
 
+  function mostrarAccesoTerminal(contenedor, alEntrar) {
+    const sesion = leerSesion();
+    contenedor.innerHTML = `
+      <section class="acceso-gate acceso-terminal">
+        <div class="acceso-presentacion">
+          <span class="seccion-etiqueta">ACCESO OPERATIVO · GATEFLOW</span>
+          <h2>Terminal User</h2>
+          <p>Dashboard protegido para personal autorizado. El acceso se valida con el correo de tu sesión, sin códigos fijos visibles en la página.</p>
+          <div class="acceso-seguridad">
+            <span aria-hidden="true">●</span>
+            <div><strong>Correo verificado + lista autorizada</strong><small>La validación se realiza en el servidor antes de abrir el dashboard.</small></div>
+          </div>
+        </div>
+        <div class="acceso-panel acceso-correo-panel">
+          <span class="seccion-etiqueta">IDENTIDAD DEL TERMINAL</span>
+          <h3>Entra con tu correo verificado</h3>
+          <p>GateFlow comprobará el correo asociado a tu sesión de ChatGPT y permitirá el acceso únicamente si está autorizado para Terminal User.</p>
+          <div class="acceso-correo-identidad" data-terminal-identidad>
+            <span>Correo de la sesión</span><strong>Comprobando identidad…</strong><small>No compartimos tu correo con otros usuarios.</small>
+          </div>
+          <button class="boton acceso-principal" type="button" data-terminal-verificar>Verificar correo y abrir dashboard</button>
+          <a class="acceso-chatgpt" href="/signin-with-chatgpt?return_to=%2F%23terminal" data-terminal-iniciar hidden>Iniciar sesión con ChatGPT</a>
+          <p class="acceso-mensaje" data-acceso-mensaje aria-live="polite"></p>
+          <p class="acceso-nota">Esta verificación reemplaza el antiguo código general. Para enviar códigos OTP por correo se deberá conectar posteriormente un servicio empresarial de correo.</p>
+          ${sesion ? `<button type="button" class="acceso-cerrar-sesion" data-acceso-cerrar>Cerrar sesión actual</button>` : ""}
+        </div>
+      </section>`;
+
+    const mensaje = contenedor.querySelector("[data-acceso-mensaje]");
+    const identidad = contenedor.querySelector("[data-terminal-identidad]");
+    const boton = contenedor.querySelector("[data-terminal-verificar]");
+    const iniciar = contenedor.querySelector("[data-terminal-iniciar]");
+    let perfil = null;
+
+    const mostrarMensaje = (texto, tipo = "") => {
+      mensaje.textContent = texto;
+      mensaje.className = `acceso-mensaje ${tipo}`.trim();
+    };
+
+    async function comprobar() {
+      boton.disabled = true;
+      mostrarMensaje("Comprobando tu correo…");
+      try {
+        const respuesta = await fetch("/api/terminal-session", { headers: { accept: "application/json" }, cache: "no-store" });
+        perfil = await respuesta.json();
+        if (!perfil.authenticated) {
+          identidad.innerHTML = `<span>Correo de la sesión</span><strong>No has iniciado sesión</strong><small>Inicia sesión con ChatGPT para verificar tu correo.</small>`;
+          iniciar.hidden = false;
+          mostrarMensaje("Necesitas iniciar sesión con ChatGPT para continuar.", "error");
+          return;
+        }
+        identidad.innerHTML = `<span>Correo verificado</span><strong>${escapar(perfil.email)}</strong><small>${perfil.authorized ? "Autorizado para Terminal User" : "Este correo no está en la lista del terminal"}</small>`;
+        iniciar.hidden = true;
+        if (!perfil.authorized) {
+          mostrarMensaje("Tu correo está verificado, pero todavía no tiene permiso de Terminal User.", "error");
+          return;
+        }
+        mostrarMensaje("Correo autorizado. Ya puedes abrir el dashboard.", "ok");
+        boton.disabled = false;
+        boton.textContent = "Abrir dashboard de Terminal User";
+      } catch (_) {
+        identidad.innerHTML = `<span>Estado del acceso</span><strong>No fue posible verificar</strong><small>Intenta nuevamente en unos segundos.</small>`;
+        mostrarMensaje("No pudimos verificar tu correo en este momento.", "error");
+        boton.disabled = false;
+        boton.textContent = "Reintentar verificación";
+      }
+    }
+
+    boton.addEventListener("click", () => {
+      if (!perfil || !perfil.authorized) return comprobar();
+      guardarSesion({
+        id: perfil.id || `GFU-${Date.now().toString(36).toUpperCase()}`,
+        nombre: perfil.name || perfil.email.split("@")[0],
+        correo: perfil.email,
+        rol: "terminal",
+      });
+      mostrarMensaje("Acceso autorizado.", "ok");
+      alEntrar();
+    });
+
+    const cerrar = contenedor.querySelector("[data-acceso-cerrar]");
+    if (cerrar) cerrar.addEventListener("click", () => cerrarSesion(() => mostrarAccesoTerminal(contenedor, alEntrar)));
+    comprobar();
+  }
+
   function mostrarAcceso(contenedor, rol, alEntrar) {
     const esTerminal = rol === "terminal";
+    if (esTerminal) return mostrarAccesoTerminal(contenedor, alEntrar);
     const sesion = leerSesion();
     const nombreRol = esTerminal ? "Terminal User" : "Customer User";
     const descripcion = esTerminal
@@ -96,7 +181,6 @@ const GateFlowAcceso = (() => {
             <label>Nombre completo<input name="nombre" autocomplete="name" required placeholder="Nombre y apellido"></label>
             <label>Correo electrónico<input name="correo" type="email" autocomplete="email" required placeholder="usuario@empresa.com"></label>
             <label>Contraseña<input name="clave" type="password" autocomplete="new-password" minlength="8" required placeholder="Mínimo 8 caracteres"></label>
-            ${esTerminal ? `<label>Código de autorización<input name="codigo" required autocomplete="off" placeholder="Código entregado por administración"></label>` : ""}
             <label class="acceso-aceptar"><input type="checkbox" required> Acepto usar información de demostración y no ingresar datos sensibles.</label>
             <button class="boton acceso-principal" type="submit">Crear ${nombreRol}</button>
           </form>
@@ -140,9 +224,6 @@ const GateFlowAcceso = (() => {
       const claveOriginal = String(datos.get("clave"));
       const usuarios = leerUsuarios();
       if (usuarios.some((item) => item.correo === correo)) return mostrarMensaje("Ya existe un usuario con este correo.", "error");
-      if (esTerminal && String(datos.get("codigo")).trim().toUpperCase() !== CODIGO_TERMINAL) {
-        return mostrarMensaje("El código de autorización de la terminal no es válido.", "error");
-      }
       const usuario = {
         id: `GFU-${Date.now().toString(36).toUpperCase()}`,
         nombre,

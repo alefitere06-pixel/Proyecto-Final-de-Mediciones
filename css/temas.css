@@ -1570,6 +1570,14 @@ body[data-modulo="cliente"] .filtros { display: none; }
 .acceso-seguridad div { display: grid; gap: 2px; }
 .acceso-seguridad small { color: rgba(255,255,255,.62); }
 .acceso-panel { display: flex; flex-direction: column; justify-content: center; padding: clamp(28px, 4vw, 52px); background: linear-gradient(150deg, rgba(9,43,53,.98), rgba(4,27,37,.99)); color: #fff; }
+.acceso-correo-panel h3 { margin: 9px 0 8px; color: #fff; font-size: clamp(1.55rem,3vw,2.2rem); line-height: 1.05; }
+.acceso-correo-panel > p:not(.acceso-mensaje):not(.acceso-nota) { margin: 0 0 22px; color: rgba(255,255,255,.58); line-height: 1.5; }
+.acceso-correo-identidad { display: grid; gap: 5px; margin-bottom: 17px; padding: 17px; border: 1px solid rgba(101,211,201,.20); border-radius: 13px; background: rgba(101,211,201,.07); }
+.acceso-correo-identidad span { color: #8ee8de; font-size: .68rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.acceso-correo-identidad strong { color: #fff; word-break: break-word; }
+.acceso-correo-identidad small { color: rgba(255,255,255,.46); line-height: 1.4; }
+.acceso-chatgpt { display: flex; justify-content: center; margin-top: 10px; padding: 12px 16px; border: 1px solid rgba(255,255,255,.17); border-radius: 999px; color: #fff; font-size: .82rem; font-weight: 800; text-decoration: none; }
+.acceso-chatgpt[hidden] { display: none; }
 .acceso-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 5px; margin-bottom: 28px; border-radius: 13px; background: rgba(255,255,255,.07); }
 .acceso-tabs button { padding: 12px 8px; border: 0; border-radius: 10px; background: transparent; color: rgba(255,255,255,.60); font: inherit; font-weight: 750; cursor: pointer; }
 .acceso-tabs button.activo { background: #65d3c9; color: #052832; box-shadow: 0 8px 22px rgba(0,0,0,.20); }
@@ -1582,6 +1590,7 @@ body[data-modulo="cliente"] .filtros { display: none; }
 .acceso-formulario .acceso-aceptar { grid-template-columns: auto 1fr; align-items: start; font-weight: 500; line-height: 1.4; }
 .acceso-formulario .acceso-aceptar input { width: 18px; height: 18px; }
 .acceso-principal { width: 100%; justify-content: center; margin-top: 4px; border: 0; background: #f3b340; color: #102d35; font-weight: 850; }
+.acceso-principal:disabled { opacity: .55; cursor: wait; }
 .acceso-aviso, .acceso-mensaje { padding: 11px 13px; border-radius: 9px; background: rgba(243,179,64,.12); color: #ffd589; line-height: 1.4; }
 .acceso-mensaje:empty { display: none; }
 .acceso-mensaje.error { background: rgba(244,98,98,.13); color: #ffaaaa; }

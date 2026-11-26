@@ -67,6 +67,36 @@ export default {
       });
     }
 
+    if (ruta === "/api/terminal-session") {
+      const email = (request.headers.get("oai-authenticated-user-email") || "").trim().toLowerCase();
+      const userId = (request.headers.get("oai-authenticated-user-id") || "").trim();
+      const nombreCodificado = request.headers.get("oai-authenticated-user-full-name") || "";
+      const nombreEncoding = request.headers.get("oai-authenticated-user-full-name-encoding") || "";
+      let name = "";
+      if (nombreCodificado && nombreEncoding === "percent-encoded-utf-8") {
+        try { name = decodeURIComponent(nombreCodificado); } catch (_) { name = ""; }
+      }
+      const autorizados = new Set(String(env.TERMINAL_ALLOWED_EMAILS || "")
+        .split(",").map((item) => item.trim().toLowerCase()).filter(Boolean));
+      const authenticated = Boolean(email && userId);
+      const authorized = authenticated && autorizados.has(email);
+      return new Response(JSON.stringify({
+        authenticated,
+        authorized,
+        email: authenticated ? email : "",
+        id: authorized ? userId : "",
+        name: authorized ? name : "",
+      }), {
+        status: authenticated ? (authorized ? 200 : 403) : 401,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          "cache-control": "no-store, max-age=0",
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "no-referrer",
+        },
+      });
+    }
+
     if (ruta === "/" || ruta.endsWith("/")) ruta += "index.html";
     const recurso = RECURSOS[ruta];
     if (!recurso) return new Response("Página no encontrada", { status: 404 });
