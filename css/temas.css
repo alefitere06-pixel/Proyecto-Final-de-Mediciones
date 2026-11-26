@@ -376,3 +376,17 @@ details.mas[open] > summary { margin-bottom: 12px; }
 .diapositiva .mf-svg { max-height: 60vh; }
 .diapositiva .mf-cuerpo { grid-template-columns: minmax(0, 1fr) 240px; }
 @media print { .diapositiva .mf-svg { max-height: 120mm; } }
+
+/* ---- Mapas oscuros de la sección Puerto y fila ---- */
+.mapa-zona { margin: 8px 0 18px; }
+.mapa-zona img { width: 100%; max-width: 760px; height: auto; margin: 0 auto; border-radius: 14px; display: block; }
+.mf-svg.mf-oscuro { background: #2b2f45; max-height: 70vh; }
+.mf-oscuro .mf-etq { fill: #fff; stroke: rgba(20, 22, 40, .85); stroke-width: 3px; font-size: 12px; }
+.mf-oscuro .mf-etq.verde { fill: #8ee6a8; }
+.mf-oscuro .mf-etq.rojo { fill: #ff9d9d; }
+.mf-oscuro .mf-ruta { stroke: rgba(255, 220, 0, .25); stroke-width: 14; }
+.mf-oscuro .mf-c.acc { fill: #b9a6ff; }
+.mf-oscuro .mf-c.calle { fill: #ff5a5f; }
+.mf-oscuro .mf-c.pre { fill: #5ee08a; }
+.mf-oscuro .mf-pre { fill: rgba(94, 224, 138, .15); stroke: #5ee08a; }
+.mf-oscuro .mf-llamado { stroke: #5ee08a; }

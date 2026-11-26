@@ -30,7 +30,9 @@ MODULOS.unshift({   // unshift: queda antes de Llegadas (Inicio se agrega despu�
         </figure>
       </section>
       <section class="mapa-simulacion">
-        <div class="mapa-seccion-cabecera"><div><span class="seccion-etiqueta">SIMULACIÓN DEL PROYECTO</span><h3>Así crece la fila durante el día ${estado.dia}</h3></div><p>Cada punto representa un camión. Pulsa ▶ para reproducir el día.</p></div>
+        <div class="mapa-seccion-cabecera"><div><span class="seccion-etiqueta">VISTA GENERAL</span><h3>La zona del Puerto de Balboa</h3></div><p>El puerto, la vía 266/6 y Albrook. Abajo, el acercamiento a la vía donde se forma la fila.</p></div>
+        <figure class="mapa-zona"><img src="img/mapa-zona-balboa.png" alt="Mapa de la zona del Puerto de Balboa, Diablo Heights, Albrook, Ancón y La Boca"></figure>
+        <div class="mapa-seccion-cabecera"><div><span class="seccion-etiqueta">SIMULACIÓN DEL PROYECTO</span><h3>Así crece la fila durante el día ${estado.dia}</h3></div><p>Cada punto es un camión sobre la vía marcada en amarillo. Pulsa ▶ para reproducir el día.</p></div>
         <div id="mapa-fila"></div>
       </section>
       <details class="mas">

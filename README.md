@@ -42,7 +42,8 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
   su símbolo del curso (λ, μ·c, ρ, Lq, Wq, TTT), que se mantiene en las fichas y en la presentación.
 
 ## Lo más fácil de ver (para la defensa)
-- **La fila en el mapa:** sobre el mapa de distribución del Puerto de Balboa (`img/mapa-puerto-balboa.png`)
+- **La fila en el mapa:** vista general de la zona (`img/mapa-zona-balboa.png`) y, encima del acercamiento a la vía
+  de acceso junto a la vía 266 / Panama Canal Fourth Bridge (`img/mapa-fila-cuarto-puente.png`), la fila sobre la línea amarilla
   se dibuja un punto por cada camión esperando, desde la puerta principal hacia La Boca y la carretera al Puente
   de las Américas: morado = carril de espera (40), rojo = en la calle. Botones "Hoy" / "Con nuestra propuesta"
   (aparece el estacionamiento de espera en verde) y ▶ para reproducir el día. Funciona sin internet.
@@ -141,7 +142,7 @@ Fichas completas en [`docs/fichas_kpi.md`](docs/fichas_kpi.md). Fórmulas en `js
 Verificación a mano en [`docs/verificacion_manual.md`](docs/verificacion_manual.md).
 
 ## Mapa e imágenes
-- El mapa simulado funciona sin internet con `img/mapa-puerto-balboa.png`.
+- El mapa simulado funciona sin internet con `img/mapa-zona-balboa.png` e `img/mapa-fila-cuarto-puente.png`.
 - Los botones de Google Maps usan **Maps URLs** y no guardan claves ni tokens; necesitan conexión a internet.
 - Portada: *Puerto de Contenedores en Balboa*, Mdesanjur, Wikimedia Commons, CC BY-SA 4.0.
 - Operación de contenedor: U.S. Government Accountability Office, Wikimedia Commons, dominio público.
