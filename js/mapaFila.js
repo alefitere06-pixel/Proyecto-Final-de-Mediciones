@@ -1,21 +1,23 @@
 // =============================================================================
 // mapaFila.js · La fila de camiones dibujada sobre el mapa del Puerto de Balboa
 // -----------------------------------------------------------------------------
-// Fondo: img/mapa-puerto-balboa.png (Seaport Layout de Balboa, aportado por el grupo).
-// Encima se dibuja un punto por cada camión esperando: salen de la puerta principal
-// (junto a "Puerto de Balboa") y siguen por la avenida hacia La Boca y la carretera
-// al Puente de las Américas. Los primeros 40 caben en el carril de espera (morado);
-// el resto queda en la calle (rojo). Con la propuesta, el estacionamiento de espera
-// (verde) recibe a los camiones antes de que salgan a la calle.
-// Coordenadas en píxeles de la imagen (649 × 657).
+// Fondo: img/mapa-fila-cuarto-puente.png (acercamiento aportado por el grupo, con la
+// vía de acceso marcada en amarillo, junto a la vía 266 / Panama Canal Fourth Bridge).
+// Encima se dibuja un punto por cada camión esperando: empiezan en la entrada al puerto
+// (extremo suroeste de la línea amarilla) y la fila crece hacia el noreste sobre esa línea.
+// Los primeros 40 caben en el carril de espera (morado); el resto queda en la calle (rojo).
+// Con la propuesta, el estacionamiento de espera (verde) recibe a los camiones antes de
+// que salgan a la calle. Coordenadas en píxeles de la imagen (669 × 465).
 // =============================================================================
 
-const MAPA_IMG = "img/mapa-puerto-balboa.png";
-const PUERTA = [414, 303];
+const MAPA_IMG = "img/mapa-fila-cuarto-puente.png";
+const MAPA_ANCHO = 669, MAPA_ALTO = 465;
+const PUERTA = [210, 289];
 // Recorrido de la fila (de la puerta hacia afuera), medido sobre la imagen
-const RUTA_FILA = [[414, 303], [420, 311], [460, 340], [500, 373], [530, 398], [547, 417], [560, 440], [575, 462], [600, 476], [635, 488]];
-const PRE_EST = { x: 528, y: 92, ancho: 96, alto: 50 }; // ubicación propuesta (a validar por el grupo)
-const SEPARACION = 3.1;   // píxeles entre camiones
+const RUTA_FILA = [[210, 289], [229, 270.5], [249, 255], [269, 244.5], [289, 234], [309, 218], [329, 202.5], [349, 185.5],
+  [369, 168.5], [389, 153], [409, 140.5], [429, 131.5], [449, 115], [469, 95], [489, 64.5], [511, 20]];
+const PRE_EST = { x: 222, y: 150, ancho: 96, alto: 50 }; // ubicación propuesta (a validar por el grupo)
+const SEPARACION = 4.5;   // píxeles entre camiones
 const MAX_POS = 92;       // posiciones por carril (2 carriles)
 
 // Puntos a lo largo de la ruta cada `paso` píxeles, con su dirección
@@ -57,18 +59,18 @@ function crearMapaFila(contenedor, { dia, prefijo = "mf", conControles = true })
       <input type="range" class="anim-barra" id="${prefijo}-barra" min="4" max="22" step="0.05" aria-label="Hora del día">
     </div>
     <div class="mf-cuerpo">
-      <svg class="mf-svg" viewBox="300 60 337 450" role="img" aria-label="Mapa del Puerto de Balboa con la fila de camiones">
-        <image href="${MAPA_IMG}" x="0" y="0" width="649" height="657"/>
+      <svg class="mf-svg mf-oscuro" viewBox="0 0 ${MAPA_ANCHO} ${MAPA_ALTO}" role="img" aria-label="Mapa de la vía de acceso al Puerto de Balboa con la fila de camiones">
+        <image href="${MAPA_IMG}" x="0" y="0" width="${MAPA_ANCHO}" height="${MAPA_ALTO}"/>
         <polyline points="${RUTA_FILA.map((p) => p.join(",")).join(" ")}" class="mf-ruta"/>
         <g id="${prefijo}-pre" class="mf-pre-grupo">
           <rect x="${PRE_EST.x}" y="${PRE_EST.y}" width="${PRE_EST.ancho}" height="${PRE_EST.alto}" rx="4" class="mf-pre"/>
           <text x="${PRE_EST.x + PRE_EST.ancho / 2}" y="${PRE_EST.y - 4}" class="mf-etq verde" text-anchor="middle">Estacionamiento de espera (propuesto)</text>
-          <path d="M${PRE_EST.x + 10} ${PRE_EST.y + PRE_EST.alto} Q 470 250 ${PUERTA[0] + 4} ${PUERTA[1] - 6}" class="mf-llamado"/>
+          <path d="M${PRE_EST.x + 20} ${PRE_EST.y + PRE_EST.alto} Q ${PRE_EST.x + 10} ${PUERTA[1] - 30} ${PUERTA[0] + 2} ${PUERTA[1] - 6}" class="mf-llamado"/>
         </g>
         <g id="${prefijo}-camiones"></g>
         <circle cx="${PUERTA[0]}" cy="${PUERTA[1]}" r="6" class="mf-puerta"/>
-        <text x="${PUERTA[0] - 10}" y="${PUERTA[1] - 9}" class="mf-etq" text-anchor="end">Puerta principal</text>
-        <text x="612" y="503" class="mf-etq rojo" text-anchor="end">↘ hacia el Puente de las Américas</text>
+        <text x="${PUERTA[0] - 4}" y="${PUERTA[1] + 22}" class="mf-etq" text-anchor="middle">Entrada al puerto</text>
+        <text x="505" y="40" class="mf-etq rojo" text-anchor="end">la fila crece hacia aquí ↗</text>
       </svg>
       <div class="mf-lado">
         <div class="mf-dato"><span id="${prefijo}-n" class="mf-num">0</span><span>camiones esperando</span></div>
@@ -76,7 +78,7 @@ function crearMapaFila(contenedor, { dia, prefijo = "mf", conControles = true })
         <div class="mf-dato verde" id="${prefijo}-pre-dato"><span id="${prefijo}-preN" class="mf-num">0</span><span>en el estacionamiento (caben ${capPre})</span></div>
         <div class="mf-dato rojo"><span id="${prefijo}-calle" class="mf-num">0</span><span>en la calle 🚧</span></div>
         <div class="mf-dato"><span id="${prefijo}-espera" class="mf-num">0</span><span>minutos de espera si llegas a esta hora</span></div>
-        <p class="suave">Cada punto es un camión. Mapa: distribución del Puerto de Balboa; la fila y el estacionamiento son dibujos nuestros (datos simulados).</p>
+        <p class="suave">Cada punto es un camión. La fila sigue la vía marcada en amarillo; los puntos y el estacionamiento representan el modelo operativo GateFlow.</p>
       </div>
     </div>`;
 
@@ -85,11 +87,11 @@ function crearMapaFila(contenedor, { dia, prefijo = "mf", conControles = true })
   const NS = "http://www.w3.org/2000/svg";
   const grupo = contenedor.querySelector(`#${prefijo}-camiones`);
   const puntosFila = [];
-  pts.forEach((p) => [-1.8, 1.8].forEach((d) => {
+  pts.forEach((p) => [-2.3, 2.3].forEach((d) => {
     const c = document.createElementNS(NS, "circle");
     c.setAttribute("cx", (p.x + p.nx * d).toFixed(1));
     c.setAttribute("cy", (p.y + p.ny * d).toFixed(1));
-    c.setAttribute("r", "1.45");
+    c.setAttribute("r", "2.4");
     grupo.appendChild(c);
     puntosFila.push(c);
   }));
@@ -121,7 +123,7 @@ function crearMapaFila(contenedor, { dia, prefijo = "mf", conControles = true })
     puntosFila.forEach((c, i) => {
       let clase = "mf-c";
       if (i < enAcc) clase += " acc visible";
-      else if (i < capVia + enCalle) clase += " calle visible";
+      else if (i >= capVia && i < capVia + enCalle) clase += " calle visible";
       c.setAttribute("class", clase);
     });
     puntosPre.forEach((c, i) => c.classList.toggle("visible", i < enPre));

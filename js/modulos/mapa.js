@@ -66,7 +66,9 @@ MODULOS.unshift({   // unshift: queda antes de Llegadas (Inicio se agrega despu�
       </section>
 
       <section class="mapa-simulacion">
-        <div class="mapa-seccion-cabecera"><div><span class="seccion-etiqueta">MODELO OPERATIVO GATEFLOW</span><h3>Escenario de fila del día ${estado.dia}</h3></div><p>Este modelo permite probar decisiones; no sustituye los datos de Google.</p></div>
+        <div class="mapa-seccion-cabecera"><div><span class="seccion-etiqueta">VISTA GENERAL</span><h3>La zona del Puerto de Balboa</h3></div><p>Ubica el puerto, la vía 266/6, Albrook y el corredor de acceso.</p></div>
+        <figure class="mapa-zona"><img src="img/mapa-zona-balboa.png" alt="Mapa general de la zona del Puerto de Balboa, Diablo Heights, Albrook, Ancón y La Boca"></figure>
+        <div class="mapa-seccion-cabecera"><div><span class="seccion-etiqueta">MODELO OPERATIVO GATEFLOW</span><h3>Fila sobre la vía de acceso · día ${estado.dia}</h3></div><p>Cada punto es un camión sobre la vía marcada en amarillo. Usa los controles para comparar la operación actual con la propuesta.</p></div>
         <div id="mapa-fila"></div>
       </section>
       <details class="mas">

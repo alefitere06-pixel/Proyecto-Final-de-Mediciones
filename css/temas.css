@@ -2143,3 +2143,26 @@ body[data-modulo="cliente"] .filtros { display: none; }
   .ecosistema-flujo { align-items: flex-start; flex-direction: column; }
   .ecosistema-flujo ol { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
 }
+
+/* Mapas aportados por el equipo: vista general y fila sobre la vía amarilla. */
+.mapa-zona { margin: 8px 0 24px; }
+.mapa-zona img {
+  width: 100%;
+  max-width: 980px;
+  height: auto;
+  margin: 0 auto;
+  border: 1px solid rgba(184,196,208,.32);
+  border-radius: 18px;
+  display: block;
+  box-shadow: 0 18px 38px rgba(0,14,34,.24);
+}
+.mf-svg.mf-oscuro { background: #2b2f45; max-height: 70vh; }
+.mf-oscuro .mf-etq { fill: #fff; stroke: rgba(20,22,40,.85); stroke-width: 3px; font-size: 12px; }
+.mf-oscuro .mf-etq.verde { fill: #8ee6a8; }
+.mf-oscuro .mf-etq.rojo { fill: #ff9d9d; }
+.mf-oscuro .mf-ruta { stroke: rgba(255,220,0,.25); stroke-width: 14; }
+.mf-oscuro .mf-c.acc { fill: #b9a6ff; }
+.mf-oscuro .mf-c.calle { fill: #ff5a5f; }
+.mf-oscuro .mf-c.pre { fill: #5ee08a; }
+.mf-oscuro .mf-pre { fill: rgba(94,224,138,.15); stroke: #5ee08a; }
+.mf-oscuro .mf-llamado { stroke: #5ee08a; }
