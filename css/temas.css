@@ -1824,21 +1824,62 @@ body[data-modulo="cliente"] .filtros { display: none; }
 .terminal-modulo-embebido > p.suave { color: rgba(255,255,255,.52); }
 .terminal-modulo-embebido .mas > summary { color: #8ee8de; }
 
+.terminal-aliado-vista {
+  display: grid;
+  align-items: stretch;
+}
+.terminal-aliado {
+  display: grid;
+  grid-template-columns: minmax(0,1.45fr) minmax(260px,.55fr);
+  gap: 18px;
+  min-height: 480px;
+  padding: clamp(24px,4vw,52px);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 22px;
+  background:
+    linear-gradient(110deg, rgba(4,27,47,.97) 0%, rgba(4,34,49,.91) 58%, rgba(7,44,55,.76) 100%),
+    url("../img/fondo-terminal-buque.webp") center / cover no-repeat;
+  color: #fff;
+  box-shadow: 0 22px 48px rgba(0,0,0,.24);
+}
+.terminal-aliado-contenido { align-self: center; max-width: 850px; }
+.terminal-aliado h3 { max-width: 720px; margin: 9px 0 14px; color: #fff; font-size: clamp(2rem,4vw,4rem); line-height: .98; letter-spacing: -.045em; }
+.terminal-aliado-contenido > p { max-width: 760px; margin: 0; color: rgba(255,255,255,.68); line-height: 1.65; }
+.terminal-aliado-alcance { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 26px; }
+.terminal-aliado-alcance article { display: flex; gap: 11px; min-height: 136px; padding: 16px; border: 1px solid rgba(255,255,255,.11); border-radius: 14px; background: rgba(4,24,40,.66); backdrop-filter: blur(10px); }
+.terminal-aliado-alcance article > span { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; background: rgba(101,211,201,.14); color: #8ee8de; font-size: .72rem; font-weight: 900; }
+.terminal-aliado-alcance strong { display: block; margin-bottom: 6px; color: #fff; font-size: .9rem; }
+.terminal-aliado-alcance small { color: rgba(255,255,255,.52); line-height: 1.45; }
+.terminal-aliado-acciones { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 24px; }
+.terminal-aliado-abrir { border: 0; background: #65d3c9; color: #052832; font-weight: 900; text-decoration: none; }
+.terminal-aliado-volver { color: #fff; font-size: .84rem; font-weight: 750; text-underline-offset: 4px; }
+.terminal-aliado-contenido .terminal-aliado-nota { margin-top: 16px; color: rgba(255,255,255,.40); font-size: .74rem; }
+.terminal-aliado-ficha { align-self: end; padding: 23px; border: 1px solid rgba(255,255,255,.15); border-top: 4px solid #f3b340; border-radius: 17px; background: rgba(3,23,39,.82); backdrop-filter: blur(12px); }
+.terminal-aliado-ficha > span { color: #ffd589; font-size: .7rem; font-weight: 850; letter-spacing: .08em; }
+.terminal-aliado-ficha > strong { display: block; margin: 9px 0 10px; color: #fff; font-size: 1.35rem; }
+.terminal-aliado-ficha p { margin: 0; color: rgba(255,255,255,.57); font-size: .83rem; line-height: 1.5; }
+.terminal-aliado-ficha div { display: flex; gap: 8px; align-items: center; margin-top: 20px; color: #8ee8de; font-size: .76rem; font-weight: 800; }
+.terminal-aliado-ficha i { width: 9px; height: 9px; border-radius: 50%; background: #65d3c9; box-shadow: 0 0 0 5px rgba(101,211,201,.12); }
+
 @media (max-width: 1050px) {
   .terminal-kpis-completos { grid-template-columns: repeat(4,minmax(0,1fr)); }
   .terminal-operacion-grid, .terminal-graficas-decision { grid-template-columns: 1fr; }
   .terminal-planes { grid-template-columns: 1fr 1fr; }
+  .terminal-aliado { grid-template-columns: 1fr; }
+  .terminal-aliado-ficha { align-self: auto; }
 }
 
 @media (max-width: 720px) {
   .terminal-kpis-completos { grid-template-columns: 1fr 1fr; }
   .terminal-palancas, .terminal-planes { grid-template-columns: 1fr; }
   .terminal-subnav { top: 6px; }
+  .terminal-aliado-alcance { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
   .terminal-kpis-completos { grid-template-columns: 1fr; }
   .terminal-modulo-embebido, .terminal-controles-panel, .terminal-decision-panel, .terminal-historial { padding: 17px; }
+  .terminal-aliado { padding: 22px 18px; }
 }
 
 /* --------------------------------------------------------------------------

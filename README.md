@@ -62,6 +62,7 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
   flujo y garita sin presentar la plataforma como un “generador de soluciones”.
 - La barra superior deja visibles Inicio, Mapa, **Pase QR**, **Terminal User** y **Customer User**. Se eliminó
   **"Más análisis"**: Llegadas, Capacidad y cola, TTT, Citas TAS y Mejora A3 están integrados dentro de Terminal User y requieren una cuenta Terminal activa.
+- **Dwell Time · Aliado** conecta Terminal User con el dashboard externo **Patio en Flujo**. GateFlow no duplica sus análisis: el proyecto aliado mide permanencia y presión del patio, mientras GateFlow coordina citas, fila virtual, notificaciones y el acceso QR.
 - Cada sección tiene una frase de introducción, migas "Inicio › Sección" y botones **← Anterior / Siguiente →**.
 - Los detalles (tablas hora por hora, gráficos extra, análisis A3 completo) están en **"Ver más"** y los
   7 indicadores del día en un botón plegable.

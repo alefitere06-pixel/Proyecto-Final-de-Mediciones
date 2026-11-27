@@ -3,6 +3,7 @@
 // =============================================================================
 
 const TERMINAL_PLANES_CLAVE = "gateflow_planes_terminal_v1";
+const TERMINAL_DWELL_ALIADO_URL = "https://osmarborel16-hub.github.io/Proyecto-semestral-de-mediciones-y-rendimiento-portuario/?v=c8d62d4&utm_source=gateflow&utm_medium=partner_link";
 const TERMINAL_ESTADO = {
   vista: "resumen",
   carriles: 5,
@@ -17,6 +18,7 @@ const TERMINAL_ESTADO = {
 const TERMINAL_VISTAS = [
   { id: "resumen", nombre: "Dashboard" },
   { id: "llegadas", nombre: "Llegadas" },
+  { id: "dwell", nombre: "Dwell Time · Aliado" },
   { id: "operacion", nombre: "Capacidad y cola" },
   { id: "ttt", nombre: "TTT" },
   { id: "citas", nombre: "Citas TAS" },
@@ -262,6 +264,34 @@ function renderAnalisisTerminal(panel, vista, estado) {
   modulo.render.call(modulo, panel, estado);
 }
 
+function renderDwellAliadoTerminal(panel) {
+  panel.className = "terminal-vista terminal-aliado-vista";
+  panel.innerHTML = `
+    <section class="terminal-aliado">
+      <div class="terminal-aliado-contenido">
+        <span class="seccion-etiqueta">PROYECTO ALIADO · PATIO EN FLUJO</span>
+        <h3>Dwell Time y ocupación del patio</h3>
+        <p>GateFlow se conecta con el dashboard del equipo aliado para consultar permanencia de contenedores, antigüedad, densidad del patio y planificación de camiones sin duplicar esos análisis dentro de esta plataforma.</p>
+        <div class="terminal-aliado-alcance" aria-label="Relación entre los proyectos">
+          <article><span>01</span><div><strong>Patio en Flujo</strong><small>Explica cuánto tiempo permanecen los contenedores y qué categorías presionan el patio.</small></div></article>
+          <article><span>02</span><div><strong>GateFlow</strong><small>Convierte la demanda de retiro en citas, fila virtual, notificaciones y autorización QR.</small></div></article>
+          <article><span>03</span><div><strong>Decisión conectada</strong><small>La terminal puede revisar el patio y regresar a GateFlow para coordinar el acceso de los camiones.</small></div></article>
+        </div>
+        <div class="terminal-aliado-acciones">
+          <a class="boton terminal-aliado-abrir" href="${TERMINAL_DWELL_ALIADO_URL}" target="_blank" rel="noopener noreferrer">Abrir dashboard Dwell Time <span aria-hidden="true">↗</span></a>
+          <a class="terminal-aliado-volver" href="#pase">Ir al Pase QR de GateFlow</a>
+        </div>
+        <p class="terminal-aliado-nota">Recurso externo de referencia. El dashboard aliado identifica sus datos como simulados y conserva su propia metodología y autoría.</p>
+      </div>
+      <aside class="terminal-aliado-ficha" aria-label="Complemento operativo">
+        <span>CONEXIÓN OPERATIVA</span>
+        <strong>Patio → camiones → gate</strong>
+        <p>Dwell Time determina la presión de retiro. GateFlow organiza cuándo debe acercarse cada camión.</p>
+        <div><i></i> Enlace verificado</div>
+      </aside>
+    </section>`;
+}
+
 function renderTerminalUser(contenedor, estado) {
   const modulo = MODULOS.find((item) => item.id === "terminal");
   const usuario = GateFlowAcceso.usuarioActual("terminal");
@@ -294,6 +324,7 @@ function renderTerminalUser(contenedor, estado) {
 
   const panel = contenedor.querySelector("[data-terminal-contenido]");
   if (TERMINAL_ESTADO.vista === "resumen") renderResumenTerminal(panel, estado, usuario);
+  else if (TERMINAL_ESTADO.vista === "dwell") renderDwellAliadoTerminal(panel);
   else renderAnalisisTerminal(panel, TERMINAL_ESTADO.vista, estado);
 }
 
