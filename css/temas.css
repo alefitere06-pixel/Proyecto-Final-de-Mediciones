@@ -1596,6 +1596,12 @@ body[data-modulo="cliente"] .filtros { display: none; }
 .acceso-mensaje.error { background: rgba(244,98,98,.13); color: #ffaaaa; }
 .acceso-mensaje.ok { background: rgba(101,211,201,.13); color: #8ee8de; }
 .acceso-nota { margin: 20px 0 0; color: rgba(255,255,255,.42); font-size: .76rem; line-height: 1.45; }
+.acceso-codigo-form { margin-top: 4px; }
+.acceso-regresar { width: 100%; padding: 10px 12px; border: 0; background: transparent; color: #8ee8de; font: inherit; font-size: .8rem; font-weight: 750; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.acceso-regresar:hover { color: #fff; }
+.acceso-regresar[hidden], [data-acceso-codigo][hidden] { display: none; }
+.acceso-formulario input:disabled { opacity: .68; cursor: not-allowed; }
+.acceso-formulario button:disabled { opacity: .62; cursor: wait; }
 .acceso-cerrar-sesion { align-self: flex-start; margin-top: 12px; padding: 0; border: 0; background: transparent; color: #8ee8de; text-decoration: underline; cursor: pointer; }
 
 .terminal-hero, .cliente-hero {

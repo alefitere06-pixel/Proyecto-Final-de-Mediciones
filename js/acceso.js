@@ -1,53 +1,36 @@
 // =============================================================================
-// Acceso demostrativo por rol para GateFlow.
-// Los usuarios y la sesión se guardan únicamente en este navegador. No sustituye
-// un sistema corporativo de identidad ni debe utilizarse con datos reales.
+// Acceso por correo y código de un solo uso para GateFlow.
+// Las cuentas y sesiones se validan en el servidor; el navegador solo conserva
+// el token temporal de la sesión actual.
 // =============================================================================
 
 const GateFlowAcceso = (() => {
-  const CLAVE_USUARIOS = "gateflow_usuarios_demo_v1";
-  const CLAVE_SESION = "gateflow_sesion_demo_v1";
-
-  function leerUsuarios() {
-    try { return JSON.parse(localStorage.getItem(CLAVE_USUARIOS) || "[]"); }
-    catch (_) { return []; }
-  }
-
-  function guardarUsuarios(usuarios) {
-    localStorage.setItem(CLAVE_USUARIOS, JSON.stringify(usuarios));
-  }
+  const CLAVE_SESION = "gateflow_sesion_segura_v2";
 
   function leerSesion() {
     try { return JSON.parse(sessionStorage.getItem(CLAVE_SESION) || "null"); }
     catch (_) { return null; }
   }
 
-  function guardarSesion(usuario) {
+  function guardarSesion(usuario, token, vence) {
     sessionStorage.setItem(CLAVE_SESION, JSON.stringify({
       id: usuario.id,
-      nombre: usuario.nombre,
-      correo: usuario.correo,
-      rol: usuario.rol,
+      nombre: usuario.name,
+      correo: usuario.email,
+      rol: usuario.role,
+      token,
+      vence,
     }));
-  }
-
-  async function huella(clave) {
-    if (window.crypto && window.crypto.subtle && window.TextEncoder) {
-      const bytes = new TextEncoder().encode(clave);
-      const resumen = await window.crypto.subtle.digest("SHA-256", bytes);
-      return Array.from(new Uint8Array(resumen)).map((n) => n.toString(16).padStart(2, "0")).join("");
-    }
-    let valor = 2166136261;
-    for (let i = 0; i < clave.length; i += 1) {
-      valor ^= clave.charCodeAt(i);
-      valor = Math.imul(valor, 16777619);
-    }
-    return `demo-${(valor >>> 0).toString(16)}`;
   }
 
   function usuarioActual(rol) {
     const sesion = leerSesion();
-    return sesion && (!rol || sesion.rol === rol) ? sesion : null;
+    if (!sesion || (rol && sesion.rol !== rol)) return null;
+    if (sesion.vence && Date.parse(sesion.vence) <= Date.now()) {
+      sessionStorage.removeItem(CLAVE_SESION);
+      return null;
+    }
+    return sesion;
   }
 
   function escapar(valor) {
@@ -56,137 +39,237 @@ const GateFlowAcceso = (() => {
     })[caracter]);
   }
 
+  async function api(ruta, opciones = {}) {
+    const sesion = leerSesion();
+    const headers = { accept: "application/json" };
+    if (opciones.body) headers["content-type"] = "application/json";
+    if (sesion?.token) headers.authorization = `Bearer ${sesion.token}`;
+    const respuesta = await fetch(ruta, {
+      method: opciones.method || (opciones.body ? "POST" : "GET"),
+      headers,
+      body: opciones.body ? JSON.stringify(opciones.body) : undefined,
+      cache: "no-store",
+    });
+    let datos = {};
+    try { datos = await respuesta.json(); } catch (_) { datos = {}; }
+    if (!respuesta.ok) throw new Error(datos.message || "No fue posible completar la operación.");
+    return datos;
+  }
+
   function cerrarSesion(alCerrar) {
+    const sesion = leerSesion();
     sessionStorage.removeItem(CLAVE_SESION);
+    if (sesion?.token) {
+      fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { authorization: `Bearer ${sesion.token}`, accept: "application/json" },
+      }).catch(() => {});
+    }
     if (alCerrar) alCerrar();
   }
 
   function mostrarAccesoTerminal(contenedor, alEntrar) {
-    const sesion = leerSesion();
     contenedor.innerHTML = `
       <section class="acceso-gate acceso-terminal">
         <div class="acceso-presentacion">
           <span class="seccion-etiqueta">ACCESO OPERATIVO · GATEFLOW</span>
           <h2>Terminal User</h2>
-          <p>Dashboard protegido para personal autorizado. El acceso se valida con el correo de tu sesión, sin códigos fijos visibles en la página.</p>
+          <p>El dashboard operativo está reservado al personal autorizado. GateFlow enviará un código de seis dígitos al correo registrado.</p>
           <div class="acceso-seguridad">
             <span aria-hidden="true">●</span>
-            <div><strong>Correo verificado + lista autorizada</strong><small>La validación se realiza en el servidor antes de abrir el dashboard.</small></div>
+            <div><strong>Código personal y temporal</strong><small>Vence en 10 minutos, admite hasta cinco intentos y solo puede utilizarse una vez.</small></div>
           </div>
         </div>
         <div class="acceso-panel acceso-correo-panel">
           <span class="seccion-etiqueta">IDENTIDAD DEL TERMINAL</span>
-          <h3>Entra con tu correo verificado</h3>
-          <p>GateFlow comprobará el correo asociado a tu sesión de ChatGPT y permitirá el acceso únicamente si está autorizado para Terminal User.</p>
+          <h3>Recibe tu código de acceso</h3>
+          <p>Solo los correos autorizados por la terminal pueden solicitarlo.</p>
           <div class="acceso-correo-identidad" data-terminal-identidad>
-            <span>Correo de la sesión</span><strong>Comprobando identidad…</strong><small>No compartimos tu correo con otros usuarios.</small>
+            <span>Correo autorizado</span><strong>Comprobando tu sesión…</strong><small>También puedes escribir el correo manualmente.</small>
           </div>
-          <button class="boton acceso-principal" type="button" data-terminal-verificar>Verificar correo y abrir dashboard</button>
-          <a class="acceso-chatgpt" href="/signin-with-chatgpt?return_to=%2F%23terminal" data-terminal-iniciar hidden>Iniciar sesión con ChatGPT</a>
+          <form class="acceso-formulario" data-terminal-solicitar>
+            <label>Correo electrónico<input name="correo" type="email" autocomplete="email" required placeholder="usuario@empresa.com"></label>
+            <button class="boton acceso-principal" type="submit">Enviar código por correo</button>
+          </form>
+          <form class="acceso-formulario acceso-codigo-form" data-terminal-verificar hidden>
+            <label>Código de seis dígitos<input name="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" required placeholder="000000"></label>
+            <button class="boton acceso-principal" type="submit">Verificar y abrir dashboard</button>
+            <button class="acceso-regresar" type="button" data-terminal-regresar>Cambiar correo o reenviar</button>
+          </form>
           <p class="acceso-mensaje" data-acceso-mensaje aria-live="polite"></p>
-          <p class="acceso-nota">Esta verificación reemplaza el antiguo código general. Para enviar códigos OTP por correo se deberá conectar posteriormente un servicio empresarial de correo.</p>
-          ${sesion ? `<button type="button" class="acceso-cerrar-sesion" data-acceso-cerrar>Cerrar sesión actual</button>` : ""}
+          <p class="acceso-nota">El registro de Terminal User no es público. La administración debe autorizar cada correo antes del primer acceso.</p>
         </div>
       </section>`;
 
     const mensaje = contenedor.querySelector("[data-acceso-mensaje]");
     const identidad = contenedor.querySelector("[data-terminal-identidad]");
-    const boton = contenedor.querySelector("[data-terminal-verificar]");
-    const iniciar = contenedor.querySelector("[data-terminal-iniciar]");
-    let perfil = null;
+    const solicitar = contenedor.querySelector("[data-terminal-solicitar]");
+    const verificar = contenedor.querySelector("[data-terminal-verificar]");
+    const correoInput = solicitar.elements.correo;
+    let correoPendiente = "";
 
     const mostrarMensaje = (texto, tipo = "") => {
       mensaje.textContent = texto;
       mensaje.className = `acceso-mensaje ${tipo}`.trim();
     };
 
-    async function comprobar() {
-      boton.disabled = true;
-      mostrarMensaje("Comprobando tu correo…");
-      try {
-        const respuesta = await fetch("/api/terminal-session", { headers: { accept: "application/json" }, cache: "no-store" });
-        perfil = await respuesta.json();
-        if (!perfil.authenticated) {
-          identidad.innerHTML = `<span>Correo de la sesión</span><strong>No has iniciado sesión</strong><small>Inicia sesión con ChatGPT para verificar tu correo.</small>`;
-          iniciar.hidden = false;
-          mostrarMensaje("Necesitas iniciar sesión con ChatGPT para continuar.", "error");
-          return;
-        }
-        identidad.innerHTML = `<span>Correo verificado</span><strong>${escapar(perfil.email)}</strong><small>${perfil.authorized ? "Autorizado para Terminal User" : "Este correo no está en la lista del terminal"}</small>`;
-        iniciar.hidden = true;
-        if (!perfil.authorized) {
-          mostrarMensaje("Tu correo está verificado, pero todavía no tiene permiso de Terminal User.", "error");
-          return;
-        }
-        mostrarMensaje("Correo autorizado. Ya puedes abrir el dashboard.", "ok");
-        boton.disabled = false;
-        boton.textContent = "Abrir dashboard de Terminal User";
-      } catch (_) {
-        identidad.innerHTML = `<span>Estado del acceso</span><strong>No fue posible verificar</strong><small>Intenta nuevamente en unos segundos.</small>`;
-        mostrarMensaje("No pudimos verificar tu correo en este momento.", "error");
-        boton.disabled = false;
-        boton.textContent = "Reintentar verificación";
-      }
-    }
-
-    boton.addEventListener("click", () => {
-      if (!perfil || !perfil.authorized) return comprobar();
-      guardarSesion({
-        id: perfil.id || `GFU-${Date.now().toString(36).toUpperCase()}`,
-        nombre: perfil.name || perfil.email.split("@")[0],
-        correo: perfil.email,
-        rol: "terminal",
+    fetch("/api/terminal-session", { headers: { accept: "application/json" }, cache: "no-store" })
+      .then((respuesta) => respuesta.json())
+      .then((perfil) => {
+        if (perfil.authenticated) correoInput.value = perfil.email || "";
+        identidad.innerHTML = perfil.authenticated
+          ? `<span>Correo verificado en esta sesión</span><strong>${escapar(perfil.email)}</strong><small>${perfil.authorized ? "Autorizado para recibir el código" : "Todavía no está en la lista del terminal"}</small>`
+          : `<span>Correo del terminal</span><strong>Escríbelo para continuar</strong><small>GateFlow comprobará la autorización antes de enviar el código.</small>`;
+      })
+      .catch(() => {
+        identidad.innerHTML = `<span>Correo del terminal</span><strong>Escríbelo para continuar</strong><small>GateFlow comprobará la autorización antes de enviar el código.</small>`;
       });
-      mostrarMensaje("Acceso autorizado.", "ok");
-      alEntrar();
+
+    solicitar.addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+      correoPendiente = String(new FormData(solicitar).get("correo") || "").trim().toLowerCase();
+      const boton = solicitar.querySelector("button[type='submit']");
+      boton.disabled = true;
+      mostrarMensaje("Enviando código…");
+      try {
+        const datos = await api("/api/auth/request-code", { body: { email: correoPendiente, role: "terminal", purpose: "login" } });
+        solicitar.hidden = true;
+        verificar.hidden = false;
+        verificar.elements.codigo.focus();
+        mostrarMensaje(datos.message, "ok");
+      } catch (error) {
+        mostrarMensaje(error.message, "error");
+      } finally {
+        boton.disabled = false;
+      }
     });
 
-    const cerrar = contenedor.querySelector("[data-acceso-cerrar]");
-    if (cerrar) cerrar.addEventListener("click", () => cerrarSesion(() => mostrarAccesoTerminal(contenedor, alEntrar)));
-    comprobar();
+    verificar.addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+      const codigo = String(new FormData(verificar).get("codigo") || "").trim();
+      const boton = verificar.querySelector("button[type='submit']");
+      boton.disabled = true;
+      mostrarMensaje("Validando código…");
+      try {
+        const datos = await api("/api/auth/verify-code", { body: { email: correoPendiente, role: "terminal", purpose: "login", code: codigo } });
+        guardarSesion(datos.user, datos.token, datos.expiresAt);
+        mostrarMensaje("Acceso autorizado.", "ok");
+        alEntrar();
+      } catch (error) {
+        mostrarMensaje(error.message, "error");
+      } finally {
+        boton.disabled = false;
+      }
+    });
+
+    contenedor.querySelector("[data-terminal-regresar]").addEventListener("click", () => {
+      verificar.hidden = true;
+      solicitar.hidden = false;
+      verificar.reset();
+      mostrarMensaje("");
+      correoInput.focus();
+    });
   }
 
-  function mostrarAcceso(contenedor, rol, alEntrar) {
-    const esTerminal = rol === "terminal";
-    if (esTerminal) return mostrarAccesoTerminal(contenedor, alEntrar);
-    const sesion = leerSesion();
-    const nombreRol = esTerminal ? "Terminal User" : "Customer User";
-    const descripcion = esTerminal
-      ? "Centro de control para el personal operativo. Una cuenta habilita Dashboard, Llegadas, Capacidad, TTT, Citas y Mejora."
-      : "Portal para transportistas, conductores y clientes de carga.";
+  function prepararFormularioCodigo(formulario, configuracion, alEntrar, mostrarMensaje) {
+    const principal = formulario.querySelector("[data-acceso-principal]");
+    const codigoGrupo = formulario.querySelector("[data-acceso-codigo]");
+    const regresar = formulario.querySelector("[data-acceso-regresar]");
+    const correoInput = formulario.elements.correo;
+    const nombreInput = formulario.elements.nombre;
+    let correoPendiente = "";
 
+    const reiniciar = () => {
+      formulario.dataset.etapa = "solicitar";
+      codigoGrupo.hidden = true;
+      regresar.hidden = true;
+      correoInput.disabled = false;
+      if (nombreInput) nombreInput.disabled = false;
+      principal.textContent = configuracion.textoSolicitar;
+      formulario.elements.codigo.value = "";
+      mostrarMensaje("");
+    };
+
+    formulario.addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+      const datosFormulario = new FormData(formulario);
+      principal.disabled = true;
+      try {
+        if (formulario.dataset.etapa !== "verificar") {
+          correoPendiente = String(datosFormulario.get("correo") || "").trim().toLowerCase();
+          const respuesta = await api("/api/auth/request-code", {
+            body: {
+              email: correoPendiente,
+              name: String(datosFormulario.get("nombre") || "").trim(),
+              role: "cliente",
+              purpose: configuracion.proposito,
+            },
+          });
+          formulario.dataset.etapa = "verificar";
+          codigoGrupo.hidden = false;
+          regresar.hidden = false;
+          correoInput.disabled = true;
+          if (nombreInput) nombreInput.disabled = true;
+          principal.textContent = configuracion.textoVerificar;
+          formulario.elements.codigo.focus();
+          mostrarMensaje(respuesta.message, "ok");
+        } else {
+          const respuesta = await api("/api/auth/verify-code", {
+            body: {
+              email: correoPendiente,
+              role: "cliente",
+              purpose: configuracion.proposito,
+              code: String(datosFormulario.get("codigo") || "").trim(),
+            },
+          });
+          guardarSesion(respuesta.user, respuesta.token, respuesta.expiresAt);
+          mostrarMensaje("Acceso autorizado.", "ok");
+          alEntrar();
+        }
+      } catch (error) {
+        mostrarMensaje(error.message, "error");
+      } finally {
+        principal.disabled = false;
+      }
+    });
+
+    regresar.addEventListener("click", reiniciar);
+    reiniciar();
+    return reiniciar;
+  }
+
+  function mostrarAccesoCliente(contenedor, alEntrar) {
+    const sesion = leerSesion();
     contenedor.innerHTML = `
-      <section class="acceso-gate acceso-${rol}">
+      <section class="acceso-gate acceso-cliente">
         <div class="acceso-presentacion">
-          <span class="seccion-etiqueta">ACCESO CONTROLADO · GATEFLOW</span>
-          <h2>${nombreRol}</h2>
-          <p>${descripcion}</p>
-          <div class="acceso-seguridad">
-            <span aria-hidden="true">●</span>
-            <div><strong>Área protegida por rol</strong><small>La sesión permanece solamente en este dispositivo.</small></div>
-          </div>
+          <span class="seccion-etiqueta">PORTAL DE SERVICIO · GATEFLOW</span>
+          <h2>Customer User</h2>
+          <p>Crea tu cuenta para gestionar movimientos, citas y el Pase QR desde un solo lugar.</p>
+          <div class="acceso-seguridad"><span aria-hidden="true">●</span><div><strong>Acceso sin contraseñas</strong><small>Cada ingreso se confirma mediante un código enviado al correo registrado.</small></div></div>
         </div>
         <div class="acceso-panel">
           <div class="acceso-tabs" role="tablist" aria-label="Opciones de acceso">
             <button type="button" class="activo" data-acceso-vista="ingresar">Iniciar sesión</button>
             <button type="button" data-acceso-vista="registro">Crear usuario</button>
           </div>
-          ${sesion && sesion.rol !== rol ? `<div class="acceso-aviso">La sesión actual corresponde a <strong>${sesion.rol === "terminal" ? "Terminal User" : "Customer User"}</strong>. Cierra esa sesión para entrar en esta área.</div>` : ""}
-          <form class="acceso-formulario" data-acceso-form="ingresar">
-            <label>Correo electrónico<input name="correo" type="email" autocomplete="username" required placeholder="usuario@empresa.com"></label>
-            <label>Contraseña<input name="clave" type="password" autocomplete="current-password" minlength="8" required placeholder="Mínimo 8 caracteres"></label>
-            <button class="boton acceso-principal" type="submit">Entrar a ${nombreRol}</button>
-          </form>
-          <form class="acceso-formulario" data-acceso-form="registro" hidden>
-            <label>Nombre completo<input name="nombre" autocomplete="name" required placeholder="Nombre y apellido"></label>
+          ${sesion && sesion.rol !== "cliente" ? `<div class="acceso-aviso">La sesión actual corresponde a <strong>Terminal User</strong>. Cierra esa sesión antes de entrar como cliente.</div>` : ""}
+          <form class="acceso-formulario" data-acceso-form="ingresar" data-etapa="solicitar">
             <label>Correo electrónico<input name="correo" type="email" autocomplete="email" required placeholder="usuario@empresa.com"></label>
-            <label>Contraseña<input name="clave" type="password" autocomplete="new-password" minlength="8" required placeholder="Mínimo 8 caracteres"></label>
-            <label class="acceso-aceptar"><input type="checkbox" required> Acepto usar información de demostración y no ingresar datos sensibles.</label>
-            <button class="boton acceso-principal" type="submit">Crear ${nombreRol}</button>
+            <label data-acceso-codigo hidden>Código de seis dígitos<input name="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" placeholder="000000"></label>
+            <button class="boton acceso-principal" type="submit" data-acceso-principal>Enviar código de acceso</button>
+            <button class="acceso-regresar" type="button" data-acceso-regresar hidden>Cambiar correo o reenviar</button>
+          </form>
+          <form class="acceso-formulario" data-acceso-form="registro" data-etapa="solicitar" hidden>
+            <label>Nombre completo<input name="nombre" autocomplete="name" minlength="3" required placeholder="Nombre y apellido"></label>
+            <label>Correo electrónico<input name="correo" type="email" autocomplete="email" required placeholder="usuario@empresa.com"></label>
+            <label data-acceso-codigo hidden>Código de verificación<input name="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" placeholder="000000"></label>
+            <label class="acceso-aceptar"><input type="checkbox" required> Acepto el uso de mis datos para crear la cuenta y gestionar mis solicitudes en GateFlow.</label>
+            <button class="boton acceso-principal" type="submit" data-acceso-principal>Enviar código y crear usuario</button>
+            <button class="acceso-regresar" type="button" data-acceso-regresar hidden>Cambiar datos o reenviar</button>
           </form>
           <p class="acceso-mensaje" data-acceso-mensaje aria-live="polite"></p>
-          <p class="acceso-nota">Registro habilitado para el proyecto académico. La cuenta se guarda en este navegador y no sustituye una autenticación corporativa.</p>
-          ${sesion ? `<button type="button" class="acceso-cerrar-sesion" data-acceso-cerrar>Cerrar sesión actual</button>` : ""}
+          <p class="acceso-nota">La cuenta queda registrada en GateFlow. El código vence en 10 minutos y la sesión dura hasta 12 horas.</p>
         </div>
       </section>`;
 
@@ -196,51 +279,30 @@ const GateFlowAcceso = (() => {
       mensaje.className = `acceso-mensaje ${tipo}`.trim();
     };
 
+    const reiniciarIngreso = prepararFormularioCodigo(
+      contenedor.querySelector("[data-acceso-form='ingresar']"),
+      { proposito: "login", textoSolicitar: "Enviar código de acceso", textoVerificar: "Verificar y entrar" },
+      alEntrar,
+      mostrarMensaje,
+    );
+    const reiniciarRegistro = prepararFormularioCodigo(
+      contenedor.querySelector("[data-acceso-form='registro']"),
+      { proposito: "register", textoSolicitar: "Enviar código y crear usuario", textoVerificar: "Verificar y crear cuenta" },
+      alEntrar,
+      mostrarMensaje,
+    );
+
     contenedor.querySelectorAll("[data-acceso-vista]").forEach((boton) => boton.addEventListener("click", () => {
       const vista = boton.dataset.accesoVista;
       contenedor.querySelectorAll("[data-acceso-vista]").forEach((otro) => otro.classList.toggle("activo", otro === boton));
       contenedor.querySelectorAll("[data-acceso-form]").forEach((formulario) => { formulario.hidden = formulario.dataset.accesoForm !== vista; });
-      mostrarMensaje("");
+      reiniciarIngreso();
+      reiniciarRegistro();
     }));
+  }
 
-    contenedor.querySelector("[data-acceso-form='ingresar']").addEventListener("submit", async (evento) => {
-      evento.preventDefault();
-      const datos = new FormData(evento.currentTarget);
-      const correo = String(datos.get("correo")).trim().toLowerCase();
-      const clave = await huella(String(datos.get("clave")));
-      const usuario = leerUsuarios().find((item) => item.correo === correo && item.huella === clave);
-      if (!usuario) return mostrarMensaje("Correo o contraseña incorrectos.", "error");
-      if (usuario.rol !== rol) return mostrarMensaje(`Esta cuenta no tiene acceso a ${nombreRol}.`, "error");
-      guardarSesion(usuario);
-      mostrarMensaje("Acceso autorizado.", "ok");
-      alEntrar();
-    });
-
-    contenedor.querySelector("[data-acceso-form='registro']").addEventListener("submit", async (evento) => {
-      evento.preventDefault();
-      const datos = new FormData(evento.currentTarget);
-      const nombre = String(datos.get("nombre")).trim();
-      const correo = String(datos.get("correo")).trim().toLowerCase();
-      const claveOriginal = String(datos.get("clave"));
-      const usuarios = leerUsuarios();
-      if (usuarios.some((item) => item.correo === correo)) return mostrarMensaje("Ya existe un usuario con este correo.", "error");
-      const usuario = {
-        id: `GFU-${Date.now().toString(36).toUpperCase()}`,
-        nombre,
-        correo,
-        rol,
-        huella: await huella(claveOriginal),
-        creado: new Date().toISOString(),
-      };
-      usuarios.push(usuario);
-      guardarUsuarios(usuarios);
-      guardarSesion(usuario);
-      mostrarMensaje("Usuario creado. Acceso autorizado.", "ok");
-      alEntrar();
-    });
-
-    const cerrar = contenedor.querySelector("[data-acceso-cerrar]");
-    if (cerrar) cerrar.addEventListener("click", () => cerrarSesion(() => mostrarAcceso(contenedor, rol, alEntrar)));
+  function mostrarAcceso(contenedor, rol, alEntrar) {
+    return rol === "terminal" ? mostrarAccesoTerminal(contenedor, alEntrar) : mostrarAccesoCliente(contenedor, alEntrar);
   }
 
   return { usuarioActual, mostrarAcceso, cerrarSesion, escapar };
