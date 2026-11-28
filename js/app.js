@@ -155,6 +155,7 @@ function mostrarModulo(id) {
   id = resolverRutaTerminal(id);
   ESTADO.moduloActivo = id;
   document.body.dataset.modulo = id;   // permite estilos por pestaña (ej. ocultar tarjetas en Inicio)
+  if (id !== "terminal") delete document.body.dataset.terminalVista;
   document.querySelectorAll("#pestanas a").forEach((b) =>
     b.classList.toggle("activa", b.dataset.id === id));
   pintarModulo();

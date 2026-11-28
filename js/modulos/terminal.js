@@ -369,6 +369,9 @@ function renderPatioFlujoTerminal(panel, estado) {
 
 function renderTerminalUser(contenedor, estado) {
   const modulo = MODULOS.find((item) => item.id === "terminal");
+  const vistaSolicitada = TERMINAL_VISTAS.some((item) => item.id === TERMINAL_ESTADO.vista) ? TERMINAL_ESTADO.vista : "resumen";
+  TERMINAL_ESTADO.vista = vistaSolicitada;
+  document.body.dataset.terminalVista = vistaSolicitada;
   const usuario = GateFlowAcceso.usuarioActual("terminal");
   if (!usuario) {
     GateFlowAcceso.mostrarAcceso(contenedor, "terminal", () => modulo.render(contenedor, estado));
@@ -377,9 +380,6 @@ function renderTerminalUser(contenedor, estado) {
 
   const actual = simularDia(estado.dia, escenario());
   const estadoOperacion = estadoOperacionTerminal(actual);
-  const vistaValida = TERMINAL_VISTAS.some((item) => item.id === TERMINAL_ESTADO.vista);
-  if (!vistaValida) TERMINAL_ESTADO.vista = "resumen";
-
   contenedor.innerHTML = `
     <section class="terminal-hero">
       <div><span class="seccion-etiqueta">GATEFLOW · CONTROL OPERATIVO</span><h2>Terminal User</h2><p>Dashboard protegido para analizar indicadores, probar cambios y preparar decisiones del turno.</p></div>

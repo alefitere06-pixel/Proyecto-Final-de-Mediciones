@@ -65,7 +65,12 @@ function renderLogistica(contenedor, estado) {
 
   const enCalle = Math.round(k.viaPublicaMax);
   contenedor.innerHTML = `
-    <section class="hero-balboa hero-puerto-interactivo" id="hero-puerto">
+    <section class="hero-balboa hero-puerto-interactivo" id="hero-puerto" data-escena="buque">
+      <div class="hero-fondos" aria-hidden="true">
+        <span class="hero-fondo activo" data-hero-fondo="buque"></span>
+        <span class="hero-fondo" data-hero-fondo="flujo"></span>
+        <span class="hero-fondo" data-hero-fondo="garita"></span>
+      </div>
       <div class="hero-balboa-contenido">
         <span class="hero-etiqueta">GATEFLOW · PUERTO DE BALBOA</span>
         <h2>Tecnología que mueve el puerto.</h2>
@@ -260,6 +265,46 @@ function renderLogistica(contenedor, estado) {
   // La portada responde suavemente al cursor y muestra explicaciones puntuales.
   const heroPuerto = contenedor.querySelector("#hero-puerto");
   const movimientoPermitido = window.matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)").matches;
+  const rotacionPermitida = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
+  const escenasHero = ["buque", "flujo", "garita"];
+  let escenaHeroActual = 0;
+  let intervaloHero = null;
+
+  const cambiarEscenaHero = (escena) => {
+    const indice = escenasHero.indexOf(escena);
+    if (!heroPuerto || indice < 0) return;
+    escenaHeroActual = indice;
+    heroPuerto.dataset.escena = escena;
+    heroPuerto.querySelectorAll("[data-hero-fondo]").forEach((fondo) => {
+      fondo.classList.toggle("activo", fondo.dataset.heroFondo === escena);
+    });
+  };
+
+  const detenerRotacionHero = () => {
+    if (intervaloHero) window.clearInterval(intervaloHero);
+    intervaloHero = null;
+  };
+
+  const iniciarRotacionHero = () => {
+    detenerRotacionHero();
+    if (!heroPuerto || !rotacionPermitida || heroPuerto.matches(":focus-within")) return;
+    intervaloHero = window.setInterval(() => {
+      if (!heroPuerto.isConnected) {
+        detenerRotacionHero();
+        return;
+      }
+      escenaHeroActual = (escenaHeroActual + 1) % escenasHero.length;
+      cambiarEscenaHero(escenasHero[escenaHeroActual]);
+    }, 8000);
+  };
+
+  iniciarRotacionHero();
+  if (heroPuerto) {
+    heroPuerto.addEventListener("pointerenter", detenerRotacionHero);
+    heroPuerto.addEventListener("pointerleave", iniciarRotacionHero);
+    heroPuerto.addEventListener("focusin", detenerRotacionHero);
+    heroPuerto.addEventListener("focusout", () => window.setTimeout(iniciarRotacionHero, 0));
+  }
   if (heroPuerto && movimientoPermitido) {
     heroPuerto.addEventListener("pointermove", (evento) => {
       const caja = heroPuerto.getBoundingClientRect();
@@ -325,6 +370,7 @@ function renderLogistica(contenedor, estado) {
 
   contenedor.querySelectorAll("[data-hero-punto]").forEach((punto) => punto.addEventListener("click", () => {
     const clave = punto.dataset.heroPunto;
+    cambiarEscenaHero(clave);
     const detalle = informacionOperacion[clave];
     const yaAbierto = punto.getAttribute("aria-expanded") === "true" && !fichaOperacion.hidden;
     if (yaAbierto) {

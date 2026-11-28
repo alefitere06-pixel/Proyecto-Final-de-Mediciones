@@ -2400,3 +2400,119 @@ body[data-modulo="cliente"] .filtros { display: none; }
   .mapa-operacion { grid-template-columns: 1fr; align-items: stretch; }
   .mapa-ahora { width: 100%; }
 }
+
+/* =============================================================================
+   Escenas portuarias GateFlow
+   Tres fondos contextuales, transiciones suaves y lectura protegida.
+   ============================================================================= */
+body { --arte-modulo: url("../img/gateflow-smart-port.webp"); }
+body[data-modulo="mapa"] { --arte-modulo: url("../img/gateflow-patio-operativo.webp"); }
+body[data-modulo="pase"],
+body[data-modulo="cliente"] { --arte-modulo: url("../img/gateflow-puerto-atardecer.webp"); }
+body[data-modulo="terminal"] { --arte-modulo: url("../img/gateflow-smart-port.webp"); }
+body[data-terminal-vista="patio"],
+body[data-terminal-vista="llegadas"],
+body[data-terminal-vista="citas"] { --arte-modulo: url("../img/gateflow-patio-operativo.webp"); }
+body[data-terminal-vista="ttt"] { --arte-modulo: url("../img/gateflow-puerto-atardecer.webp"); }
+
+/* La portada reutiliza los puntos Buque, Flujo y Garita como controles visuales. */
+.hero-balboa.hero-puerto-interactivo::before { display: none; }
+.hero-fondos {
+  position: absolute;
+  z-index: -2;
+  inset: -20px;
+  overflow: hidden;
+  transform: translate3d(var(--hero-x), var(--hero-y), 0) scale(1.045);
+  transition: transform .45s cubic-bezier(.2,.8,.2,1);
+  will-change: transform;
+}
+.hero-fondo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transform: scale(1.025);
+  transition: opacity 1s ease, transform 8s ease;
+}
+.hero-fondo.activo { opacity: 1; transform: scale(1); }
+.hero-fondo[data-hero-fondo="buque"] { background-image: url("../img/gateflow-puerto-atardecer.webp"); background-position: 56% center; }
+.hero-fondo[data-hero-fondo="flujo"] { background-image: url("../img/gateflow-smart-port.webp"); background-position: 48% center; }
+.hero-fondo[data-hero-fondo="garita"] { background-image: url("../img/gateflow-patio-operativo.webp"); background-position: 58% center; }
+.hero-puerto-interactivo .hero-instruccion::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: #ff667c;
+  box-shadow: 0 0 0 4px rgba(200,16,46,.2);
+}
+
+/* Escena adecuada para cada acceso y cada espacio de trabajo. */
+.acceso-terminal .acceso-presentacion {
+  background-image:
+    linear-gradient(90deg, rgba(3,20,46,.96), rgba(3,28,58,.60) 67%, rgba(3,25,55,.18)),
+    linear-gradient(0deg, rgba(3,19,43,.94), transparent 56%),
+    url("../img/gateflow-smart-port.webp");
+  background-position: center;
+}
+.acceso-cliente .acceso-presentacion {
+  background-image:
+    linear-gradient(90deg, rgba(3,20,46,.96), rgba(3,28,58,.57) 67%, rgba(3,25,55,.16)),
+    linear-gradient(0deg, rgba(3,19,43,.94), transparent 56%),
+    url("../img/gateflow-puerto-atardecer.webp");
+  background-position: 58% center;
+}
+.terminal-hero {
+  --terminal-fondo: url("../img/gateflow-smart-port.webp");
+  background-image:
+    linear-gradient(90deg, rgba(3,18,43,.97), rgba(4,31,65,.62) 58%, rgba(4,31,65,.18)),
+    linear-gradient(0deg, rgba(3,18,43,.94), transparent 67%),
+    var(--terminal-fondo);
+  background-position: center;
+  background-size: cover;
+}
+body[data-terminal-vista="patio"] .terminal-hero,
+body[data-terminal-vista="llegadas"] .terminal-hero,
+body[data-terminal-vista="citas"] .terminal-hero { --terminal-fondo: url("../img/gateflow-patio-operativo.webp"); }
+body[data-terminal-vista="ttt"] .terminal-hero { --terminal-fondo: url("../img/gateflow-puerto-atardecer.webp"); }
+.cliente-hero {
+  background-image:
+    linear-gradient(90deg, rgba(3,18,43,.97), rgba(4,31,65,.55) 58%, rgba(4,31,65,.16)),
+    linear-gradient(0deg, rgba(3,18,43,.92), transparent 67%),
+    url("../img/gateflow-puerto-atardecer.webp");
+  background-position: 56% center;
+  background-size: cover;
+}
+.patio-flujo-hero {
+  background-image:
+    linear-gradient(110deg, rgba(3,18,43,.98), rgba(5,38,76,.76)),
+    url("../img/gateflow-patio-operativo.webp");
+  background-position: center;
+  background-size: cover;
+}
+.mapa-google-seccion {
+  background-image:
+    linear-gradient(135deg, rgba(3,25,55,.97), rgba(9,54,96,.88)),
+    url("../img/gateflow-patio-operativo.webp");
+}
+.pase-portada::before { background-image: url("../img/gateflow-puerto-atardecer.webp"); background-position: 58% center; }
+.hero-ficha-operacion { --ficha-fondo: url("../img/gateflow-puerto-atardecer.webp"); }
+.hero-ficha-operacion[data-tema="flujo"] { --ficha-fondo: url("../img/gateflow-smart-port.webp"); }
+.hero-ficha-operacion[data-tema="garita"] { --ficha-fondo: url("../img/gateflow-patio-operativo.webp"); }
+
+@media (max-width: 720px) {
+  .hero-fondo[data-hero-fondo="buque"] { background-position: 66% center; }
+  .hero-fondo[data-hero-fondo="flujo"] { background-position: 60% center; }
+  .hero-fondo[data-hero-fondo="garita"] { background-position: 64% center; }
+  .acceso-terminal .acceso-presentacion,
+  .acceso-cliente .acceso-presentacion { min-height: 470px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fondos,
+  .hero-fondo { transition: none; transform: none; }
+}
