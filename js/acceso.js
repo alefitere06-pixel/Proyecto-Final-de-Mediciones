@@ -260,12 +260,12 @@ const GateFlowAcceso = (() => {
         <div class="acceso-presentacion">
           <span class="seccion-etiqueta">PORTAL DE SERVICIO · GATEFLOW</span>
           <h2>Customer User</h2>
-          <p>Crea tu cuenta para gestionar movimientos, citas y el Pase QR desde un solo lugar.</p>
-          <div class="acceso-seguridad"><span aria-hidden="true">●</span><div><strong>Acceso sin contraseñas</strong><small>Cada ingreso se confirma mediante un código enviado al correo registrado.</small></div></div>
+          <p>Crea una cuenta libre para vincular tus cargas, seguir sus etapas y coordinar movimientos desde un solo lugar.</p>
+          <div class="acceso-seguridad"><span aria-hidden="true">●</span><div><strong>Registro independiente del correo de prueba</strong><small>El cliente entra con su correo y una clave personal protegida; Terminal User mantiene su código temporal.</small></div></div>
           <div class="acceso-ruta-breve" aria-label="Pasos para entrar a Customer User">
-            <div><span>1</span><strong>Crear usuario</strong><small>Nombre, correo y consentimiento.</small></div>
-            <div><span>2</span><strong>Revisar el correo</strong><small>Recibir el código de seis dígitos.</small></div>
-            <div><span>3</span><strong>Entrar</strong><small>La sesión permanece activa hasta 12 horas.</small></div>
+            <div><span>1</span><strong>Crear usuario</strong><small>Nombre, cualquier correo válido y clave personal.</small></div>
+            <div><span>2</span><strong>Vincular carga</strong><small>Contenedor, booking y segunda referencia.</small></div>
+            <div><span>3</span><strong>Dar seguimiento</strong><small>La terminal confirma cada etapa visible.</small></div>
           </div>
         </div>
         <div class="acceso-panel">
@@ -274,22 +274,30 @@ const GateFlowAcceso = (() => {
             <button type="button" data-acceso-vista="registro">Crear usuario</button>
           </div>
           ${sesion && sesion.rol !== "cliente" ? `<div class="acceso-aviso">La sesión actual corresponde a <strong>Terminal User</strong>. Cierra esa sesión antes de entrar como cliente.</div>` : ""}
-          <form class="acceso-formulario" data-acceso-form="ingresar" data-etapa="solicitar">
+          <form class="acceso-formulario" data-acceso-form="ingresar">
             <label>Correo electrónico<input name="correo" type="email" autocomplete="email" required placeholder="usuario@empresa.com"></label>
-            <label data-acceso-codigo hidden>Código de seis dígitos<input name="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" placeholder="000000"></label>
-            <button class="boton acceso-principal" type="submit" data-acceso-principal>Enviar código de acceso</button>
-            <button class="acceso-regresar" type="button" data-acceso-regresar hidden>Cambiar correo o reenviar</button>
+            <label>Clave personal<input name="clave" type="password" autocomplete="current-password" minlength="8" maxlength="128" required placeholder="Tu clave de acceso"></label>
+            <button class="boton acceso-principal" type="submit" data-acceso-principal>Entrar a Customer User</button>
           </form>
-          <form class="acceso-formulario" data-acceso-form="registro" data-etapa="solicitar" hidden>
+          <form class="acceso-formulario" data-acceso-form="registro" hidden>
             <label>Nombre completo<input name="nombre" autocomplete="name" minlength="3" required placeholder="Nombre y apellido"></label>
             <label>Correo electrónico<input name="correo" type="email" autocomplete="email" required placeholder="usuario@empresa.com"></label>
-            <label data-acceso-codigo hidden>Código de verificación<input name="codigo" type="text" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" placeholder="000000"></label>
+            <label>Crear clave<input name="clave" type="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Mínimo 8 caracteres, letra y número"></label>
+            <label>Confirmar clave<input name="confirmar" type="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Repite la clave"></label>
             <label class="acceso-aceptar"><input type="checkbox" required> Acepto el uso de mis datos para crear la cuenta y gestionar mis solicitudes en GateFlow.</label>
-            <button class="boton acceso-principal" type="submit" data-acceso-principal>Enviar código y crear usuario</button>
-            <button class="acceso-regresar" type="button" data-acceso-regresar hidden>Cambiar datos o reenviar</button>
+            <button class="boton acceso-principal" type="submit" data-acceso-principal>Crear cuenta y entrar</button>
           </form>
           <p class="acceso-mensaje" data-acceso-mensaje aria-live="polite"></p>
-          <p class="acceso-nota">La cuenta queda registrada en GateFlow. El código vence en 10 minutos y la sesión dura hasta 12 horas.</p>
+          <p class="acceso-nota">La clave se protege mediante derivación criptográfica y no se guarda en texto. Después de cinco intentos incorrectos, el acceso se bloquea temporalmente.</p>
+          <div class="acceso-consulta-publica">
+            <div><span class="seccion-etiqueta">CONSULTA LIMITADA</span><h3>Buscar por contenedor</h3><p>Consulta únicamente la etapa general. Los documentos y detalles requieren una cuenta vinculada.</p></div>
+            <form data-consulta-publica>
+              <label class="solo-lectores" for="consulta-contenedor">Número de contenedor</label>
+              <input id="consulta-contenedor" name="contenedor" required minlength="11" maxlength="14" placeholder="ABCD1234567" autocomplete="off">
+              <button type="submit">Consultar</button>
+            </form>
+            <p data-consulta-resultado aria-live="polite"></p>
+          </div>
         </div>
       </section>`;
 
@@ -299,26 +307,82 @@ const GateFlowAcceso = (() => {
       mensaje.className = `acceso-mensaje ${tipo}`.trim();
     };
 
-    const reiniciarIngreso = prepararFormularioCodigo(
-      contenedor.querySelector("[data-acceso-form='ingresar']"),
-      { proposito: "login", textoSolicitar: "Enviar código de acceso", textoVerificar: "Verificar y entrar" },
-      alEntrar,
-      mostrarMensaje,
-    );
-    const reiniciarRegistro = prepararFormularioCodigo(
-      contenedor.querySelector("[data-acceso-form='registro']"),
-      { proposito: "register", textoSolicitar: "Enviar código y crear usuario", textoVerificar: "Verificar y crear cuenta" },
-      alEntrar,
-      mostrarMensaje,
-    );
-
     contenedor.querySelectorAll("[data-acceso-vista]").forEach((boton) => boton.addEventListener("click", () => {
       const vista = boton.dataset.accesoVista;
       contenedor.querySelectorAll("[data-acceso-vista]").forEach((otro) => otro.classList.toggle("activo", otro === boton));
       contenedor.querySelectorAll("[data-acceso-form]").forEach((formulario) => { formulario.hidden = formulario.dataset.accesoForm !== vista; });
-      reiniciarIngreso();
-      reiniciarRegistro();
+      mostrarMensaje("");
     }));
+
+    contenedor.querySelector("[data-acceso-form='ingresar']").addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+      const formulario = evento.currentTarget;
+      const datos = new FormData(formulario);
+      const boton = formulario.querySelector("[data-acceso-principal]");
+      boton.disabled = true;
+      mostrarMensaje("Validando acceso…");
+      try {
+        const respuesta = await api("/api/customer/login", { body: {
+          email: String(datos.get("correo") || "").trim().toLowerCase(),
+          password: String(datos.get("clave") || ""),
+        } });
+        guardarSesion(respuesta.user, respuesta.token, respuesta.expiresAt);
+        mostrarMensaje("Acceso autorizado.", "ok");
+        alEntrar();
+      } catch (error) {
+        mostrarMensaje(error.message, "error");
+      } finally {
+        boton.disabled = false;
+      }
+    });
+
+    contenedor.querySelector("[data-acceso-form='registro']").addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+      const formulario = evento.currentTarget;
+      const datos = new FormData(formulario);
+      const boton = formulario.querySelector("[data-acceso-principal]");
+      const clave = String(datos.get("clave") || "");
+      if (clave !== String(datos.get("confirmar") || "")) {
+        mostrarMensaje("Las claves no coinciden.", "error");
+        return;
+      }
+      boton.disabled = true;
+      mostrarMensaje("Creando cuenta protegida…");
+      try {
+        const respuesta = await api("/api/customer/register", { body: {
+          name: String(datos.get("nombre") || "").trim(),
+          email: String(datos.get("correo") || "").trim().toLowerCase(),
+          password: clave,
+        } });
+        guardarSesion(respuesta.user, respuesta.token, respuesta.expiresAt);
+        mostrarMensaje("Cuenta creada. Ya puedes vincular tu primera carga.", "ok");
+        alEntrar();
+      } catch (error) {
+        mostrarMensaje(error.message, "error");
+      } finally {
+        boton.disabled = false;
+      }
+    });
+
+    contenedor.querySelector("[data-consulta-publica]").addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+      const boton = evento.currentTarget.querySelector("button");
+      const resultado = contenedor.querySelector("[data-consulta-resultado]");
+      const numero = String(new FormData(evento.currentTarget).get("contenedor") || "").trim().toUpperCase().replace(/\s+/g, "");
+      boton.disabled = true;
+      resultado.textContent = "Consultando estado general…";
+      resultado.className = "";
+      try {
+        const datos = await api(`/api/public/cargo-status?container=${encodeURIComponent(numero)}`);
+        resultado.textContent = datos.found ? `${datos.container} · ${datos.status}. ${datos.message}` : datos.message;
+        resultado.className = datos.found ? "ok" : "";
+      } catch (error) {
+        resultado.textContent = error.message;
+        resultado.className = "error";
+      } finally {
+        boton.disabled = false;
+      }
+    });
   }
 
   function mostrarAcceso(contenedor, rol, alEntrar) {

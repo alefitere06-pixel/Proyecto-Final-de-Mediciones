@@ -24,6 +24,7 @@ const TERMINAL_VISTAS = [
   { id: "operacion", nombre: "Capacidad y cola" },
   { id: "ttt", nombre: "TTT" },
   { id: "citas", nombre: "Citas TAS" },
+  { id: "cargas", nombre: "Cargas de clientes" },
   { id: "mejora", nombre: "Mejora A3" },
   { id: "usuarios", nombre: "Usuarios" },
 ];
@@ -474,6 +475,78 @@ async function renderUsuariosTerminal(panel, usuario, aviso = "") {
   }
 }
 
+async function renderCargasClientesTerminal(panel, aviso = "") {
+  const opcionesEstado = [
+    ["pending", "Pendiente de validación"],
+    ["verified", "Titularidad validada"],
+    ["customs", "En revisión aduanera"],
+    ["ready", "Disponible para retiro"],
+    ["scheduled", "Retiro coordinado"],
+    ["completed", "Carga retirada"],
+    ["observed", "Requiere corrección"],
+  ];
+  panel.innerHTML = `<section class="terminal-usuarios-cargando" aria-live="polite">Consultando cargas vinculadas por clientes…</section>`;
+  try {
+    const datos = await GateFlowAcceso.api("/api/terminal/cargo-links");
+    const cargas = Array.isArray(datos.cargo) ? datos.cargo : [];
+    const pendientes = cargas.filter((item) => item.status === "pending").length;
+    const disponibles = cargas.filter((item) => item.status === "ready").length;
+    panel.innerHTML = `
+      <section class="terminal-cargas-vista">
+        <header class="terminal-cargas-cabecera">
+          <div><span class="seccion-etiqueta">CONTROL DE TITULARIDAD Y ESTADO</span><h3>Cargas de Customer User</h3><p>Valida la relación documental del cliente y publica únicamente estados confirmados por la operación.</p></div>
+          <div class="terminal-cargas-metricas"><article><strong>${cargas.length}</strong><span>Total</span></article><article><strong>${pendientes}</strong><span>Por validar</span></article><article><strong>${disponibles}</strong><span>Disponibles</span></article></div>
+        </header>
+        ${aviso ? `<p class="terminal-cargas-aviso">${GateFlowAcceso.escapar(aviso)}</p>` : ""}
+        <div class="terminal-cargas-lista">
+          ${cargas.length ? cargas.map((carga) => `
+            <article class="terminal-carga estado-${GateFlowAcceso.escapar(carga.status)}" data-terminal-carga="${GateFlowAcceso.escapar(carga.id)}">
+              <header><div><span>${GateFlowAcceso.escapar(carga.id)}</span><h4>${GateFlowAcceso.escapar(carga.container_number)}</h4></div><b>${GateFlowAcceso.escapar(carga.status_label)}</b></header>
+              <div class="terminal-carga-identidad">
+                <p><span>Cliente</span><strong>${GateFlowAcceso.escapar(carga.customer_name)}</strong><small>${GateFlowAcceso.escapar(carga.customer_email)}</small></p>
+                <p><span>Booking</span><strong>${GateFlowAcceso.escapar(carga.booking_reference)}</strong></p>
+                <p><span>${GateFlowAcceso.escapar(carga.document_type)}</span><strong>${GateFlowAcceso.escapar(carga.document_reference)}</strong></p>
+                <p><span>Última actualización</span><strong>${GateFlowAcceso.escapar(new Date(carga.updated_at).toLocaleString("es-PA"))}</strong></p>
+              </div>
+              <form class="terminal-carga-form" data-actualizar-carga>
+                <input type="hidden" name="id" value="${GateFlowAcceso.escapar(carga.id)}">
+                <label>Estado confirmado<select name="estado">${opcionesEstado.map(([valor, etiqueta]) => `<option value="${valor}" ${carga.status === valor ? "selected" : ""}>${etiqueta}</option>`).join("")}</select></label>
+                <label>Ubicación o etapa<input name="ubicacion" maxlength="100" value="${GateFlowAcceso.escapar(carga.current_location || "")}" placeholder="Etapa operacional confirmada"></label>
+                <label>Fecha estimada<input name="eta" maxlength="32" value="${GateFlowAcceso.escapar(carga.eta || "")}" placeholder="Ej. 30 nov · 14:00"></label>
+                <label class="terminal-carga-nota">Nota para el cliente<textarea name="nota" maxlength="220" rows="2" placeholder="Explica el cambio sin incluir información interna o sensible"></textarea></label>
+                <button class="boton" type="submit">Guardar estado y notificar en el portal</button>
+              </form>
+            </article>`).join("") : `<div class="terminal-usuarios-bloqueado"><h3>No hay cargas pendientes</h3><p>Las solicitudes de vinculación creadas desde Customer User aparecerán en esta sección.</p></div>`}
+        </div>
+        <p class="cliente-referencia">GateFlow registra quién actualiza cada etapa. La conexión automática con TOS, Aduanas o navieras debe implementarse mediante sus interfaces oficiales.</p>
+      </section>`;
+
+    panel.querySelectorAll("[data-actualizar-carga]").forEach((formulario) => formulario.addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+      const valores = new FormData(evento.currentTarget);
+      const boton = evento.currentTarget.querySelector("button[type='submit']");
+      boton.disabled = true;
+      boton.textContent = "Guardando…";
+      try {
+        const respuesta = await GateFlowAcceso.api("/api/terminal/cargo-links", { body: {
+          id: String(valores.get("id") || ""),
+          status: String(valores.get("estado") || ""),
+          currentLocation: String(valores.get("ubicacion") || "").trim(),
+          eta: String(valores.get("eta") || "").trim(),
+          note: String(valores.get("nota") || "").trim(),
+        } });
+        await renderCargasClientesTerminal(panel, respuesta.message);
+      } catch (error) {
+        window.alert(error.message);
+        boton.disabled = false;
+        boton.textContent = "Guardar estado y notificar en el portal";
+      }
+    }));
+  } catch (error) {
+    panel.innerHTML = `<section class="terminal-usuarios-bloqueado"><h3>No fue posible consultar las cargas.</h3><p>${GateFlowAcceso.escapar(error.message)}</p></section>`;
+  }
+}
+
 async function renderTerminalUser(contenedor, estado) {
   const modulo = MODULOS.find((item) => item.id === "terminal");
   const vistaSolicitada = TERMINAL_VISTAS.some((item) => item.id === TERMINAL_ESTADO.vista) ? TERMINAL_ESTADO.vista : "resumen";
@@ -509,6 +582,7 @@ async function renderTerminalUser(contenedor, estado) {
   const panel = contenedor.querySelector("[data-terminal-contenido]");
   if (TERMINAL_ESTADO.vista === "resumen") renderResumenTerminal(panel, estado, usuario);
   else if (TERMINAL_ESTADO.vista === "patio") renderPatioFlujoTerminal(panel, estado);
+  else if (TERMINAL_ESTADO.vista === "cargas") renderCargasClientesTerminal(panel);
   else if (TERMINAL_ESTADO.vista === "usuarios") renderUsuariosTerminal(panel, usuario);
   else renderAnalisisTerminal(panel, TERMINAL_ESTADO.vista, estado);
 }

@@ -75,6 +75,48 @@ function tokenSeguro() {
   return btoa(binario).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
+function bytesBase64(bytes) {
+  let binario = "";
+  for (const byte of bytes) binario += String.fromCharCode(byte);
+  return btoa(binario);
+}
+
+function base64Bytes(valor) {
+  const binario = atob(valor);
+  return Uint8Array.from(binario, (caracter) => caracter.charCodeAt(0));
+}
+
+function comparacionConstante(a, b) {
+  const izquierda = String(a || "");
+  const derecha = String(b || "");
+  let diferencia = izquierda.length ^ derecha.length;
+  const longitud = Math.max(izquierda.length, derecha.length);
+  for (let i = 0; i < longitud; i += 1) diferencia |= (izquierda.charCodeAt(i) || 0) ^ (derecha.charCodeAt(i) || 0);
+  return diferencia === 0;
+}
+
+async function hashClaveCliente(env, clave, saltBase64) {
+  const material = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(`${String(env.OTP_PEPPER || "")}:${clave}`),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
+  const bits = await crypto.subtle.deriveBits({
+    name: "PBKDF2",
+    hash: "SHA-256",
+    salt: base64Bytes(saltBase64),
+    iterations: 120000,
+  }, material, 256);
+  return bytesBase64(new Uint8Array(bits));
+}
+
+function claveClienteValida(clave) {
+  return typeof clave === "string" && clave.length >= 8 && clave.length <= 128
+    && /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(clave) && /[0-9]/.test(clave);
+}
+
 async function asegurarEsquema(env) {
   if (!env.DB) throw new Error("DB_UNAVAILABLE");
   const db = env.DB;
@@ -118,6 +160,37 @@ async function asegurarEsquema(env) {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS customer_cargo_links (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      container_number TEXT NOT NULL,
+      booking_reference TEXT NOT NULL,
+      document_type TEXT NOT NULL,
+      document_reference TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      current_location TEXT NOT NULL DEFAULT 'Pendiente de validación con terminal',
+      eta TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS customer_credentials (
+      user_id TEXT PRIMARY KEY,
+      password_salt TEXT NOT NULL,
+      password_hash TEXT NOT NULL,
+      failed_attempts INTEGER NOT NULL DEFAULT 0,
+      locked_until TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS cargo_events (
+      id TEXT PRIMARY KEY,
+      cargo_link_id TEXT NOT NULL,
+      status TEXT NOT NULL,
+      title TEXT NOT NULL,
+      detail TEXT NOT NULL,
+      source TEXT NOT NULL DEFAULT 'GateFlow',
+      event_at TEXT NOT NULL
+    )`),
     db.prepare(`CREATE TABLE IF NOT EXISTS terminal_authorizations (
       email TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -132,6 +205,10 @@ async function asegurarEsquema(env) {
     db.prepare("CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)"),
     db.prepare("CREATE INDEX IF NOT EXISTS idx_customer_requests_user_created ON customer_requests(user_id, created_at)"),
     db.prepare("CREATE INDEX IF NOT EXISTS idx_customer_requests_container ON customer_requests(container_number)"),
+    db.prepare("CREATE INDEX IF NOT EXISTS idx_customer_cargo_user_created ON customer_cargo_links(user_id, created_at)"),
+    db.prepare("CREATE INDEX IF NOT EXISTS idx_customer_cargo_container_status ON customer_cargo_links(container_number, status)"),
+    db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_customer_cargo_owner_booking ON customer_cargo_links(user_id, container_number, booking_reference)"),
+    db.prepare("CREATE INDEX IF NOT EXISTS idx_cargo_events_link_event ON cargo_events(cargo_link_id, event_at)"),
     db.prepare("CREATE INDEX IF NOT EXISTS idx_terminal_authorizations_status_updated ON terminal_authorizations(status, updated_at)"),
   ]);
 }
@@ -319,6 +396,88 @@ async function cerrarSesionApi(request, env) {
   return respuestaJson({ ok: true });
 }
 
+async function crearSesionRespuesta(env, usuario, estado = 200) {
+  const token = tokenSeguro();
+  const tokenHash = await hashHex(String(env.OTP_PEPPER || "") + ":session:" + token);
+  const creado = new Date().toISOString();
+  const vence = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
+  await env.DB.prepare("INSERT INTO sessions (id, user_id, token_hash, expires_at, created_at) VALUES (?, ?, ?, ?, ?)")
+    .bind(crypto.randomUUID(), usuario.id, tokenHash, vence, creado).run();
+  return respuestaJson({
+    ok: true,
+    token,
+    expiresAt: vence,
+    user: { id: usuario.id, name: usuario.name, email: usuario.email, role: usuario.role, canManageUsers: false },
+  }, estado);
+}
+
+async function registrarClienteConClave(request, env) {
+  const datos = await leerJson(request);
+  if (!datos) return respuestaJson({ ok: false, message: "Solicitud inválida." }, 400);
+  const nombre = textoSeguro(datos.name, 100);
+  const correo = correoNormalizado(datos.email);
+  const clave = String(datos.password || "");
+  if (nombre.length < 3) return respuestaJson({ ok: false, message: "Escribe tu nombre completo." }, 400);
+  if (!correoValido(correo)) return respuestaJson({ ok: false, message: "Escribe un correo válido." }, 400);
+  if (!claveClienteValida(clave)) return respuestaJson({ ok: false, message: "La clave debe tener entre 8 y 128 caracteres, con al menos una letra y un número." }, 400);
+
+  await asegurarEsquema(env);
+  let usuario = await env.DB.prepare("SELECT id, name, email, role, status FROM users WHERE email = ? LIMIT 1").bind(correo).first();
+  if (usuario && usuario.role !== "cliente") return respuestaJson({ ok: false, message: "Este correo está reservado para Terminal User." }, 409);
+  if (usuario) {
+    const credencial = await env.DB.prepare("SELECT user_id FROM customer_credentials WHERE user_id = ? LIMIT 1").bind(usuario.id).first();
+    if (credencial) return respuestaJson({ ok: false, message: "Ya existe una cuenta con este correo. Utiliza Iniciar sesión." }, 409);
+    return respuestaJson({ ok: false, message: "Este correo pertenece a una cuenta anterior creada por código. Para protegerla, utiliza otro correo o solicita su migración al administrador." }, 409);
+  }
+
+  const ahora = new Date().toISOString();
+  const id = `GFU-${crypto.randomUUID()}`;
+  await env.DB.prepare("INSERT INTO users (id, name, email, role, status, created_at) VALUES (?, ?, ?, 'cliente', 'active', ?)")
+    .bind(id, nombre, correo, ahora).run();
+  usuario = { id, name: nombre, email: correo, role: "cliente", status: "active" };
+
+  const salt = new Uint8Array(16);
+  crypto.getRandomValues(salt);
+  const saltBase64 = bytesBase64(salt);
+  const claveHash = await hashClaveCliente(env, clave, saltBase64);
+  await env.DB.prepare(`INSERT INTO customer_credentials
+    (user_id, password_salt, password_hash, failed_attempts, locked_until, created_at, updated_at)
+    VALUES (?, ?, ?, 0, NULL, ?, ?)`)
+    .bind(usuario.id, saltBase64, claveHash, ahora, ahora).run();
+  return crearSesionRespuesta(env, usuario, 201);
+}
+
+async function iniciarClienteConClave(request, env) {
+  const datos = await leerJson(request);
+  if (!datos) return respuestaJson({ ok: false, message: "Solicitud inválida." }, 400);
+  const correo = correoNormalizado(datos.email);
+  const clave = String(datos.password || "");
+  if (!correoValido(correo) || !clave) return respuestaJson({ ok: false, message: "Escribe tu correo y clave." }, 400);
+  await asegurarEsquema(env);
+  const usuario = await env.DB.prepare(`SELECT u.id, u.name, u.email, u.role, u.status,
+      c.password_salt, c.password_hash, c.failed_attempts, c.locked_until
+    FROM users u JOIN customer_credentials c ON c.user_id = u.id
+    WHERE u.email = ? AND u.role = 'cliente' LIMIT 1`).bind(correo).first();
+  if (!usuario || usuario.status !== "active") return respuestaJson({ ok: false, message: "Correo o clave incorrectos." }, 401);
+  if (usuario.locked_until && Date.parse(usuario.locked_until) > Date.now()) {
+    return respuestaJson({ ok: false, message: "Acceso bloqueado temporalmente por varios intentos. Espera 15 minutos." }, 429);
+  }
+
+  const calculado = await hashClaveCliente(env, clave, usuario.password_salt);
+  if (!comparacionConstante(calculado, usuario.password_hash)) {
+    const intentos = Number(usuario.failed_attempts || 0) + 1;
+    const bloquear = intentos >= 5;
+    const bloqueo = bloquear ? new Date(Date.now() + 15 * 60 * 1000).toISOString() : null;
+    await env.DB.prepare("UPDATE customer_credentials SET failed_attempts = ?, locked_until = ?, updated_at = ? WHERE user_id = ?")
+      .bind(bloquear ? 0 : intentos, bloqueo, new Date().toISOString(), usuario.id).run();
+    return respuestaJson({ ok: false, message: bloquear ? "Acceso bloqueado durante 15 minutos por varios intentos." : "Correo o clave incorrectos." }, bloquear ? 429 : 401);
+  }
+
+  await env.DB.prepare("UPDATE customer_credentials SET failed_attempts = 0, locked_until = NULL, updated_at = ? WHERE user_id = ?")
+    .bind(new Date().toISOString(), usuario.id).run();
+  return crearSesionRespuesta(env, usuario);
+}
+
 async function terminalSesionPlataforma(request, env) {
   const email = correoNormalizado(request.headers.get("oai-authenticated-user-email"));
   const userId = String(request.headers.get("oai-authenticated-user-id") || "").trim();
@@ -431,6 +590,201 @@ function contenedorValido(valor) {
   return /^[A-Z]{4}[0-9]{7}$/.test(valor);
 }
 
+const ESTADOS_CARGA = {
+  pending: {
+    label: "Pendiente de validación",
+    location: "Validación documental GateFlow",
+    detail: "La solicitud fue recibida y espera confirmación de titularidad por la terminal.",
+  },
+  verified: {
+    label: "Titularidad validada",
+    location: "Expediente confirmado",
+    detail: "La terminal confirmó la relación entre el cliente, la reserva y el contenedor.",
+  },
+  customs: {
+    label: "En revisión aduanera",
+    location: "Proceso documental de Aduanas",
+    detail: "La carga se encuentra en revisión documental. GateFlow todavía no autoriza el retiro.",
+  },
+  ready: {
+    label: "Disponible para retiro",
+    location: "Terminal portuaria · carga disponible",
+    detail: "La carga está disponible para coordinar cita, transportista y pase de acceso.",
+  },
+  scheduled: {
+    label: "Retiro coordinado",
+    location: "Cita y acceso en preparación",
+    detail: "La operación tiene una gestión de retiro coordinada en GateFlow.",
+  },
+  completed: {
+    label: "Carga retirada",
+    location: "Operación completada",
+    detail: "El movimiento fue marcado como completado por la terminal.",
+  },
+  observed: {
+    label: "Requiere corrección",
+    location: "Validación documental observada",
+    detail: "La terminal necesita que el cliente revise las referencias suministradas.",
+  },
+};
+
+function referenciaCarga(valor, maximo = 50) {
+  return textoSeguro(valor, maximo).toUpperCase().replace(/\s+/g, "");
+}
+
+function referenciaEnmascarada(valor) {
+  const limpia = String(valor || "");
+  if (limpia.length <= 4) return "••••";
+  return `${"•".repeat(Math.min(8, limpia.length - 4))}${limpia.slice(-4)}`;
+}
+
+async function exigirSesionCliente(request, env) {
+  const sesion = await obtenerSesion(request, env);
+  if (!sesion || sesion.status !== "active" || sesion.role !== "cliente") return null;
+  return sesion;
+}
+
+async function exigirSesionTerminal(request, env) {
+  const sesion = await obtenerSesion(request, env);
+  if (!sesion || sesion.status !== "active" || sesion.role !== "terminal") return null;
+  if (!(await estaAutorizadoTerminal(env, sesion.email))) return null;
+  return sesion;
+}
+
+async function listarCargasCliente(request, env) {
+  const sesion = await exigirSesionCliente(request, env);
+  if (!sesion) return respuestaJson({ ok: false, message: "Inicia sesión como Customer User." }, 401);
+
+  const resultado = await env.DB.prepare(`SELECT id, container_number, booking_reference,
+      document_type, document_reference, status, current_location, eta, created_at, updated_at
+    FROM customer_cargo_links WHERE user_id = ? ORDER BY created_at DESC LIMIT 50`)
+    .bind(sesion.id).all();
+  const cargas = [];
+  for (const item of resultado.results || []) {
+    const eventos = await env.DB.prepare(`SELECT id, status, title, detail, source, event_at
+      FROM cargo_events WHERE cargo_link_id = ? ORDER BY event_at ASC, id ASC LIMIT 50`)
+      .bind(item.id).all();
+    const estado = ESTADOS_CARGA[item.status] || ESTADOS_CARGA.pending;
+    cargas.push({
+      id: item.id,
+      container_number: item.container_number,
+      booking_reference: item.booking_reference,
+      document_type: item.document_type,
+      document_reference_masked: referenciaEnmascarada(item.document_reference),
+      status: item.status,
+      status_label: estado.label,
+      current_location: item.current_location || estado.location,
+      eta: item.eta || "",
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      events: eventos.results || [],
+    });
+  }
+  return respuestaJson({ ok: true, cargo: cargas });
+}
+
+async function vincularCargaCliente(request, env) {
+  const sesion = await exigirSesionCliente(request, env);
+  if (!sesion) return respuestaJson({ ok: false, message: "Inicia sesión como Customer User." }, 401);
+  const datos = await leerJson(request);
+  if (!datos) return respuestaJson({ ok: false, message: "Solicitud inválida." }, 400);
+
+  const contenedor = referenciaCarga(datos.container, 14);
+  const booking = referenciaCarga(datos.bookingReference, 40);
+  const tipoDocumento = textoSeguro(datos.documentType, 20);
+  const documento = referenciaCarga(datos.documentReference, 50);
+  const tipos = new Set(["Bill of Lading", "PIN de retiro", "Referencia aduanera"]);
+  if (!contenedorValido(contenedor)) return respuestaJson({ ok: false, message: "El contenedor debe tener cuatro letras y siete números." }, 400);
+  if (booking.length < 4) return respuestaJson({ ok: false, message: "Escribe un booking válido." }, 400);
+  if (!tipos.has(tipoDocumento) || documento.length < 4) {
+    return respuestaJson({ ok: false, message: "Selecciona y completa una segunda referencia de seguridad." }, 400);
+  }
+
+  const existente = await env.DB.prepare(`SELECT id FROM customer_cargo_links
+    WHERE user_id = ? AND container_number = ? AND booking_reference = ? LIMIT 1`)
+    .bind(sesion.id, contenedor, booking).first();
+  if (existente) return respuestaJson({ ok: false, message: "Esta carga ya está vinculada a tu cuenta." }, 409);
+
+  const ahora = new Date().toISOString();
+  const id = `GFC-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+  const eventoId = `GFE-${crypto.randomUUID().slice(0, 10).toUpperCase()}`;
+  await env.DB.batch([
+    env.DB.prepare(`INSERT INTO customer_cargo_links
+      (id, user_id, container_number, booking_reference, document_type, document_reference,
+       status, current_location, eta, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, '', ?, ?)`)
+      .bind(id, sesion.id, contenedor, booking, tipoDocumento, documento, ESTADOS_CARGA.pending.location, ahora, ahora),
+    env.DB.prepare(`INSERT INTO cargo_events
+      (id, cargo_link_id, status, title, detail, source, event_at)
+      VALUES (?, ?, 'pending', ?, ?, 'Customer User', ?)`)
+      .bind(eventoId, id, "Solicitud de vinculación recibida", ESTADOS_CARGA.pending.detail, ahora),
+  ]);
+  return respuestaJson({ ok: true, message: "Carga vinculada. La terminal debe validar las referencias antes de habilitar el seguimiento completo.", id }, 201);
+}
+
+async function consultaPublicaCarga(url, env) {
+  await asegurarEsquema(env);
+  const contenedor = referenciaCarga(url.searchParams.get("container"), 14);
+  if (!contenedorValido(contenedor)) return respuestaJson({ ok: false, message: "Escribe un número de contenedor válido." }, 400);
+  const carga = await env.DB.prepare(`SELECT status, updated_at FROM customer_cargo_links
+    WHERE container_number = ? ORDER BY updated_at DESC LIMIT 1`).bind(contenedor).first();
+  if (!carga) {
+    return respuestaJson({ ok: true, found: false, message: "No hay un estado público disponible. El titular puede iniciar sesión y vincular la carga." });
+  }
+  const estado = ESTADOS_CARGA[carga.status] || ESTADOS_CARGA.pending;
+  return respuestaJson({
+    ok: true,
+    found: true,
+    container: contenedor,
+    status: estado.label,
+    message: carga.status === "observed" ? "El seguimiento detallado requiere acceso del titular." : estado.detail,
+    updatedAt: carga.updated_at,
+  });
+}
+
+async function listarCargasTerminal(request, env) {
+  const sesion = await exigirSesionTerminal(request, env);
+  if (!sesion) return respuestaJson({ ok: false, message: "Se requiere acceso autorizado de Terminal User." }, 403);
+  const resultado = await env.DB.prepare(`SELECT c.id, c.container_number, c.booking_reference,
+      c.document_type, c.document_reference, c.status, c.current_location, c.eta,
+      c.created_at, c.updated_at, u.name AS customer_name, u.email AS customer_email
+    FROM customer_cargo_links c JOIN users u ON u.id = c.user_id
+    ORDER BY CASE c.status WHEN 'pending' THEN 0 WHEN 'observed' THEN 1 ELSE 2 END, c.updated_at DESC
+    LIMIT 150`).all();
+  return respuestaJson({ ok: true, cargo: (resultado.results || []).map((item) => ({
+    ...item,
+    status_label: (ESTADOS_CARGA[item.status] || ESTADOS_CARGA.pending).label,
+  })) });
+}
+
+async function actualizarCargaTerminal(request, env) {
+  const sesion = await exigirSesionTerminal(request, env);
+  if (!sesion) return respuestaJson({ ok: false, message: "Se requiere acceso autorizado de Terminal User." }, 403);
+  const datos = await leerJson(request);
+  if (!datos) return respuestaJson({ ok: false, message: "Solicitud inválida." }, 400);
+  const id = textoSeguro(datos.id, 40);
+  const estadoClave = textoSeguro(datos.status, 20);
+  const estado = ESTADOS_CARGA[estadoClave];
+  const nota = textoSeguro(datos.note, 220);
+  const ubicacion = textoSeguro(datos.currentLocation, 100) || estado?.location || "";
+  const eta = textoSeguro(datos.eta, 32);
+  if (!id || !estado) return respuestaJson({ ok: false, message: "Selecciona una carga y un estado válido." }, 400);
+  const carga = await env.DB.prepare("SELECT id FROM customer_cargo_links WHERE id = ? LIMIT 1").bind(id).first();
+  if (!carga) return respuestaJson({ ok: false, message: "La carga solicitada no existe." }, 404);
+
+  const ahora = new Date().toISOString();
+  const eventoId = `GFE-${crypto.randomUUID().slice(0, 10).toUpperCase()}`;
+  await env.DB.batch([
+    env.DB.prepare(`UPDATE customer_cargo_links SET status = ?, current_location = ?, eta = ?, updated_at = ? WHERE id = ?`)
+      .bind(estadoClave, ubicacion, eta, ahora, id),
+    env.DB.prepare(`INSERT INTO cargo_events
+      (id, cargo_link_id, status, title, detail, source, event_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`)
+      .bind(eventoId, id, estadoClave, estado.label, nota || estado.detail, sesion.email, ahora),
+  ]);
+  return respuestaJson({ ok: true, message: `Estado actualizado: ${estado.label}.` });
+}
+
 async function listarSolicitudesCliente(request, env) {
   const sesion = await obtenerSesion(request, env);
   if (!sesion || sesion.status !== "active" || sesion.role !== "cliente") {
@@ -464,6 +818,13 @@ async function crearSolicitudCliente(request, env) {
   if (referencia.length < 3) return respuestaJson({ ok: false, message: "Escribe un booking o referencia válido." }, 400);
   if (!operaciones.has(operacion) || !franjas.has(franja) || !fechaValida) return respuestaJson({ ok: false, message: "Revisa la operación, fecha y franja seleccionadas." }, 400);
 
+  const cargaVinculada = await env.DB.prepare(`SELECT id, status FROM customer_cargo_links
+    WHERE user_id = ? AND container_number = ? AND booking_reference = ? LIMIT 1`)
+    .bind(sesion.id, contenedor, referencia.replace(/\s+/g, "")).first();
+  if (!cargaVinculada || !new Set(["verified", "customs", "ready", "scheduled"]).has(cargaVinculada.status)) {
+    return respuestaJson({ ok: false, message: "Primero vincula la carga y espera la validación de la terminal antes de solicitar el movimiento." }, 409);
+  }
+
   const ahora = new Date().toISOString();
   const id = `GFR-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
   await env.DB.prepare(`INSERT INTO customer_requests
@@ -485,6 +846,8 @@ export default {
         return respuestaJson({ enabled: Boolean(apiKey && mapId), apiKey, mapId });
       }
       if (ruta === "/api/terminal-session") return terminalSesionPlataforma(request, env);
+      if (ruta === "/api/customer/register" && request.method === "POST") return registrarClienteConClave(request, env);
+      if (ruta === "/api/customer/login" && request.method === "POST") return iniciarClienteConClave(request, env);
       if (ruta === "/api/auth/request-code" && request.method === "POST") return solicitarCodigo(request, env);
       if (ruta === "/api/auth/verify-code" && request.method === "POST") return verificarCodigo(request, env);
       if (ruta === "/api/auth/session" && request.method === "GET") {
@@ -508,8 +871,13 @@ export default {
         });
       }
       if (ruta === "/api/auth/logout" && request.method === "POST") return cerrarSesionApi(request, env);
+      if (ruta === "/api/public/cargo-status" && request.method === "GET") return consultaPublicaCarga(url, env);
       if (ruta === "/api/terminal/authorizations" && request.method === "GET") return listarAutorizacionesTerminal(request, env);
       if (ruta === "/api/terminal/authorizations" && request.method === "POST") return gestionarAutorizacionTerminal(request, env);
+      if (ruta === "/api/terminal/cargo-links" && request.method === "GET") return listarCargasTerminal(request, env);
+      if (ruta === "/api/terminal/cargo-links" && request.method === "POST") return actualizarCargaTerminal(request, env);
+      if (ruta === "/api/customer/cargo-links" && request.method === "GET") return listarCargasCliente(request, env);
+      if (ruta === "/api/customer/cargo-links" && request.method === "POST") return vincularCargaCliente(request, env);
       if (ruta === "/api/customer/requests" && request.method === "GET") return listarSolicitudesCliente(request, env);
       if (ruta === "/api/customer/requests" && request.method === "POST") return crearSolicitudCliente(request, env);
     } catch (error) {
