@@ -247,6 +247,11 @@ const GateFlowAcceso = (() => {
           <h2>Customer User</h2>
           <p>Crea tu cuenta para gestionar movimientos, citas y el Pase QR desde un solo lugar.</p>
           <div class="acceso-seguridad"><span aria-hidden="true">●</span><div><strong>Acceso sin contraseñas</strong><small>Cada ingreso se confirma mediante un código enviado al correo registrado.</small></div></div>
+          <div class="acceso-ruta-breve" aria-label="Pasos para entrar a Customer User">
+            <div><span>1</span><strong>Crear usuario</strong><small>Nombre, correo y consentimiento.</small></div>
+            <div><span>2</span><strong>Revisar el correo</strong><small>Recibir el código de seis dígitos.</small></div>
+            <div><span>3</span><strong>Entrar</strong><small>La sesión permanece activa hasta 12 horas.</small></div>
+          </div>
         </div>
         <div class="acceso-panel">
           <div class="acceso-tabs" role="tablist" aria-label="Opciones de acceso">
@@ -305,5 +310,5 @@ const GateFlowAcceso = (() => {
     return rol === "terminal" ? mostrarAccesoTerminal(contenedor, alEntrar) : mostrarAccesoCliente(contenedor, alEntrar);
   }
 
-  return { usuarioActual, mostrarAcceso, cerrarSesion, escapar };
+  return { usuarioActual, mostrarAcceso, cerrarSesion, escapar, api };
 })();

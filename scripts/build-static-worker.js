@@ -7,7 +7,7 @@ const path = require("path");
 const raiz = path.resolve(__dirname, "..");
 const salida = path.join(raiz, "dist", "server", "index.js");
 const runtime = path.join(__dirname, "worker-runtime.js");
-const archivos = ["index.html", "data/llegadas.js"];
+const archivos = ["index.html", "data/llegadas.js", "data/patio_aliado.js"];
 
 function agregarDirectorio(directorio) {
   const absoluto = path.join(raiz, directorio);

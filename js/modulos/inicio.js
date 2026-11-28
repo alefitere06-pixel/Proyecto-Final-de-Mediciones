@@ -120,7 +120,7 @@ function renderLogistica(contenedor, estado) {
       <p>En el día ${estado.dia}, la fila máxima es de <strong>${fmt(k.lqMax)} camiones</strong>. ${enCalle > 0
         ? `<strong>${enCalle} quedarían en la calle</strong> cerca de la zona portuaria.`
         : `La fila cabe en el acceso y <strong>no invade la calle</strong>.`}</p>
-      <a href="#terminal">Revisar el control operativo →</a>
+      <a href="#terminal/resumen">Revisar el control operativo →</a>
     </section>
 
     <section class="ecosistema-gateflow" id="capacidades-gateflow" aria-labelledby="ecosistema-titulo">
@@ -145,7 +145,7 @@ function renderLogistica(contenedor, estado) {
           <p>Consolida afiliación, cita, naviera, Aduanas y terminal en un solo recorrido.</p>
           <b>Consultar Pase GateFlow <i>→</i></b>
         </a>
-        <a class="ecosistema-servicio" href="#terminal">
+        <a class="ecosistema-servicio" href="#terminal/resumen">
           <span class="ecosistema-numero">03</span><small>CONTROL OPERATIVO</small>
           <h4>Terminal User</h4>
           <p>Supervisa KPI, capacidad, cola, tiempos y escenarios desde el centro de decisión.</p>
@@ -288,7 +288,7 @@ function renderLogistica(contenedor, estado) {
       ],
       accion: "Cruzar el plan del buque con las citas de retiro permite anticipar la demanda y evitar que todos los camiones lleguen en la misma franja.",
       enlace: "Ver llegadas y días de buque",
-      destino: "#llegadas",
+      destino: "#terminal/llegadas",
     },
     flujo: {
       etiqueta: "FLUJO · LLEGADA DE CAMIONES",
@@ -301,7 +301,7 @@ function renderLogistica(contenedor, estado) {
       ],
       accion: "Las citas y la cola virtual distribuyen las llegadas por horarios. El conductor recibe una franja y se aproxima a la garita cuando existe capacidad.",
       enlace: "Ver cómo funcionan las citas",
-      destino: "#citas",
+      destino: "#terminal/citas",
     },
     garita: {
       etiqueta: "GARITA · CONTROL DE ACCESO",
@@ -314,7 +314,7 @@ function renderLogistica(contenedor, estado) {
       ],
       accion: "Abrir la sexta ventanilla en horas pico y validar previamente documentos y QR aumenta la capacidad sin mantener recursos adicionales durante todo el día.",
       enlace: "Probar mejoras en la garita",
-      destino: "#simulador",
+      destino: "#terminal/operacion",
     },
   };
 

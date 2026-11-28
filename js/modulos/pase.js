@@ -29,6 +29,11 @@ function telefonoWhatsApp(valor) {
   return digitos.length === 8 ? `507${digitos}` : digitos;
 }
 
+function solicitudCustomerActiva() {
+  try { return JSON.parse(sessionStorage.getItem("gateflow_solicitud_activa_v1") || "null"); }
+  catch (_) { return null; }
+}
+
 function estadoPorPosicion(posicion) {
   if (posicion === 0) return {
     estado: "verde",
@@ -165,6 +170,21 @@ function renderPaseQR(contenedor) {
   pintarQR();
   if (s.pase) actualizarNotificacion();
 
+  const solicitudCustomer = solicitudCustomerActiva();
+  if (solicitudCustomer && !s.expediente) {
+    const formularioExpediente = contenedor.querySelector("#pase-expediente");
+    formularioExpediente.elements.referencia.value = solicitudCustomer.reference || "";
+    formularioExpediente.elements.contenedor.value = solicitudCustomer.container_number || "";
+    const equivalencias = {
+      "Retiro de importación": "Retiro de contenedor",
+      "Entrega de exportación": "Entrega de contenedor",
+      "Vacío / devolución": "Devolución de vacío",
+      "Doble transacción": "Doble transacción",
+    };
+    formularioExpediente.elements.operacion.value = equivalencias[solicitudCustomer.operation] || "Retiro de contenedor";
+    contenedor.querySelector("#pase-aviso").textContent = `Solicitud ${solicitudCustomer.id} vinculada. Completa primero el registro del transportista; la operación ya está preparada.`;
+  }
+
   botones.forEach((boton) => boton.addEventListener("click", () => {
     const paso = Number(boton.dataset.pasePaso);
     const permitido = paso === 1 || (paso === 2 && s.afiliado) || (paso === 3 && s.expediente);
@@ -216,6 +236,7 @@ function renderPaseQR(contenedor) {
     };
     s.posicion = 10;
     s.pase = { id: idPase("GF"), estado: "rojo" };
+    sessionStorage.removeItem("gateflow_solicitud_activa_v1");
     estadoPaso(2, true);
     estadoPaso(3, true);
     contenedor.querySelector("#pase-aviso").textContent = "Registro completado. El QR está en rojo y WhatsApp avisará cada avance de la fila virtual.";
@@ -302,7 +323,7 @@ MODULOS.push({
           <form id="pase-expediente" class="pase-formulario pase-expediente">
             <label>Referencia de retiro<input required name="referencia" placeholder="BOOKING-0001"></label>
             <label>Número de contenedor<input required name="contenedor" placeholder="ABCD1234567" maxlength="14"></label>
-            <label>Operación<select required name="operacion"><option>Retiro de contenedor</option><option>Entrega de contenedor</option><option>Doble transacción</option></select></label>
+            <label>Operación<select required name="operacion"><option>Retiro de contenedor</option><option>Entrega de contenedor</option><option>Devolución de vacío</option><option>Doble transacción</option></select></label>
             <label>Horario asignado<select required name="horario"><option>10:15 – 10:30</option><option>10:30 – 10:45</option><option>10:45 – 11:00</option></select></label>
             <label>Carril asignado<select required name="carril"><option>03</option><option>02</option><option>04</option></select></label>
             <div class="pase-validaciones">

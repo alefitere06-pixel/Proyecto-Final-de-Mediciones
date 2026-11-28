@@ -12,13 +12,15 @@ const TERMINAL_ESTADO = {
   tas: false,
   colaVirtual: false,
   doble: false,
+  teuPorCamion: 1.5,
+  retirosPatioDia: 120,
   mensaje: "",
 };
 
 const TERMINAL_VISTAS = [
   { id: "resumen", nombre: "Dashboard" },
   { id: "llegadas", nombre: "Llegadas" },
-  { id: "dwell", nombre: "Dwell Time · Aliado" },
+  { id: "patio", nombre: "Patio + Flujo" },
   { id: "operacion", nombre: "Capacidad y cola" },
   { id: "ttt", nombre: "TTT" },
   { id: "citas", nombre: "Citas TAS" },
@@ -103,21 +105,22 @@ function renderResumenTerminal(panel, estado, usuario) {
   const horas = registrosDelDia(estado.dia).filter((item) => item.hora >= 5 && item.hora <= 22).map((item) => item.hora);
   const planes = leerPlanesTerminal().slice(-3).reverse();
 
-  const tarjeta = (nombre, simbolo, valor, detalle, cumple) => `
-    <article class="terminal-kpi ${cumple ? "bien" : "fuera"}">
+  const tarjeta = (nombre, simbolo, valor, detalle, cumple, destino) => `
+    <a class="terminal-kpi ${cumple ? "bien" : "fuera"}" href="#terminal/${destino}" aria-label="${nombre}: ${valor}. Abrir detalle">
       <span>${nombre}${simbolo ? ` · ${simbolo}` : ""}</span><strong>${valor}</strong><small>${detalle}</small>
-    </article>`;
+      <b>Ver detalle →</b>
+    </a>`;
 
   panel.innerHTML = `
     <section class="terminal-kpis terminal-kpis-completos" aria-label="Indicadores operativos del escenario">
-      ${tarjeta("Llegadas en hora pico", "λ", `${fmt(lambdaPico)} cam/h`, `${horaTexto(horaPico)} · antes ${fmt(actual.llegadas[actual.horaPico])}`, lambdaPico <= capacidadPico)}
-      ${tarjeta("Capacidad de garita", "μ·c", `${fmt(capacidadPico)} cam/h`, `${TERMINAL_ESTADO.carriles} ventanillas · ${fmt(TERMINAL_ESTADO.servicioMin, 1)} min`, capacidadPico >= lambdaPico)}
-      ${tarjeta("Utilización", "ρ", `${fmt(propuesta.rhoPico)} %`, `Antes ${fmt(actual.rhoPico)} % · meta ≤ ${KPI.METAS.rho_pct} %`, propuesta.rhoPico <= KPI.METAS.rho_pct)}
-      ${tarjeta("Cola máxima", "Lq", `${fmt(propuesta.lqMax)} cam.`, `Antes ${fmt(actual.lqMax)} · meta ≤ ${KPI.METAS.lq_max}`, propuesta.lqMax <= KPI.METAS.lq_max)}
-      ${tarjeta("Espera promedio", "Wq", `${fmt(propuesta.wqPromedio)} min`, `Antes ${fmt(actual.wqPromedio)} · meta ≤ ${KPI.METAS.wq_min}`, propuesta.wqPromedio <= KPI.METAS.wq_min)}
-      ${tarjeta("Truck Turn Time", "TTT", `${fmt(propuesta.tttPromedio)} min`, `Antes ${fmt(actual.tttPromedio)} · meta ≤ ${KPI.METAS.ttt_min}`, propuesta.tttPromedio <= KPI.METAS.ttt_min)}
-      ${tarjeta("Desborde vial", "", `${fmt(propuesta.horasDesborde)} h`, `${fmt(propuesta.viaPublicaMax)} camiones fuera · meta 0`, propuesta.horasDesborde <= KPI.METAS.desborde_h)}
-      ${tarjeta("Cumplimiento de citas", "", `${fmt(cumplimiento, 1)} %`, `No-show ${fmt(noShow, 1)} % · meta ≥ ${KPI.METAS.cumplimiento_pct} %`, cumplimiento >= KPI.METAS.cumplimiento_pct)}
+      ${tarjeta("Llegadas en hora pico", "λ", `${fmt(lambdaPico)} cam/h`, `${horaTexto(horaPico)} · antes ${fmt(actual.llegadas[actual.horaPico])}`, lambdaPico <= capacidadPico, "llegadas")}
+      ${tarjeta("Capacidad de garita", "μ·c", `${fmt(capacidadPico)} cam/h`, `${TERMINAL_ESTADO.carriles} ventanillas · ${fmt(TERMINAL_ESTADO.servicioMin, 1)} min`, capacidadPico >= lambdaPico, "operacion")}
+      ${tarjeta("Utilización", "ρ", `${fmt(propuesta.rhoPico)} %`, `Antes ${fmt(actual.rhoPico)} % · meta ≤ ${KPI.METAS.rho_pct} %`, propuesta.rhoPico <= KPI.METAS.rho_pct, "operacion")}
+      ${tarjeta("Cola máxima", "Lq", `${fmt(propuesta.lqMax)} cam.`, `Antes ${fmt(actual.lqMax)} · meta ≤ ${KPI.METAS.lq_max}`, propuesta.lqMax <= KPI.METAS.lq_max, "operacion")}
+      ${tarjeta("Espera promedio", "Wq", `${fmt(propuesta.wqPromedio)} min`, `Antes ${fmt(actual.wqPromedio)} · meta ≤ ${KPI.METAS.wq_min}`, propuesta.wqPromedio <= KPI.METAS.wq_min, "ttt")}
+      ${tarjeta("Truck Turn Time", "TTT", `${fmt(propuesta.tttPromedio)} min`, `Antes ${fmt(actual.tttPromedio)} · meta ≤ ${KPI.METAS.ttt_min}`, propuesta.tttPromedio <= KPI.METAS.ttt_min, "ttt")}
+      ${tarjeta("Desborde vial", "", `${fmt(propuesta.horasDesborde)} h`, `${fmt(propuesta.viaPublicaMax)} camiones fuera · meta 0`, propuesta.horasDesborde <= KPI.METAS.desborde_h, "operacion")}
+      ${tarjeta("Cumplimiento de citas", "", `${fmt(cumplimiento, 1)} %`, `No-show ${fmt(noShow, 1)} % · meta ≥ ${KPI.METAS.cumplimiento_pct} %`, cumplimiento >= KPI.METAS.cumplimiento_pct, "citas")}
     </section>
 
     <section class="terminal-operacion-grid">
@@ -264,32 +267,104 @@ function renderAnalisisTerminal(panel, vista, estado) {
   modulo.render.call(modulo, panel, estado);
 }
 
-function renderDwellAliadoTerminal(panel) {
-  panel.className = "terminal-vista terminal-aliado-vista";
+function renderPatioFlujoTerminal(panel, estado) {
+  const patio = PATIO_ALIADO_REMOTO || PATIO_ALIADO;
+  const flujo = simularDia(estado.dia, escenarioControlTerminal());
+  const excesoTeu = Math.max(0, patio.inventarioTeu - (patio.capacidadTeu * patio.metas.densidadPct / 100));
+  const viajesBase = Math.ceil(excesoTeu / TERMINAL_ESTADO.teuPorCamion);
+  const viajesMin = Math.ceil(excesoTeu / 2);
+  const viajesMax = Math.ceil(excesoTeu);
+  const horas = registrosDelDia(estado.dia).filter((item) => item.hora >= 5 && item.hora <= 22).map((item) => item.hora);
+  const cuposGateSeguros = horas.reduce((total, hora) => total + Math.max(0, Math.floor(flujo.capacidades[hora] * .85) - Math.ceil(flujo.llegadas[hora])), 0);
+  const cupoDiario = Math.max(1, Math.min(cuposGateSeguros, TERMINAL_ESTADO.retirosPatioDia));
+  const diasPlan = Math.ceil(viajesBase / cupoDiario);
+  const camionesDia = Math.round(flujo.llegadas.reduce((total, valor) => total + valor, 0));
+  const categoriaCritica = [...patio.categorias].sort((a, b) => (b.dwellDias / b.metaDias) - (a.dwellDias / a.metaDias))[0];
+
+  const estadoKpi = (valor, meta, inverso = false) => inverso ? valor >= meta : valor <= meta;
+  const tarjeta = (nombre, valor, meta, cumple, fuente) => `
+    <article class="patio-kpi ${cumple ? "bien" : "alerta"}"><span>${nombre}</span><strong>${valor}</strong><small>${meta}</small><i>${fuente}</i></article>`;
+
+  panel.className = "terminal-vista terminal-patio-vista";
   panel.innerHTML = `
-    <section class="terminal-aliado">
-      <div class="terminal-aliado-contenido">
-        <span class="seccion-etiqueta">PROYECTO ALIADO · PATIO EN FLUJO</span>
-        <h3>Dwell Time y ocupación del patio</h3>
-        <p>GateFlow se conecta con el dashboard del equipo aliado para consultar permanencia de contenedores, antigüedad, densidad del patio y planificación de camiones sin duplicar esos análisis dentro de esta plataforma.</p>
-        <div class="terminal-aliado-alcance" aria-label="Relación entre los proyectos">
-          <article><span>01</span><div><strong>Patio en Flujo</strong><small>Explica cuánto tiempo permanecen los contenedores y qué categorías presionan el patio.</small></div></article>
-          <article><span>02</span><div><strong>GateFlow</strong><small>Convierte la demanda de retiro en citas, fila virtual, notificaciones y autorización QR.</small></div></article>
-          <article><span>03</span><div><strong>Decisión conectada</strong><small>La terminal puede revisar el patio y regresar a GateFlow para coordinar el acceso de los camiones.</small></div></article>
-        </div>
-        <div class="terminal-aliado-acciones">
-          <a class="boton terminal-aliado-abrir" href="${TERMINAL_DWELL_ALIADO_URL}" target="_blank" rel="noopener noreferrer">Abrir dashboard Dwell Time <span aria-hidden="true">↗</span></a>
-          <a class="terminal-aliado-volver" href="#pase">Ir al Pase QR de GateFlow</a>
-        </div>
-        <p class="terminal-aliado-nota">Recurso externo de referencia. El dashboard aliado identifica sus datos como simulados y conserva su propia metodología y autoría.</p>
+    <section class="patio-flujo-hero">
+      <div>
+        <span class="seccion-etiqueta">DECISIÓN CONECTADA · PATIO → CAMIONES → GATE</span>
+        <h3>Patio y flujo en una sola decisión.</h3>
+        <p>GateFlow combina el corte verificado de Dwell Time del proyecto aliado con la capacidad de acceso del día seleccionado. El resultado no es otro gráfico: es un plan de retiros, citas y control de llegada.</p>
       </div>
-      <aside class="terminal-aliado-ficha" aria-label="Complemento operativo">
-        <span>CONEXIÓN OPERATIVA</span>
-        <strong>Patio → camiones → gate</strong>
-        <p>Dwell Time determina la presión de retiro. GateFlow organiza cuándo debe acercarse cada camión.</p>
-        <div><i></i> Enlace verificado</div>
-      </aside>
-    </section>`;
+      <aside><span>PRIORIDAD DEL PATIO</span><strong>${categoriaCritica.nombre}</strong><small>${fmt(categoriaCritica.dwellDias, 2)} días frente a meta de ${fmt(categoriaCritica.metaDias, 0)}</small></aside>
+    </section>
+
+    <section class="patio-fuentes" aria-label="Calidad y origen de los datos">
+      <div><span>PATIO EN FLUJO</span><strong>Corte verificado</strong><small>${patio.periodo} · ${patio.actualizado}</small></div>
+      <div><span>GATEFLOW</span><strong>Día operativo ${estado.dia}</strong><small>${camionesDia} camiones modelados · pico ${horaTexto(flujo.horaPico)}</small></div>
+      <div><span>ALCANCE</span><strong>Planificación académica</strong><small>No es telemetría en vivo ni modifica sistemas oficiales.</small></div>
+    </section>
+
+    <section class="patio-kpis" aria-label="Indicadores integrados de patio y camiones">
+      ${tarjeta("Yard Density", `${fmt(patio.densidadPct, 1)} %`, `Meta ≤ ${patio.metas.densidadPct} %`, estadoKpi(patio.densidadPct, patio.metas.densidadPct), "Patio en Flujo")}
+      ${tarjeta("Dwell global", `${fmt(patio.dwellGlobalDias, 2)} días`, `Meta ≤ ${patio.metas.dwellGlobalDias} días`, estadoKpi(patio.dwellGlobalDias, patio.metas.dwellGlobalDias), "Patio en Flujo")}
+      ${tarjeta("Remanejos", `${fmt(patio.remanejosPct, 1)} %`, `Meta ≤ ${patio.metas.remanejosPct} %`, estadoKpi(patio.remanejosPct, patio.metas.remanejosPct), "Patio en Flujo")}
+      ${tarjeta("Alerta roja", `${fmt(patio.diasAlertaRoja, 0)} días`, `Meta ≥ ${patio.metas.diasAlertaRoja}`, estadoKpi(patio.diasAlertaRoja, patio.metas.diasAlertaRoja, true), "Patio en Flujo")}
+      ${tarjeta("Cola máxima", `${fmt(flujo.lqMax)} cam.`, `Meta ≤ ${KPI.METAS.lq_max}`, estadoKpi(flujo.lqMax, KPI.METAS.lq_max), "GateFlow")}
+      ${tarjeta("Espera", `${fmt(flujo.wqPromedio)} min`, `Meta ≤ ${KPI.METAS.wq_min}`, estadoKpi(flujo.wqPromedio, KPI.METAS.wq_min), "GateFlow")}
+      ${tarjeta("TTT", `${fmt(flujo.tttPromedio)} min`, `Meta ≤ ${KPI.METAS.ttt_min}`, estadoKpi(flujo.tttPromedio, KPI.METAS.ttt_min), "GateFlow")}
+      ${tarjeta("Cupos gate seguros", `${fmt(cuposGateSeguros)} / día`, `Hasta 85 % de utilización`, cuposGateSeguros > 0, "GateFlow")}
+    </section>
+
+    <section class="patio-plan-grid">
+      <article class="patio-plan">
+        <span class="seccion-etiqueta">PLAN DE DESCONGESTIÓN</span>
+        <h3>Liberar ${fmt(excesoTeu)} TEU para regresar a 70 %.</h3>
+        <p>Según la mezcla de contenedores, esto representa entre <strong>${fmt(viajesMin)} y ${fmt(viajesMax)} retiros</strong>. Con el supuesto editable de ${fmt(TERMINAL_ESTADO.teuPorCamion, 1)} TEU por viaje, GateFlow programa <strong>${fmt(viajesBase)} retiros</strong>.</p>
+        <div class="patio-plan-resultado">
+          <div><span>Retiros por día</span><strong>${fmt(cupoDiario)}</strong><small>El menor límite entre gate y patio</small></div>
+          <div><span>Duración estimada</span><strong>${fmt(diasPlan)} ${diasPlan === 1 ? "día" : "días"}</strong><small>Sin superar la capacidad configurada</small></div>
+          <div><span>Cuello de botella</span><strong>${TERMINAL_ESTADO.retirosPatioDia <= cuposGateSeguros ? "Patio" : "Gate"}</strong><small>${TERMINAL_ESTADO.retirosPatioDia <= cuposGateSeguros ? "Equipos y carga lista" : "Capacidad de acceso"}</small></div>
+        </div>
+        <div class="patio-controles">
+          <label><span>TEU promedio por camión <strong data-patio-valor="teuPorCamion">${fmt(TERMINAL_ESTADO.teuPorCamion, 1)}</strong></span><input type="range" min="1" max="2" step="0.1" value="${TERMINAL_ESTADO.teuPorCamion}" data-patio-control="teuPorCamion"></label>
+          <label><span>Retiros que el patio puede entregar al día <strong data-patio-valor="retirosPatioDia">${fmt(TERMINAL_ESTADO.retirosPatioDia)}</strong></span><input type="range" min="40" max="400" step="10" value="${TERMINAL_ESTADO.retirosPatioDia}" data-patio-control="retirosPatioDia"></label>
+        </div>
+      </article>
+
+      <article class="patio-prioridades">
+        <span class="seccion-etiqueta">ORDEN DE ATENCIÓN</span>
+        <h3>Dwell por categoría</h3>
+        <div>${patio.categorias.map((categoria) => {
+          const pct = Math.min(100, categoria.dwellDias / Math.max(categoria.dwellDias, categoria.metaDias) * 100);
+          const cumple = categoria.dwellDias <= categoria.metaDias;
+          return `<div class="patio-categoria ${cumple ? "bien" : "alerta"}"><header><strong>${categoria.nombre}</strong><span>${fmt(categoria.dwellDias, 2)} / ${fmt(categoria.metaDias)} días</span></header><i><b style="width:${pct}%"></b></i><small>${cumple ? "Dentro de meta" : `${fmt(categoria.dwellDias - categoria.metaDias, 2)} días sobre la meta`}</small></div>`;
+        }).join("")}</div>
+      </article>
+    </section>
+
+    <section class="patio-ruta-decision">
+      <a href="#terminal/citas"><span>1</span><strong>Asignar citas de retiro</strong><small>Distribuir ${fmt(cupoDiario)} retiros diarios en franjas con capacidad.</small><b>Abrir Citas TAS →</b></a>
+      <a href="#terminal/operacion"><span>2</span><strong>Validar capacidad del gate</strong><small>Comprobar cola, utilización y desborde antes de autorizar.</small><b>Abrir Capacidad y cola →</b></a>
+      <a href="#pase"><span>3</span><strong>Autorizar por Pase QR</strong><small>Acercar únicamente los camiones cuyo expediente esté completo.</small><b>Abrir Pase QR →</b></a>
+      <a href="${TERMINAL_DWELL_ALIADO_URL}" target="_blank" rel="noopener noreferrer"><span>4</span><strong>Auditar el dato de patio</strong><small>Revisar metodología, categorías y verificación del proyecto aliado.</small><b>Abrir Dwell Time ↗</b></a>
+    </section>
+    <p class="patio-nota">La estimación usa un rango de 1–2 TEU por viaje y limita el plan por la menor capacidad entre gate y patio. Para producción deben conectarse inventario, disponibilidad del contenedor, equipos de patio, citas y lecturas de garita en tiempo real.</p>`;
+
+  panel.querySelectorAll("[data-patio-control]").forEach((input) => {
+    const clave = input.dataset.patioControl;
+    const salida = panel.querySelector(`[data-patio-valor="${clave}"]`);
+    input.addEventListener("input", () => { salida.textContent = clave === "teuPorCamion" ? Number(input.value).toFixed(1) : input.value; });
+    input.addEventListener("change", () => {
+      TERMINAL_ESTADO[clave] = Number(input.value);
+      renderPatioFlujoTerminal(panel, estado);
+    });
+  });
+
+  if (!PATIO_ALIADO_REMOTO) {
+    cargarPatioAliado().then((remoto) => {
+      if (remoto !== PATIO_ALIADO && panel.isConnected && TERMINAL_ESTADO.vista === "patio") {
+        renderPatioFlujoTerminal(panel, estado);
+      }
+    });
+  }
 }
 
 function renderTerminalUser(contenedor, estado) {
@@ -311,20 +386,15 @@ function renderTerminalUser(contenedor, estado) {
       <div class="terminal-sesion"><span class="terminal-estado ${estadoOperacion.clase}"><i></i>${estadoOperacion.texto}</span><strong data-terminal-usuario></strong><small>${turnoTerminalActual()}</small><button type="button" data-terminal-salir>Cerrar sesión</button></div>
     </section>
     <nav class="terminal-subnav" aria-label="Áreas de Terminal User">
-      ${TERMINAL_VISTAS.map((vista) => `<button type="button" class="${vista.id === TERMINAL_ESTADO.vista ? "activo" : ""}" data-terminal-vista="${vista.id}">${vista.nombre}</button>`).join("")}
+      ${TERMINAL_VISTAS.map((vista) => `<a href="#terminal/${vista.id}" class="${vista.id === TERMINAL_ESTADO.vista ? "activo" : ""}" data-terminal-vista="${vista.id}" ${vista.id === TERMINAL_ESTADO.vista ? 'aria-current="page"' : ""}>${vista.nombre}</a>`).join("")}
     </nav>
     <section class="terminal-vista" data-terminal-contenido></section>`;
 
   contenedor.querySelector("[data-terminal-usuario]").textContent = usuario.nombre;
   contenedor.querySelector("[data-terminal-salir]").addEventListener("click", () => GateFlowAcceso.cerrarSesion(() => modulo.render(contenedor, estado)));
-  contenedor.querySelectorAll("[data-terminal-vista]").forEach((boton) => boton.addEventListener("click", () => {
-    TERMINAL_ESTADO.vista = boton.dataset.terminalVista;
-    modulo.render(contenedor, estado);
-  }));
-
   const panel = contenedor.querySelector("[data-terminal-contenido]");
   if (TERMINAL_ESTADO.vista === "resumen") renderResumenTerminal(panel, estado, usuario);
-  else if (TERMINAL_ESTADO.vista === "dwell") renderDwellAliadoTerminal(panel);
+  else if (TERMINAL_ESTADO.vista === "patio") renderPatioFlujoTerminal(panel, estado);
   else renderAnalisisTerminal(panel, TERMINAL_ESTADO.vista, estado);
 }
 

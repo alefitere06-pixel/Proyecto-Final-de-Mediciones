@@ -88,10 +88,24 @@ async function asegurarEsquema(env) {
       expires_at TEXT NOT NULL,
       created_at TEXT NOT NULL
     )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS customer_requests (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      container_number TEXT NOT NULL,
+      reference TEXT NOT NULL,
+      operation TEXT NOT NULL,
+      preferred_date TEXT NOT NULL,
+      time_slot TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'Pendiente de validación',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )`),
     db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email)"),
     db.prepare("CREATE INDEX IF NOT EXISTS idx_otp_email_created ON otp_codes(email, created_at)"),
     db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token_hash)"),
     db.prepare("CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)"),
+    db.prepare("CREATE INDEX IF NOT EXISTS idx_customer_requests_user_created ON customer_requests(user_id, created_at)"),
+    db.prepare("CREATE INDEX IF NOT EXISTS idx_customer_requests_container ON customer_requests(container_number)"),
   ]);
 }
 
@@ -284,6 +298,56 @@ async function terminalSesionPlataforma(request, env) {
   }, authenticated ? (authorized ? 200 : 403) : 401);
 }
 
+function textoSeguro(valor, maximo) {
+  return String(valor || "").trim().slice(0, maximo);
+}
+
+function contenedorValido(valor) {
+  return /^[A-Z]{4}[0-9]{7}$/.test(valor);
+}
+
+async function listarSolicitudesCliente(request, env) {
+  const sesion = await obtenerSesion(request, env);
+  if (!sesion || sesion.status !== "active" || sesion.role !== "cliente") {
+    return respuestaJson({ ok: false, message: "Inicia sesión como Customer User." }, 401);
+  }
+  const resultado = await env.DB.prepare(`SELECT id, container_number, reference, operation,
+      preferred_date, time_slot, status, created_at, updated_at
+    FROM customer_requests WHERE user_id = ? ORDER BY created_at DESC LIMIT 100`)
+    .bind(sesion.id).all();
+  return respuestaJson({ ok: true, requests: resultado.results || [] });
+}
+
+async function crearSolicitudCliente(request, env) {
+  const sesion = await obtenerSesion(request, env);
+  if (!sesion || sesion.status !== "active" || sesion.role !== "cliente") {
+    return respuestaJson({ ok: false, message: "Inicia sesión como Customer User." }, 401);
+  }
+  const datos = await leerJson(request);
+  if (!datos) return respuestaJson({ ok: false, message: "Solicitud inválida." }, 400);
+
+  const contenedor = textoSeguro(datos.container, 14).toUpperCase().replace(/\s/g, "");
+  const referencia = textoSeguro(datos.reference, 24).toUpperCase();
+  const operacion = textoSeguro(datos.operation, 40);
+  const fecha = textoSeguro(datos.preferredDate, 10);
+  const franja = textoSeguro(datos.timeSlot, 20);
+  const operaciones = new Set(["Retiro de importación", "Entrega de exportación", "Vacío / devolución", "Doble transacción"]);
+  const franjas = new Set(["06:00–08:00", "08:00–10:00", "10:00–12:00", "13:00–15:00", "15:00–17:00", "17:00–19:00"]);
+  const fechaValida = /^\d{4}-\d{2}-\d{2}$/.test(fecha) && !Number.isNaN(Date.parse(`${fecha}T00:00:00Z`));
+
+  if (!contenedorValido(contenedor)) return respuestaJson({ ok: false, message: "El contenedor debe tener cuatro letras y siete números." }, 400);
+  if (referencia.length < 3) return respuestaJson({ ok: false, message: "Escribe un booking o referencia válido." }, 400);
+  if (!operaciones.has(operacion) || !franjas.has(franja) || !fechaValida) return respuestaJson({ ok: false, message: "Revisa la operación, fecha y franja seleccionadas." }, 400);
+
+  const ahora = new Date().toISOString();
+  const id = `GFR-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+  await env.DB.prepare(`INSERT INTO customer_requests
+    (id, user_id, container_number, reference, operation, preferred_date, time_slot, status, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'Pendiente de validación', ?, ?)`)
+    .bind(id, sesion.id, contenedor, referencia, operacion, fecha, franja, ahora, ahora).run();
+  return respuestaJson({ ok: true, message: "Solicitud registrada y guardada en GateFlow.", id }, 201);
+}
+
 export default {
   async fetch(request, env = {}) {
     const url = new URL(request.url);
@@ -304,6 +368,8 @@ export default {
         return respuestaJson({ authenticated: true, user: { id: sesion.id, name: sesion.name, email: sesion.email, role: sesion.role } });
       }
       if (ruta === "/api/auth/logout" && request.method === "POST") return cerrarSesionApi(request, env);
+      if (ruta === "/api/customer/requests" && request.method === "GET") return listarSolicitudesCliente(request, env);
+      if (ruta === "/api/customer/requests" && request.method === "POST") return crearSolicitudCliente(request, env);
     } catch (error) {
       const sinBase = error && error.message === "DB_UNAVAILABLE";
       return respuestaJson({ ok: false, message: sinBase ? "El registro todavía se está habilitando. Intenta nuevamente en unos minutos." : "No fue posible completar la operación." }, 503);

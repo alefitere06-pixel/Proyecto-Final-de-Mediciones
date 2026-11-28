@@ -20,14 +20,27 @@ const RUTAS_TERMINAL = Object.freeze({
   ttt: "ttt",
   citas: "citas",
   mejora: "mejora",
+  dwell: "patio",
 });
 
-function resolverRutaTerminal(id) {
-  const vista = RUTAS_TERMINAL[id];
-  if (!vista) return id;
-  if (typeof TERMINAL_ESTADO !== "undefined") TERMINAL_ESTADO.vista = vista;
-  if (location.hash.slice(1) !== "terminal") {
-    try { history.replaceState(null, "", "#terminal"); } catch (_) { /* file:// */ }
+function resolverRutaTerminal(ruta) {
+  const partes = String(ruta || "").split("/").filter(Boolean);
+  const id = partes[0] || "inicio";
+  const vistaDirectaCruda = id === "terminal" ? partes[1] : null;
+  const vistaDirecta = vistaDirectaCruda === "dwell" ? "patio" : vistaDirectaCruda;
+  const vistaLegada = RUTAS_TERMINAL[id];
+  const vista = vistaDirecta || vistaLegada;
+
+  if (vista && typeof TERMINAL_ESTADO !== "undefined") {
+    const valida = typeof TERMINAL_VISTAS === "undefined"
+      || TERMINAL_VISTAS.some((item) => item.id === vista);
+    if (valida) TERMINAL_ESTADO.vista = vista;
+  }
+  if (!vistaLegada) return id;
+
+  const destino = `#terminal/${vistaLegada}`;
+  if (location.hash !== destino) {
+    try { history.replaceState(null, "", destino); } catch (_) { /* file:// */ }
   }
   return "terminal";
 }
@@ -121,15 +134,19 @@ function prepararPestanas() {
   window.addEventListener("hashchange", () => {
     const solicitado = location.hash.slice(1) || "inicio";
     const id = resolverRutaTerminal(solicitado);
-    if (MODULOS.some((m) => m.id === id) && (id !== ESTADO.moduloActivo || Boolean(RUTAS_TERMINAL[solicitado]))) mostrarModulo(id);
+    const cambiaVistaTerminal = id === "terminal";
+    if (MODULOS.some((m) => m.id === id) && (id !== ESTADO.moduloActivo || cambiaVistaTerminal)) mostrarModulo(id);
   });
 }
 
 // Ir a un módulo desde el código (botones, presentación): cambia el enlace
 function activarModulo(id) {
-  id = resolverRutaTerminal(id);
-  if (location.hash.slice(1) !== id) {
-    try { history.pushState(null, "", "#" + id); } catch (e) { /* file:// sin historial */ }
+  const solicitado = id;
+  id = resolverRutaTerminal(solicitado);
+  const vista = RUTAS_TERMINAL[solicitado];
+  const destino = vista ? `terminal/${vista}` : solicitado;
+  if (location.hash.slice(1) !== destino) {
+    try { history.pushState(null, "", "#" + destino); } catch (e) { /* file:// sin historial */ }
   }
   mostrarModulo(id);
 }

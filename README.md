@@ -63,6 +63,9 @@ El módulo 5 mide cuánto aporta cada palanca (gráfico cascada).
 - La barra superior deja visibles Inicio, Mapa, **Pase QR**, **Terminal User** y **Customer User**. Se eliminó
   **"Más análisis"**: Llegadas, Capacidad y cola, TTT, Citas TAS y Mejora A3 están integrados dentro de Terminal User y requieren una cuenta Terminal activa.
 - **Dwell Time · Aliado** conecta Terminal User con el dashboard externo **Patio en Flujo**. GateFlow no duplica sus análisis: el proyecto aliado mide permanencia y presión del patio, mientras GateFlow coordina citas, fila virtual, notificaciones y el acceso QR.
+- **Patio + Flujo** consolida el corte verificado del proyecto aliado con los KPI de acceso de GateFlow. Calcula los TEU que deben liberarse, el rango de viajes necesarios y un plan limitado por la menor capacidad entre patio y gate. El origen y la naturaleza académica de cada dato quedan visibles.
+- Las áreas de **Terminal User** tienen enlaces directos y compartibles: `#terminal/resumen`, `#terminal/patio`, `#terminal/llegadas`, `#terminal/operacion`, `#terminal/ttt`, `#terminal/citas` y `#terminal/mejora`.
+- Las solicitudes de **Customer User** se guardan en D1 por usuario y pueden recuperarse al volver a iniciar sesión. Cada solicitud puede continuar hacia el expediente y Pase QR sin volver a escribir contenedor, referencia y operación.
 - Cada sección tiene una frase de introducción, migas "Inicio › Sección" y botones **← Anterior / Siguiente →**.
 - Los detalles (tablas hora por hora, gráficos extra, análisis A3 completo) están en **"Ver más"** y los
   7 indicadores del día en un botón plegable.

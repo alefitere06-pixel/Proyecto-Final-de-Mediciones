@@ -2,20 +2,7 @@
 // Customer User · portal de solicitudes, citas y pases GateFlow
 // =============================================================================
 
-const CLIENTE_SOLICITUDES_CLAVE = "gateflow_solicitudes_cliente_v1";
-
-function leerSolicitudesCliente() {
-  try { return JSON.parse(localStorage.getItem(CLIENTE_SOLICITUDES_CLAVE) || "[]"); }
-  catch (_) { return []; }
-}
-
-function guardarSolicitudesCliente(solicitudes) {
-  localStorage.setItem(CLIENTE_SOLICITUDES_CLAVE, JSON.stringify(solicitudes));
-}
-
-function idSolicitudCliente() {
-  return `GFR-${Date.now().toString(36).toUpperCase().slice(-7)}`;
-}
+const CLIENTE_SOLICITUD_ACTIVA = "gateflow_solicitud_activa_v1";
 
 function renderCustomerUser(contenedor, estado) {
   const modulo = MODULOS.find((item) => item.id === "cliente");
@@ -30,7 +17,7 @@ function renderCustomerUser(contenedor, estado) {
   const dia = DATOS.dias[estado.dia - 1];
   const citas = DATOS.citas_piloto.find((item) => item.dia === estado.dia);
   const cumplimiento = KPI.cumplimientoCitas(citas.dentro_franja, citas.usadas);
-  const solicitudes = leerSolicitudesCliente().filter((item) => item.usuarioId === usuario.id);
+  let solicitudes = [];
   const estadoGarita = k.rhoPico > 100 ? "Alta demanda" : k.rhoPico > KPI.METAS.rho_pct ? "Demanda moderada" : "Flujo disponible";
 
   contenedor.innerHTML = `
@@ -52,7 +39,7 @@ function renderCustomerUser(contenedor, estado) {
       <article><span>Estado de garita</span><strong>${estadoGarita}</strong><small>Día ${estado.dia} · pico ${horaTexto(k.horaPico)}</small></article>
       <article><span>Espera de referencia</span><strong>${fmt(k.wqPromedio)} min</strong><small>Antes de ingresar a la terminal</small></article>
       <article><span>Cumplimiento de citas</span><strong>${fmt(cumplimiento, 1)} %</strong><small>Referencia del piloto TAS</small></article>
-      <article><span>Mis solicitudes</span><strong>${solicitudes.length}</strong><small>${solicitudes.filter((item) => item.estado === "Pendiente de validación").length} pendientes</small></article>
+      <article><span>Mis solicitudes</span><strong data-cliente-total>—</strong><small data-cliente-pendientes>Cargando movimientos</small></article>
     </section>
 
     <section class="cliente-ruta" aria-label="Ruta de servicio GateFlow">
@@ -109,18 +96,42 @@ function renderCustomerUser(contenedor, estado) {
       <a href="#pase"><span>Acceso expedito</span><strong>Completar expediente y Pase QR</strong><small>Consolida las validaciones requeridas para la garita.</small><b>Preparar pase →</b></a>
       <a href="#mapa"><span>Antes de salir</span><strong>Ver acceso al Puerto de Balboa</strong><small>Consulta el recorrido, la zona y el estado de referencia.</small><b>Abrir mapa →</b></a>
     </section>
-    <p class="cliente-referencia">Portal funcional de demostración. Las solicitudes permanecen en este navegador y no se envían a sistemas oficiales.</p>`;
+    <p class="cliente-referencia">Las solicitudes se guardan en la cuenta Customer User y quedan disponibles al volver a iniciar sesión. La conexión con sistemas oficiales de naviera, Aduanas y terminal requiere autorización de cada entidad.</p>`;
 
   const pintarLista = () => {
     const lista = contenedor.querySelector("[data-cliente-lista]");
-    const propias = leerSolicitudesCliente().filter((item) => item.usuarioId === usuario.id).reverse();
-    lista.innerHTML = propias.length ? propias.map((item) => `
+    contenedor.querySelector("[data-cliente-total]").textContent = solicitudes.length;
+    const pendientes = solicitudes.filter((item) => item.status === "Pendiente de validación").length;
+    contenedor.querySelector("[data-cliente-pendientes]").textContent = `${pendientes} ${pendientes === 1 ? "pendiente" : "pendientes"}`;
+    lista.innerHTML = solicitudes.length ? solicitudes.map((item) => `
       <article class="cliente-solicitud">
-        <div><strong>${GateFlowAcceso.escapar(item.id)}</strong><span>${GateFlowAcceso.escapar(item.estado)}</span></div>
-        <p>${GateFlowAcceso.escapar(item.operacion)} · ${GateFlowAcceso.escapar(item.contenedor)}</p>
-        <small>${GateFlowAcceso.escapar(item.fecha)} · ${GateFlowAcceso.escapar(item.franja)} · Ref. ${GateFlowAcceso.escapar(item.referencia)}</small>
+        <div><strong>${GateFlowAcceso.escapar(item.id)}</strong><span>${GateFlowAcceso.escapar(item.status)}</span></div>
+        <p>${GateFlowAcceso.escapar(item.operation)} · ${GateFlowAcceso.escapar(item.container_number)}</p>
+        <small>${GateFlowAcceso.escapar(item.preferred_date)} · ${GateFlowAcceso.escapar(item.time_slot)} · Ref. ${GateFlowAcceso.escapar(item.reference)}</small>
+        <button type="button" data-cliente-continuar="${GateFlowAcceso.escapar(item.id)}">Continuar al expediente y Pase QR →</button>
       </article>`).join("") : `
       <div class="cliente-vacio"><strong>Aún no tienes movimientos</strong><p>Crea tu primera solicitud para comenzar el trámite unificado.</p></div>`;
+
+    lista.querySelectorAll("[data-cliente-continuar]").forEach((boton) => boton.addEventListener("click", () => {
+      const solicitud = solicitudes.find((item) => item.id === boton.dataset.clienteContinuar);
+      if (!solicitud) return;
+      sessionStorage.setItem(CLIENTE_SOLICITUD_ACTIVA, JSON.stringify(solicitud));
+      location.hash = "#pase";
+    }));
+  };
+
+  const cargarSolicitudes = async () => {
+    const lista = contenedor.querySelector("[data-cliente-lista]");
+    lista.innerHTML = `<div class="cliente-vacio"><strong>Cargando movimientos…</strong><p>Consultando tu cuenta GateFlow.</p></div>`;
+    try {
+      const datos = await GateFlowAcceso.api("/api/customer/requests");
+      solicitudes = Array.isArray(datos.requests) ? datos.requests : [];
+      pintarLista();
+    } catch (error) {
+      lista.innerHTML = `<div class="cliente-vacio cliente-error"><strong>No pudimos cargar tus movimientos</strong><p>${GateFlowAcceso.escapar(error.message)}</p></div>`;
+      contenedor.querySelector("[data-cliente-total]").textContent = "—";
+      contenedor.querySelector("[data-cliente-pendientes]").textContent = "Intenta nuevamente";
+    }
   };
 
   contenedor.querySelector("[data-cliente-usuario]").textContent = usuario.nombre;
@@ -133,28 +144,32 @@ function renderCustomerUser(contenedor, estado) {
     contenedor.querySelector("[data-cliente-formulario]").scrollIntoView({ behavior: "smooth", block: "center" });
     contenedor.querySelector("[name='contenedor']").focus({ preventScroll: true });
   });
-  contenedor.querySelector("[data-cliente-formulario]").addEventListener("submit", (evento) => {
+  contenedor.querySelector("[data-cliente-formulario]").addEventListener("submit", async (evento) => {
     evento.preventDefault();
     const datos = new FormData(evento.currentTarget);
-    const todas = leerSolicitudesCliente();
-    todas.push({
-      id: idSolicitudCliente(),
-      usuarioId: usuario.id,
-      contenedor: String(datos.get("contenedor")).trim().toUpperCase(),
-      referencia: String(datos.get("referencia")).trim().toUpperCase(),
-      operacion: String(datos.get("operacion")),
-      fecha: String(datos.get("fecha")),
-      franja: String(datos.get("franja")),
-      estado: "Pendiente de validación",
-      creado: new Date().toISOString(),
-    });
-    guardarSolicitudesCliente(todas);
-    evento.currentTarget.reset();
-    contenedor.querySelector("[data-cliente-mensaje]").textContent = "Solicitud registrada. El siguiente paso es completar las validaciones y generar el Pase QR.";
-    pintarLista();
+    const boton = evento.currentTarget.querySelector("button[type='submit']");
+    const mensaje = contenedor.querySelector("[data-cliente-mensaje]");
+    boton.disabled = true;
+    mensaje.textContent = "Guardando solicitud…";
+    try {
+      const respuesta = await GateFlowAcceso.api("/api/customer/requests", { body: {
+        container: String(datos.get("contenedor")).trim().toUpperCase(),
+        reference: String(datos.get("referencia")).trim().toUpperCase(),
+        operation: String(datos.get("operacion")),
+        preferredDate: String(datos.get("fecha")),
+        timeSlot: String(datos.get("franja")),
+      } });
+      evento.currentTarget.reset();
+      mensaje.textContent = `${respuesta.message} Ahora puedes continuar al expediente y Pase QR.`;
+      await cargarSolicitudes();
+    } catch (error) {
+      mensaje.textContent = error.message;
+    } finally {
+      boton.disabled = false;
+    }
   });
 
-  pintarLista();
+  cargarSolicitudes();
 }
 
 MODULOS.push({
