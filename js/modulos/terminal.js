@@ -25,6 +25,7 @@ const TERMINAL_VISTAS = [
   { id: "ttt", nombre: "TTT" },
   { id: "citas", nombre: "Citas TAS" },
   { id: "mejora", nombre: "Mejora A3" },
+  { id: "usuarios", nombre: "Usuarios" },
 ];
 
 function turnoTerminalActual() {
@@ -367,12 +368,125 @@ function renderPatioFlujoTerminal(panel, estado) {
   }
 }
 
-function renderTerminalUser(contenedor, estado) {
+async function renderUsuariosTerminal(panel, usuario, aviso = "") {
+  panel.className = "terminal-vista terminal-usuarios-vista";
+  if (!usuario.puedeAdministrarUsuarios) {
+    panel.innerHTML = `
+      <section class="terminal-usuarios-bloqueado">
+        <span class="seccion-etiqueta">CONTROL DE ACCESO</span>
+        <h3>Área reservada al administrador.</h3>
+        <p>Tu cuenta puede operar el dashboard, pero no autorizar ni revocar usuarios del terminal.</p>
+      </section>`;
+    return;
+  }
+
+  panel.innerHTML = `<section class="terminal-usuarios-cargando" aria-live="polite">Consultando autorizaciones del terminal…</section>`;
+  try {
+    const datos = await GateFlowAcceso.api("/api/terminal/authorizations");
+    if (!panel.isConnected) return;
+    const autorizaciones = datos.authorizations || [];
+    panel.innerHTML = `
+      <section class="terminal-usuarios-cabecera">
+        <div>
+          <span class="seccion-etiqueta">SEGURIDAD · AUTORIZACIÓN PREVIA</span>
+          <h3>Control de usuarios del terminal</h3>
+          <p>Autoriza el correo antes de que el colaborador solicite su código. Revocar un acceso cierra también sus sesiones activas.</p>
+        </div>
+        <aside><strong>${autorizaciones.filter((item) => item.status === "active").length}</strong><span>correos autorizados</span></aside>
+      </section>
+      <section class="terminal-usuarios-grid">
+        <form class="terminal-usuario-form" data-terminal-usuario-form>
+          <span class="seccion-etiqueta">NUEVA AUTORIZACIÓN</span>
+          <h4>Aprobar colaborador</h4>
+          <label>Nombre completo<input name="nombre" required minlength="3" maxlength="100" autocomplete="name" placeholder="Nombre del colaborador"></label>
+          <label>Correo corporativo<input name="correo" required type="email" autocomplete="email" placeholder="usuario@empresa.com"></label>
+          <button class="boton" type="submit">Autorizar correo</button>
+          <p class="terminal-usuario-mensaje ${aviso ? "ok" : ""}" data-terminal-usuario-mensaje aria-live="polite">${GateFlowAcceso.escapar(aviso)}</p>
+          <small>Autorizar no abre el dashboard automáticamente: el usuario todavía deberá validar el código temporal enviado a su correo.</small>
+        </form>
+        <div class="terminal-autorizaciones">
+          <div class="terminal-panel-cabecera"><div><span class="seccion-etiqueta">REGISTRO DE ACCESOS</span><h3>Personal autorizado</h3></div></div>
+          <div class="terminal-autorizaciones-lista">
+            ${autorizaciones.length ? autorizaciones.map((item) => {
+              const activo = item.status === "active";
+              const registrado = Boolean(item.user_id);
+              const fecha = item.updated_at ? new Date(item.updated_at).toLocaleString("es-PA") : "Configuración principal";
+              return `<article class="terminal-autorizacion ${activo ? "activa" : "revocada"}">
+                <div><strong>${GateFlowAcceso.escapar(item.name)}</strong><span>${activo ? "Autorizado" : "Revocado"}</span></div>
+                <p>${GateFlowAcceso.escapar(item.email)}</p>
+                <small>${registrado ? "Cuenta creada" : "Pendiente de primer acceso"} · ${GateFlowAcceso.escapar(fecha)}</small>
+                ${activo && !item.configured ? `<button type="button" data-revocar-terminal="${GateFlowAcceso.escapar(item.email)}" data-revocar-nombre="${GateFlowAcceso.escapar(item.name)}">Revocar acceso</button>` : item.configured ? `<b>Acceso maestro</b>` : `<button type="button" data-reactivar-terminal="${GateFlowAcceso.escapar(item.email)}" data-reactivar-nombre="${GateFlowAcceso.escapar(item.name)}">Reactivar</button>`}
+              </article>`;
+            }).join("") : `<p class="terminal-sin-planes">Todavía no hay autorizaciones adicionales.</p>`}
+          </div>
+        </div>
+      </section>`;
+
+    const formulario = panel.querySelector("[data-terminal-usuario-form]");
+    const mensaje = panel.querySelector("[data-terminal-usuario-mensaje]");
+    formulario.addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+      const boton = formulario.querySelector("button[type='submit']");
+      const form = new FormData(formulario);
+      boton.disabled = true;
+      mensaje.className = "terminal-usuario-mensaje";
+      mensaje.textContent = "Guardando autorización…";
+      try {
+        const respuesta = await GateFlowAcceso.api("/api/terminal/authorizations", {
+          body: { action: "authorize", name: form.get("nombre"), email: form.get("correo") },
+        });
+        await renderUsuariosTerminal(panel, usuario, respuesta.message);
+      } catch (error) {
+        mensaje.className = "terminal-usuario-mensaje error";
+        mensaje.textContent = error.message;
+        boton.disabled = false;
+      }
+    });
+
+    panel.querySelectorAll("[data-revocar-terminal]").forEach((boton) => boton.addEventListener("click", async () => {
+      if (!window.confirm(`¿Revocar el acceso de ${boton.dataset.revocarNombre}? Sus sesiones activas se cerrarán.`)) return;
+      boton.disabled = true;
+      try {
+        const respuesta = await GateFlowAcceso.api("/api/terminal/authorizations", {
+          body: { action: "revoke", name: boton.dataset.revocarNombre, email: boton.dataset.revocarTerminal },
+        });
+        await renderUsuariosTerminal(panel, usuario, respuesta.message);
+      } catch (error) {
+        window.alert(error.message);
+        boton.disabled = false;
+      }
+    }));
+
+    panel.querySelectorAll("[data-reactivar-terminal]").forEach((boton) => boton.addEventListener("click", async () => {
+      boton.disabled = true;
+      try {
+        const respuesta = await GateFlowAcceso.api("/api/terminal/authorizations", {
+          body: { action: "authorize", name: boton.dataset.reactivarNombre, email: boton.dataset.reactivarTerminal },
+        });
+        await renderUsuariosTerminal(panel, usuario, respuesta.message);
+      } catch (error) {
+        window.alert(error.message);
+        boton.disabled = false;
+      }
+    }));
+  } catch (error) {
+    panel.innerHTML = `<section class="terminal-usuarios-bloqueado"><h3>No fue posible abrir el control de usuarios.</h3><p>${GateFlowAcceso.escapar(error.message)}</p></section>`;
+  }
+}
+
+async function renderTerminalUser(contenedor, estado) {
   const modulo = MODULOS.find((item) => item.id === "terminal");
   const vistaSolicitada = TERMINAL_VISTAS.some((item) => item.id === TERMINAL_ESTADO.vista) ? TERMINAL_ESTADO.vista : "resumen";
   TERMINAL_ESTADO.vista = vistaSolicitada;
   document.body.dataset.terminalVista = vistaSolicitada;
-  const usuario = GateFlowAcceso.usuarioActual("terminal");
+  const sesionLocal = GateFlowAcceso.usuarioActual("terminal");
+  if (!sesionLocal) {
+    GateFlowAcceso.mostrarAcceso(contenedor, "terminal", () => modulo.render(contenedor, estado));
+    return;
+  }
+
+  contenedor.innerHTML = `<section class="terminal-validando" aria-live="polite">Validando autorización del terminal…</section>`;
+  const usuario = await GateFlowAcceso.validarSesion("terminal");
   if (!usuario) {
     GateFlowAcceso.mostrarAcceso(contenedor, "terminal", () => modulo.render(contenedor, estado));
     return;
@@ -386,7 +500,7 @@ function renderTerminalUser(contenedor, estado) {
       <div class="terminal-sesion"><span class="terminal-estado ${estadoOperacion.clase}"><i></i>${estadoOperacion.texto}</span><strong data-terminal-usuario></strong><small>${turnoTerminalActual()}</small><button type="button" data-terminal-salir>Cerrar sesión</button></div>
     </section>
     <nav class="terminal-subnav" aria-label="Áreas de Terminal User">
-      ${TERMINAL_VISTAS.map((vista) => `<a href="#terminal/${vista.id}" class="${vista.id === TERMINAL_ESTADO.vista ? "activo" : ""}" data-terminal-vista="${vista.id}" ${vista.id === TERMINAL_ESTADO.vista ? 'aria-current="page"' : ""}>${vista.nombre}</a>`).join("")}
+      ${TERMINAL_VISTAS.filter((vista) => vista.id !== "usuarios" || usuario.puedeAdministrarUsuarios).map((vista) => `<a href="#terminal/${vista.id}" class="${vista.id === TERMINAL_ESTADO.vista ? "activo" : ""}" data-terminal-vista="${vista.id}" ${vista.id === TERMINAL_ESTADO.vista ? 'aria-current="page"' : ""}>${vista.nombre}</a>`).join("")}
     </nav>
     <section class="terminal-vista" data-terminal-contenido></section>`;
 
@@ -395,6 +509,7 @@ function renderTerminalUser(contenedor, estado) {
   const panel = contenedor.querySelector("[data-terminal-contenido]");
   if (TERMINAL_ESTADO.vista === "resumen") renderResumenTerminal(panel, estado, usuario);
   else if (TERMINAL_ESTADO.vista === "patio") renderPatioFlujoTerminal(panel, estado);
+  else if (TERMINAL_ESTADO.vista === "usuarios") renderUsuariosTerminal(panel, usuario);
   else renderAnalisisTerminal(panel, TERMINAL_ESTADO.vista, estado);
 }
 

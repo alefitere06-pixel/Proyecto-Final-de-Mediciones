@@ -32,6 +32,24 @@ function correosTerminal(env) {
     .split(",").map((item) => correoNormalizado(item)).filter(Boolean));
 }
 
+function correosAdministradoresTerminal(env) {
+  const configurados = String(env.TERMINAL_ADMIN_EMAILS || env.TERMINAL_ALLOWED_EMAILS || "");
+  return new Set(configurados.split(",").map((item) => correoNormalizado(item)).filter(Boolean));
+}
+
+function esAdministradorTerminal(env, correo) {
+  return correosAdministradoresTerminal(env).has(correoNormalizado(correo));
+}
+
+async function estaAutorizadoTerminal(env, correo) {
+  const normalizado = correoNormalizado(correo);
+  if (correosTerminal(env).has(normalizado)) return true;
+  const autorizacion = await env.DB.prepare(
+    "SELECT status FROM terminal_authorizations WHERE email = ? LIMIT 1",
+  ).bind(normalizado).first();
+  return autorizacion?.status === "active";
+}
+
 async function leerJson(request) {
   try { return await request.json(); }
   catch (_) { return null; }
@@ -100,12 +118,21 @@ async function asegurarEsquema(env) {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS terminal_authorizations (
+      email TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active',
+      authorized_by TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )`),
     db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email)"),
     db.prepare("CREATE INDEX IF NOT EXISTS idx_otp_email_created ON otp_codes(email, created_at)"),
     db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token_hash)"),
     db.prepare("CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)"),
     db.prepare("CREATE INDEX IF NOT EXISTS idx_customer_requests_user_created ON customer_requests(user_id, created_at)"),
     db.prepare("CREATE INDEX IF NOT EXISTS idx_customer_requests_container ON customer_requests(container_number)"),
+    db.prepare("CREATE INDEX IF NOT EXISTS idx_terminal_authorizations_status_updated ON terminal_authorizations(status, updated_at)"),
   ]);
 }
 
@@ -166,10 +193,10 @@ async function solicitarCodigo(request, env) {
   await asegurarEsquema(env);
   await limpiarExpirados(env);
   const usuario = await env.DB.prepare("SELECT id, name, email, role, status FROM users WHERE email = ? LIMIT 1").bind(correo).first();
-  const autorizadoTerminal = rol === "terminal" && correosTerminal(env).has(correo);
+  const autorizadoTerminal = rol === "terminal" && await estaAutorizadoTerminal(env, correo);
 
-  if (rol === "terminal" && !autorizadoTerminal && (!usuario || usuario.role !== "terminal" || usuario.status !== "active")) {
-    return respuestaJson({ ok: false, message: "Este correo todavía no está autorizado para Terminal User." }, 403);
+  if (rol === "terminal" && !autorizadoTerminal) {
+    return respuestaJson({ ok: false, message: "Este correo requiere aprobación previa de un administrador de la terminal." }, 403);
   }
   if (proposito === "register" && usuario) return respuestaJson({ ok: false, message: "Ya existe un usuario con este correo. Utiliza Iniciar sesión." }, 409);
   if (proposito === "login" && rol === "cliente" && (!usuario || usuario.role !== "cliente" || usuario.status !== "active")) {
@@ -216,6 +243,9 @@ async function verificarCodigo(request, env) {
   if (!correoValido(correo) || codigo.length !== 6) return respuestaJson({ ok: false, message: "Escribe el código de seis dígitos." }, 400);
 
   await asegurarEsquema(env);
+  if (rol === "terminal" && !(await estaAutorizadoTerminal(env, correo))) {
+    return respuestaJson({ ok: false, message: "La autorización de este correo no está activa." }, 403);
+  }
   const registro = await env.DB.prepare(`SELECT id, requested_name, code_hash, expires_at, attempts
     FROM otp_codes WHERE email = ? AND role = ? AND purpose = ? AND consumed_at IS NULL
     ORDER BY created_at DESC LIMIT 1`).bind(correo, rol, proposito).first();
@@ -233,7 +263,7 @@ async function verificarCodigo(request, env) {
   let usuario = await env.DB.prepare("SELECT id, name, email, role, status FROM users WHERE email = ? LIMIT 1").bind(correo).first();
 
   if (!usuario) {
-    if (rol === "terminal" && !correosTerminal(env).has(correo)) return respuestaJson({ ok: false, message: "Este correo no está autorizado para Terminal User." }, 403);
+    if (rol === "terminal" && !(await estaAutorizadoTerminal(env, correo))) return respuestaJson({ ok: false, message: "Este correo no está autorizado para Terminal User." }, 403);
     if (rol === "cliente" && proposito !== "register") return respuestaJson({ ok: false, message: "Primero debes crear tu usuario." }, 404);
     const idUsuario = "GFU-" + crypto.randomUUID();
     const creado = new Date().toISOString();
@@ -254,7 +284,13 @@ async function verificarCodigo(request, env) {
     ok: true,
     token,
     expiresAt: vence,
-    user: { id: usuario.id, name: usuario.name, email: usuario.email, role: usuario.role },
+    user: {
+      id: usuario.id,
+      name: usuario.name,
+      email: usuario.email,
+      role: usuario.role,
+      canManageUsers: usuario.role === "terminal" && esAdministradorTerminal(env, usuario.email),
+    },
   });
 }
 
@@ -288,7 +324,8 @@ async function terminalSesionPlataforma(request, env) {
   const userId = String(request.headers.get("oai-authenticated-user-id") || "").trim();
   const name = nombreSesion(request);
   const authenticated = Boolean(email && userId);
-  const authorized = authenticated && correosTerminal(env).has(email);
+  await asegurarEsquema(env);
+  const authorized = authenticated && await estaAutorizadoTerminal(env, email);
   return respuestaJson({
     authenticated,
     authorized,
@@ -296,6 +333,94 @@ async function terminalSesionPlataforma(request, env) {
     id: authorized ? userId : "",
     name: authorized ? name : "",
   }, authenticated ? (authorized ? 200 : 403) : 401);
+}
+
+async function requerirAdministradorTerminal(request, env) {
+  const sesion = await obtenerSesion(request, env);
+  if (!sesion || sesion.status !== "active" || sesion.role !== "terminal") return null;
+  if (!(await estaAutorizadoTerminal(env, sesion.email))) return null;
+  return esAdministradorTerminal(env, sesion.email) ? sesion : null;
+}
+
+async function listarAutorizacionesTerminal(request, env) {
+  const administrador = await requerirAdministradorTerminal(request, env);
+  if (!administrador) return respuestaJson({ ok: false, message: "Solo un administrador puede gestionar accesos del terminal." }, 403);
+
+  const resultado = await env.DB.prepare(`SELECT a.email, a.name, a.status, a.authorized_by,
+      a.created_at, a.updated_at, u.id AS user_id, u.status AS user_status
+    FROM terminal_authorizations a
+    LEFT JOIN users u ON u.email = a.email AND u.role = 'terminal'
+    ORDER BY CASE a.status WHEN 'active' THEN 0 ELSE 1 END, a.updated_at DESC`).all();
+  const autorizaciones = (resultado.results || []).map((item) => ({ ...item, configured: false }));
+  const registrados = new Set(autorizaciones.map((item) => item.email));
+
+  for (const email of correosTerminal(env)) {
+    if (registrados.has(email)) continue;
+    const usuario = await env.DB.prepare(
+      "SELECT id, name, status FROM users WHERE email = ? AND role = 'terminal' LIMIT 1",
+    ).bind(email).first();
+    autorizaciones.unshift({
+      email,
+      name: usuario?.name || email.split("@")[0],
+      status: "active",
+      authorized_by: "Configuración maestra",
+      created_at: "",
+      updated_at: "",
+      user_id: usuario?.id || null,
+      user_status: usuario?.status || null,
+      configured: true,
+    });
+  }
+
+  return respuestaJson({ ok: true, authorizations: autorizaciones });
+}
+
+async function gestionarAutorizacionTerminal(request, env) {
+  const administrador = await requerirAdministradorTerminal(request, env);
+  if (!administrador) return respuestaJson({ ok: false, message: "Solo un administrador puede gestionar accesos del terminal." }, 403);
+
+  const datos = await leerJson(request);
+  if (!datos) return respuestaJson({ ok: false, message: "Solicitud inválida." }, 400);
+  const correo = correoNormalizado(datos.email);
+  const nombre = textoSeguro(datos.name, 100);
+  const accion = datos.action === "revoke" ? "revoke" : "authorize";
+  if (!correoValido(correo)) return respuestaJson({ ok: false, message: "Escribe un correo válido." }, 400);
+  if (accion === "authorize" && nombre.length < 3) return respuestaJson({ ok: false, message: "Escribe el nombre del colaborador." }, 400);
+
+  const usuario = await env.DB.prepare(
+    "SELECT id, role, status FROM users WHERE email = ? LIMIT 1",
+  ).bind(correo).first();
+  if (usuario && usuario.role !== "terminal") {
+    return respuestaJson({ ok: false, message: "Este correo ya pertenece a una cuenta Customer User." }, 409);
+  }
+
+  if (accion === "revoke") {
+    if (correo === correoNormalizado(administrador.email) || correosTerminal(env).has(correo)) {
+      return respuestaJson({ ok: false, message: "El acceso maestro no puede revocarse desde el panel." }, 400);
+    }
+    const ahora = new Date().toISOString();
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO terminal_authorizations
+        (email, name, status, authorized_by, created_at, updated_at)
+        VALUES (?, ?, 'revoked', ?, ?, ?)
+        ON CONFLICT(email) DO UPDATE SET status = 'revoked', authorized_by = excluded.authorized_by, updated_at = excluded.updated_at`)
+        .bind(correo, nombre || correo.split("@")[0], administrador.email, ahora, ahora),
+      env.DB.prepare("UPDATE users SET status = 'suspended' WHERE email = ? AND role = 'terminal'").bind(correo),
+      env.DB.prepare("DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE email = ? AND role = 'terminal')").bind(correo),
+    ]);
+    return respuestaJson({ ok: true, message: "Acceso revocado y sesiones cerradas." });
+  }
+
+  const ahora = new Date().toISOString();
+  await env.DB.batch([
+    env.DB.prepare(`INSERT INTO terminal_authorizations
+      (email, name, status, authorized_by, created_at, updated_at)
+      VALUES (?, ?, 'active', ?, ?, ?)
+      ON CONFLICT(email) DO UPDATE SET name = excluded.name, status = 'active', authorized_by = excluded.authorized_by, updated_at = excluded.updated_at`)
+      .bind(correo, nombre, administrador.email, ahora, ahora),
+    env.DB.prepare("UPDATE users SET name = ?, status = 'active' WHERE email = ? AND role = 'terminal'").bind(nombre, correo),
+  ]);
+  return respuestaJson({ ok: true, message: "Correo autorizado. Ya puede solicitar su código de acceso." }, 201);
 }
 
 function textoSeguro(valor, maximo) {
@@ -365,9 +490,26 @@ export default {
       if (ruta === "/api/auth/session" && request.method === "GET") {
         const sesion = await obtenerSesion(request, env);
         if (!sesion || sesion.status !== "active") return respuestaJson({ authenticated: false }, 401);
-        return respuestaJson({ authenticated: true, user: { id: sesion.id, name: sesion.name, email: sesion.email, role: sesion.role } });
+        if (sesion.role === "terminal" && !(await estaAutorizadoTerminal(env, sesion.email))) {
+          const token = tokenAutorizacion(request);
+          const tokenHash = await hashHex(String(env.OTP_PEPPER || "") + ":session:" + token);
+          await env.DB.prepare("DELETE FROM sessions WHERE token_hash = ?").bind(tokenHash).run();
+          return respuestaJson({ authenticated: false, message: "La autorización de esta cuenta fue revocada." }, 403);
+        }
+        return respuestaJson({
+          authenticated: true,
+          user: {
+            id: sesion.id,
+            name: sesion.name,
+            email: sesion.email,
+            role: sesion.role,
+            canManageUsers: sesion.role === "terminal" && esAdministradorTerminal(env, sesion.email),
+          },
+        });
       }
       if (ruta === "/api/auth/logout" && request.method === "POST") return cerrarSesionApi(request, env);
+      if (ruta === "/api/terminal/authorizations" && request.method === "GET") return listarAutorizacionesTerminal(request, env);
+      if (ruta === "/api/terminal/authorizations" && request.method === "POST") return gestionarAutorizacionTerminal(request, env);
       if (ruta === "/api/customer/requests" && request.method === "GET") return listarSolicitudesCliente(request, env);
       if (ruta === "/api/customer/requests" && request.method === "POST") return crearSolicitudCliente(request, env);
     } catch (error) {

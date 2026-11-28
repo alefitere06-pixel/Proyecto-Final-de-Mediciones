@@ -18,6 +18,7 @@ const GateFlowAcceso = (() => {
       nombre: usuario.name,
       correo: usuario.email,
       rol: usuario.role,
+      puedeAdministrarUsuarios: Boolean(usuario.canManageUsers),
       token,
       vence,
     }));
@@ -56,6 +57,20 @@ const GateFlowAcceso = (() => {
     return datos;
   }
 
+  async function validarSesion(rol) {
+    const sesion = leerSesion();
+    if (!sesion || (rol && sesion.rol !== rol)) return null;
+    try {
+      const datos = await api("/api/auth/session");
+      if (!datos.authenticated || !datos.user || (rol && datos.user.role !== rol)) throw new Error("SESSION_INVALID");
+      guardarSesion(datos.user, sesion.token, sesion.vence);
+      return usuarioActual(rol);
+    } catch (_) {
+      sessionStorage.removeItem(CLAVE_SESION);
+      return null;
+    }
+  }
+
   function cerrarSesion(alCerrar) {
     const sesion = leerSesion();
     sessionStorage.removeItem(CLAVE_SESION);
@@ -74,7 +89,7 @@ const GateFlowAcceso = (() => {
         <div class="acceso-presentacion">
           <span class="seccion-etiqueta">ACCESO OPERATIVO · GATEFLOW</span>
           <h2>Terminal User</h2>
-          <p>El dashboard operativo está reservado al personal autorizado. GateFlow enviará un código de seis dígitos al correo registrado.</p>
+          <p>El dashboard operativo está reservado al personal aprobado previamente. GateFlow solo enviará el código cuando el correo figure como autorizado por la terminal.</p>
           <div class="acceso-seguridad">
             <span aria-hidden="true">●</span>
             <div><strong>Código personal y temporal</strong><small>Vence en 10 minutos, admite hasta cinco intentos y solo puede utilizarse una vez.</small></div>
@@ -83,7 +98,7 @@ const GateFlowAcceso = (() => {
         <div class="acceso-panel acceso-correo-panel">
           <span class="seccion-etiqueta">IDENTIDAD DEL TERMINAL</span>
           <h3>Recibe tu código de acceso</h3>
-          <p>Solo los correos autorizados por la terminal pueden solicitarlo.</p>
+          <p>Primero la administración autoriza el correo; después el colaborador puede solicitar su código temporal.</p>
           <div class="acceso-correo-identidad" data-terminal-identidad>
             <span>Correo autorizado</span><strong>Comprobando tu sesión…</strong><small>También puedes escribir el correo manualmente.</small>
           </div>
@@ -97,7 +112,7 @@ const GateFlowAcceso = (() => {
             <button class="acceso-regresar" type="button" data-terminal-regresar>Cambiar correo o reenviar</button>
           </form>
           <p class="acceso-mensaje" data-acceso-mensaje aria-live="polite"></p>
-          <p class="acceso-nota">El registro de Terminal User no es público. La administración debe autorizar cada correo antes del primer acceso.</p>
+          <p class="acceso-nota">Control previo obligatorio: autorización administrativa → código temporal → acceso al dashboard. El código no reemplaza la autorización.</p>
         </div>
       </section>`;
 
@@ -310,5 +325,5 @@ const GateFlowAcceso = (() => {
     return rol === "terminal" ? mostrarAccesoTerminal(contenedor, alEntrar) : mostrarAccesoCliente(contenedor, alEntrar);
   }
 
-  return { usuarioActual, mostrarAcceso, cerrarSesion, escapar, api };
+  return { usuarioActual, validarSesion, mostrarAcceso, cerrarSesion, escapar, api };
 })();
