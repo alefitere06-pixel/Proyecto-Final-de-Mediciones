@@ -229,9 +229,9 @@ function renderResumenTerminal(panel, estado, usuario) {
     options: {
       plugins: { legend: { display: false }, tooltip: { mode: "index", intersect: false } },
       scales: {
-        x: { grid: { display: false }, ticks: { maxTicksLimit: 9, color: "rgba(10,36,72,.66)" } },
-        y: { beginAtZero: true, position: "left", title: { display: true, text: "camiones/h", color: "rgba(10,36,72,.58)" }, grid: { color: "rgba(7,59,115,.10)" }, ticks: { color: "rgba(10,36,72,.66)" } },
-        yCola: { beginAtZero: true, position: "right", title: { display: true, text: "cola", color: "rgba(10,36,72,.58)" }, grid: { drawOnChartArea: false }, ticks: { color: "rgba(10,36,72,.66)" } },
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 9, color: "rgba(255,255,255,.62)" } },
+        y: { beginAtZero: true, position: "left", title: { display: true, text: "camiones/h", color: "rgba(255,255,255,.55)" }, grid: { color: "rgba(255,255,255,.08)" }, ticks: { color: "rgba(255,255,255,.62)" } },
+        yCola: { beginAtZero: true, position: "right", title: { display: true, text: "cola", color: "rgba(255,255,255,.55)" }, grid: { drawOnChartArea: false }, ticks: { color: "rgba(255,255,255,.62)" } },
       },
     },
   });
@@ -241,16 +241,16 @@ function renderResumenTerminal(panel, estado, usuario) {
     data: {
       labels: ["Espera", "Cola", "Utilización", "TTT", "Desborde"],
       datasets: [
-        { label: "Actual", data: [actual.wqPromedio, actual.lqMax, actual.rhoPico, actual.tttPromedio, actual.horasDesborde], backgroundColor: "rgba(7,59,115,.30)", borderRadius: 5 },
-        { label: "Escenario", data: [propuesta.wqPromedio, propuesta.lqMax, propuesta.rhoPico, propuesta.tttPromedio, propuesta.horasDesborde], backgroundColor: "rgba(11,126,113,.72)", borderRadius: 5 },
+        { label: "Actual", data: [actual.wqPromedio, actual.lqMax, actual.rhoPico, actual.tttPromedio, actual.horasDesborde], backgroundColor: "rgba(255,255,255,.25)", borderRadius: 5 },
+        { label: "Escenario", data: [propuesta.wqPromedio, propuesta.lqMax, propuesta.rhoPico, propuesta.tttPromedio, propuesta.horasDesborde], backgroundColor: "rgba(101,211,201,.78)", borderRadius: 5 },
       ],
     },
     options: {
       indexAxis: "y",
-      plugins: { legend: { labels: { color: "rgba(10,36,72,.72)" } } },
+      plugins: { legend: { labels: { color: "rgba(255,255,255,.70)" } } },
       scales: {
-        x: { beginAtZero: true, grid: { color: "rgba(7,59,115,.10)" }, ticks: { color: "rgba(10,36,72,.66)" } },
-        y: { grid: { display: false }, ticks: { color: "rgba(10,36,72,.72)" } },
+        x: { beginAtZero: true, grid: { color: "rgba(255,255,255,.08)" }, ticks: { color: "rgba(255,255,255,.62)" } },
+        y: { grid: { display: false }, ticks: { color: "rgba(255,255,255,.72)" } },
       },
     },
   });
